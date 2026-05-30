@@ -1,0 +1,176 @@
+---
+import type { Lang } from '../../lib/types';
+
+interface Props {
+  lang: Lang;
+  upcomingDates?: string[];
+}
+
+const { lang, upcomingDates = ['1 Mai | Vienne, AU', '20, 21 Mai | Lucerne, CH', '20 Juin | Bad Kissingen, DE'] } = Astro.props;
+
+const agendaLabel = { fr: 'AGENDA', en: 'AGENDA', de: 'AGENDA' }[lang];
+---
+
+<section class="hero" aria-label="Vinciane Vinckenbosch">
+  <!-- Background image -->
+  <div class="hero__bg">
+    <img
+      src="/images/grilc-03101.jpg"
+      alt="Vinciane Vinckenbosch"
+      class="hero__img"
+      fetchpriority="high"
+      decoding="async"
+    />
+    <div class="hero__overlay" aria-hidden="true"></div>
+  </div>
+
+  <!-- Scroll indicator -->
+  <div class="hero__scroll" aria-hidden="true">
+    <svg width="40" height="80" viewBox="0 0 40 80" fill="none">
+      <line x1="20" y1="0" x2="20" y2="60" stroke="white" stroke-width="1" opacity="0.6"/>
+      <line x1="20" y1="60" x2="8" y2="48" stroke="white" stroke-width="1" opacity="0.6"/>
+      <line x1="20" y1="60" x2="32" y2="48" stroke="white" stroke-width="1" opacity="0.6"/>
+    </svg>
+  </div>
+
+  <!-- Upcoming dates (top-right) -->
+  {upcomingDates.length > 0 && (
+    <ul class="hero__dates" aria-label="Prochaines dates">
+      {upcomingDates.map(d => (
+        <li class="hero__date">{d}</li>
+      ))}
+    </ul>
+  )}
+
+  <!-- Bottom content -->
+  <div class="hero__bottom">
+    <div class="hero__name-block">
+      <p class="hero__subtitle">altiste belge</p>
+      <h1 class="hero__name">
+        Vinciane<br />Vinckenbosch
+      </h1>
+    </div>
+    <a href={`/${lang}/#agenda`} class="btn-pill hero__cta" aria-label="Voir l'agenda">
+      {agendaLabel} →
+    </a>
+  </div>
+</section>
+
+<style>
+.hero {
+  position: relative;
+  width: 100%;
+  height: 100svh;
+  min-height: 600px;
+  overflow: hidden;
+}
+
+.hero__bg {
+  position: absolute;
+  inset: 0;
+}
+
+.hero__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+}
+
+.hero__overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(35, 35, 35, 0.1) 0%,
+    rgba(35, 35, 35, 0.05) 40%,
+    rgba(35, 35, 35, 0.55) 80%,
+    rgba(35, 35, 35, 0.85) 100%
+  );
+}
+
+.hero__scroll {
+  position: absolute;
+  bottom: 5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0.7;
+  animation: scrollBounce 2.2s ease-in-out infinite;
+}
+
+@keyframes scrollBounce {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50%       { transform: translateX(-50%) translateY(8px); }
+}
+
+.hero__dates {
+  position: absolute;
+  top: 50%;
+  right: clamp(1.5rem, 4vw, 3.5rem);
+  transform: translateY(-50%);
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.6rem;
+}
+
+.hero__date {
+  font-family: "Ortica Linear", Georgia, serif;
+  font-weight: 300;
+  font-size: clamp(0.875rem, 1.8vw, 1.125rem);
+  color: #F7F5F3;
+  text-align: right;
+  opacity: 0.9;
+}
+
+.hero__bottom {
+  position: absolute;
+  bottom: clamp(4rem, 7vw, 6rem);
+  left: clamp(1.5rem, 4vw, 4rem);
+  right: clamp(1.5rem, 4vw, 4rem);
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+
+.hero__name-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.hero__subtitle {
+  font-family: "Ortica Linear", Georgia, serif;
+  font-weight: 300;
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  color: #F7F5F3;
+  letter-spacing: 0.02em;
+}
+
+.hero__name {
+  font-family: "Coconat", Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(3rem, 8vw, 8.125rem);
+  line-height: 0.95;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+}
+
+.hero__cta {
+  color: #ffffff;
+  align-self: flex-end;
+  margin-bottom: 0.5rem;
+}
+
+@media (max-width: 768px) {
+  .hero__dates {
+    top: 2rem;
+    transform: none;
+    right: 1.5rem;
+  }
+  .hero__cta {
+    display: none;
+  }
+}
+</style>

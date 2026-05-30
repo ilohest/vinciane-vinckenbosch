@@ -1,0 +1,97 @@
+# Dependencies
+node_modules/
+.pnp/
+.pnp.*
+
+# Build output
+dist/
+build/
+.output/
+.vercel/
+.netlify/
+
+# Astro / Vite caches and generated files
+.astro/
+.vite/
+node_modules/.vite/
+
+# Sanity local output/cache
+studio/dist/
+studio/.sanity/
+studio/node_modules/
+
+# Media
+# Keep optimized site assets such as public/images/*.jpg versioned.
+uploads/
+media/raw/
+assets/raw/
+public/uploads/
+public/images/raw/
+public/videos/
+*.psd
+*.ai
+*.sketch
+*.fig
+*.xd
+*.heic
+*.heif
+*.tif
+*.tiff
+*.raw
+*.dng
+*.mp4
+*.mov
+*.m4v
+*.webm
+*.avi
+*.mkv
+*.mpeg
+*.mpg
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Environment variables
+.env
+.env.*
+!.env.example
+!.env.*.example
+
+# Local editor and OS files
+.DS_Store
+Thumbs.db
+.claude/
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+
+# TypeScript / tooling
+*.tsbuildinfo
+eslintcache
+.eslintcache
+.stylelintcache
+
+# Test and coverage output
+coverage/
+.nyc_output/
+playwright-report/
+test-results/
+
+# Temporary files
+tmp/
+temp/
+.tmp/
+.cache/
+
+# Deployment artifacts
+*.tgz
+*.zip

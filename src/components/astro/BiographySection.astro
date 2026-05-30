@@ -1,0 +1,253 @@
+---
+import type { Lang } from '../../lib/types';
+import { useTranslations } from '../../lib/i18n';
+
+interface Props {
+  lang: Lang;
+  pdfUrl?: string;
+}
+
+const { lang, pdfUrl = '#' } = Astro.props;
+const tr = useTranslations(lang);
+
+const sections = [
+  {
+    image: '/images/grilc-02541.jpg',
+    imageAlt: 'Vinciane Vinckenbosch',
+    imagePosition: 'left',
+    paragraphs: [
+      "Régulièrement invitée en tant qu'alto solo par plusieurs orchestres européens, elle collabore notamment avec l'Orchestre symphonique de Porto à la Casa da Música, l'Orchestre philharmonique de Ratisbonne, le Clara-Schumann Philharmoniker et l'Opéra Royal de Wallonie. Elle se produit entre autres sous la direction de chefs tels que Christian Zacharias, Stefan Blunier, Paul Weikert et Giampaolo Bisanti. Elle occupe parallèlement le poste d'alto co-solo de la Niederbayerische Philharmonie depuis 2018.",
+      "Lauréate de plusieurs concours nationaux et internationaux destinés aux jeunes talents, elle a également bénéficié du soutien de la Yamaha Music Foundation of Europe et du Fonds Thirionet.",
+    ],
+  },
+  {
+    image: '/images/grilc-02173.jpg',
+    imageAlt: 'Vinciane Vinckenbosch — Trio Linaris',
+    imagePosition: 'right',
+    trioText: "Chambriste passionnée, Vinciane Vinckenbosch est membre fondatrice du <span class=\"text-accent\">Trio Linaris</span>, qu'elle forme aux côtés du flûtiste Pierre Cornu-Deyme et de la harpiste Alexandra Bidi (harpe solo de l'Orchestre de Paris).",
+    paragraphs: [
+      "Invitée régulière de festivals en Europe et aux États-Unis, elle partage la scène aux côtés d'artistes tels que Philippe Graffin, Petru Iuga, Ariadne Daskalakis, Julie Sévilla-Fraysse, Philippe Zuckerman, Nazareno Ferruggio, Sodi Braide et Silvia Denk.",
+      "Elle se produit également en soliste avec orchestre, notamment avec le Concertino Ensemble d'Augsbourg, l'Orchestre des étudiants de l'IMEP et l'Orchestre symphonique de Namur.",
+      "En 2026, Vinciane Vinckenbosch bénéficie, pour la deuxième année consécutive, du soutien du ministère bavarois de la Culture dans le cadre du programme « Tonkünstler Live Special », qui distingue son engagement en faveur de la musique de chambre et de la scène musicale indépendante.",
+      "Dans ce contexte, elle assurera en septembre 2026 <em class=\"text-accent\">la création mondiale d'une œuvre pour alto</em> de Nicolas Bacri, aux côtés du pianiste Jean-Baptiste Fonlupt.",
+    ],
+  },
+  {
+    image: '/images/grilc-02256.jpg',
+    imageAlt: 'Vinciane Vinckenbosch — Formation',
+    imagePosition: 'left',
+    paragraphs: [
+      "Après avoir débuté ses études à Bruxelles auprès de Shirly Laub, Vinciane Vinckenbosch obtient en 2011 un Master en violon avec la plus grande distinction dans la classe d'Igor Tkatchouk, à l'Institut royal de Musique et de Pédagogie de Namur. Parallèlement, elle découvre l'alto auprès de Daniel Rubenstein, avant de poursuivre son perfectionnement en violon en Allemagne dans la classe de Petru Munteanu, au Leopold Mozart College of Music de l'université d'Augsbourg.",
+      "Elle se consacre ensuite pleinement à l'alto à la Haute École de Musique de Genève, puis à la Hochschule für Musik und Tanz de Cologne dans la classe de Matthias Buchholz. Sélectionnée pour représenter la Hochschule de Cologne à New York, lors de concerts de musique de chambre en partenariat avec la Juilliard School, elle obtient en 2016 un Master en alto avec la plus haute mention.",
+      "Son parcours se nourrit également des précieux conseils d'Augustin Dumay, Boris Kuschnir, Atar Arad, Walter Küssner et Wilfried Strehle.",
+      "Parallèlement à sa carrière d'interprète, Vinciane Vinckenbosch se passionne pour la pédagogie. Elle joue un alto du luthier Nicolas Gilles, réalisé en 2015.",
+    ],
+  },
+];
+---
+
+<section class="bio" id="biographie">
+  <div class="bio__container">
+
+    <!-- Header: quote + title + intro image -->
+    <div class="bio__header">
+      <div class="bio__intro-quote">
+        <p class="bio__intro-text">
+          Saluée par la critique internationale pour la « grande classe » de son jeu,
+          Vinciane Vinckenbosch mène une carrière artistique riche et multiple,
+          entre scène soliste, musique de chambre et orchestre.
+        </p>
+        <span class="bio__intro-attr">(Passauer Neue Presse)</span>
+      </div>
+      <div class="bio__header-right">
+        <h2 class="section-title bio__title">{tr('bio.title')}</h2>
+        <div class="bio__intro-img-wrap">
+          <img
+            src="/images/grilc-03046.jpg"
+            alt="Vinciane Vinckenbosch"
+            class="bio__intro-img"
+            loading="lazy"
+            decoding="async"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- Alternating sections -->
+    {sections.map((s) => (
+      <div class:list={['bio__section', `bio__section--${s.imagePosition}`]}>
+        <div class="bio__section-img-wrap">
+          <img
+            src={s.image}
+            alt={s.imageAlt}
+            class="bio__section-img"
+            loading="lazy"
+            decoding="async"
+          />
+        </div>
+        <div class="bio__section-text">
+          {s.trioText && (
+            <p class="bio__trio-text" set:html={s.trioText} />
+          )}
+          {s.paragraphs.map(p => (
+            <p class="bio__paragraph" set:html={p} />
+          ))}
+        </div>
+      </div>
+    ))}
+
+    <!-- Download CTA -->
+    <div class="bio__cta-wrap">
+      <a href={pdfUrl} class="cta-underline" download>
+        {tr('bio.download')}
+      </a>
+    </div>
+
+  </div>
+</section>
+
+<style>
+.bio {
+  padding: clamp(4rem, 8vw, 8rem) 0;
+}
+
+.bio__container {
+  max-width: 1728px;
+  margin: 0 auto;
+  padding: 0 clamp(1.5rem, 4vw, 4rem);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(4rem, 6vw, 6rem);
+}
+
+.bio__header {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: flex-end;
+}
+
+.bio__intro-quote {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.bio__intro-text {
+  font-family: "Ortica Linear", Georgia, serif;
+  font-weight: 300;
+  font-size: clamp(2rem, 5.5vw, 5.3125rem);
+  line-height: 1.06;
+  color: #DA7F52;
+}
+
+.bio__intro-attr {
+  font-family: "Ortica Linear", Georgia, serif;
+  font-weight: 300;
+  font-size: clamp(0.875rem, 1.5vw, 1.4375rem);
+  color: #F7F5F3;
+  opacity: 0.75;
+}
+
+.bio__header-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.5rem;
+}
+
+.bio__title {
+  font-size: clamp(2.5rem, 5vw, 4.5625rem);
+  line-height: 0.84;
+  color: #ffffff;
+}
+
+.bio__intro-img-wrap {
+  width: 100%;
+  aspect-ratio: 1099 / 628;
+  overflow: hidden;
+}
+
+.bio__intro-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.bio__section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(2rem, 4vw, 4rem);
+  align-items: start;
+}
+
+.bio__section--right {
+  direction: rtl;
+}
+.bio__section--right > * {
+  direction: ltr;
+}
+
+.bio__section-img-wrap {
+  overflow: hidden;
+}
+
+.bio__section-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.bio__section-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1.3rem;
+  padding-top: 0.5rem;
+}
+
+.bio__trio-text {
+  font-family: "Ortica Linear", Georgia, serif;
+  font-weight: 300;
+  font-size: clamp(1.5rem, 3.5vw, 3.5rem);
+  line-height: 1.14;
+  color: #BCB7A9;
+  margin-bottom: 0.5rem;
+}
+
+.bio__paragraph {
+  font-family: "Ortica Linear", Georgia, serif;
+  font-weight: 300;
+  font-size: clamp(0.9375rem, 1.6vw, 1.1875rem);
+  color: #F7F5F3;
+  line-height: 1.6;
+}
+
+.bio__cta-wrap {
+  display: flex;
+  justify-content: flex-start;
+  padding-top: 1rem;
+}
+
+.cta-underline {
+  font-size: clamp(0.875rem, 1.4vw, 1.0625rem);
+  color: #ffffff;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.cta-underline:hover {
+  color: #DA7F52;
+}
+
+@media (max-width: 900px) {
+  .bio__header {
+    grid-template-columns: 1fr;
+  }
+  .bio__section,
+  .bio__section--right {
+    grid-template-columns: 1fr;
+    direction: ltr;
+  }
+}
+</style>

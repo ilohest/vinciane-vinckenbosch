@@ -1,0 +1,48 @@
+---
+interface Props {
+  quote: string;
+  attribution?: string;
+  size?: 'large' | 'medium';
+}
+
+const { quote, attribution, size = 'large' } = Astro.props;
+---
+
+<blockquote class:list={['quote', `quote--${size}`]}>
+  <p class="quote__text" set:html={quote} />
+  {attribution && (
+    <cite class="quote__attribution">{attribution}</cite>
+  )}
+</blockquote>
+
+<style>
+.quote {
+  font-style: normal;
+}
+
+.quote__text {
+  font-family: "Ortica Linear", Georgia, serif;
+  font-weight: 300;
+  color: #DA7F52;
+  line-height: 1.06;
+}
+
+.quote--large .quote__text {
+  font-size: clamp(2rem, 5.5vw, 5.3125rem);
+}
+
+.quote--medium .quote__text {
+  font-size: clamp(1.5rem, 3.5vw, 3.5rem);
+}
+
+.quote__attribution {
+  display: block;
+  margin-top: 1.25rem;
+  font-family: "Ortica Linear", Georgia, serif;
+  font-weight: 300;
+  font-size: clamp(0.8125rem, 1.4vw, 1.0625rem);
+  color: #F7F5F3;
+  font-style: normal;
+  opacity: 0.75;
+}
+</style>

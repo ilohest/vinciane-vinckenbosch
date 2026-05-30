@@ -1,0 +1,102 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Footer from '../../components/astro/Footer.astro';
+import MasonryGallery from '../../components/vue/MasonryGallery.vue';
+import type { Lang } from '../../lib/types';
+import { LANGS, useTranslations } from '../../lib/i18n';
+
+export function getStaticPaths() {
+  return LANGS.map(lang => ({ params: { lang } }));
+}
+
+const { lang } = Astro.params as { lang: Lang };
+const tr = useTranslations(lang);
+
+// Placeholder press items — screenshots + article links will come from Sanity
+const pressItems = [
+  {
+    image: '/images/grilc-03101.jpg', // placeholder — replace with actual press screenshots
+    caption: 'Passauer Neue Presse',
+    href: 'https://example.com/article-1',
+  },
+  {
+    image: '/images/grilc-02541.jpg',
+    caption: 'Klassik Heute',
+    href: 'https://example.com/article-2',
+  },
+  {
+    image: '/images/grilc-02660.jpg',
+    caption: 'La Libre Belgique',
+    href: 'https://example.com/article-3',
+  },
+  {
+    image: '/images/grilc-01839.jpg',
+    caption: 'Le Soir',
+    href: 'https://example.com/article-4',
+  },
+  {
+    image: '/images/grilc-02173.jpg',
+    caption: 'Crescendo Magazine',
+    href: 'https://example.com/article-5',
+  },
+  {
+    image: '/images/grilc-02056.jpg',
+    caption: 'Bachtrack',
+    href: 'https://example.com/article-6',
+  },
+];
+
+const pageTitle = {
+  fr: 'Presse — Vinciane Vinckenbosch',
+  en: 'Press — Vinciane Vinckenbosch',
+  de: 'Presse — Vinciane Vinckenbosch',
+}[lang];
+---
+
+<BaseLayout lang={lang} title={pageTitle}>
+  <main class="presse-page">
+    <div class="presse-page__container">
+      <h1 class="section-title presse-page__title">{tr('nav.presse')}</h1>
+      <p class="presse-page__intro">
+        {lang === 'fr' && 'Revue de presse — cliquez sur chaque article pour le lire.'}
+        {lang === 'en' && 'Press coverage — click each article to read it.'}
+        {lang === 'de' && 'Pressestimmen — klicken Sie auf einen Artikel, um ihn zu lesen.'}
+      </p>
+      <MasonryGallery
+        client:visible
+        items={pressItems}
+      />
+    </div>
+  </main>
+  <Footer lang={lang} />
+</BaseLayout>
+
+<style>
+.presse-page {
+  min-height: 100vh;
+  padding-top: clamp(4rem, 8vw, 7rem);
+  padding-bottom: clamp(4rem, 8vw, 6rem);
+}
+
+.presse-page__container {
+  max-width: 1728px;
+  margin: 0 auto;
+  padding: 0 clamp(1.5rem, 4vw, 4rem);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(2rem, 3vw, 3rem);
+}
+
+.presse-page__title {
+  font-size: clamp(2.5rem, 5.5vw, 5.375rem);
+  color: #ffffff;
+}
+
+.presse-page__intro {
+  font-family: "Ortica Linear", Georgia, serif;
+  font-weight: 300;
+  font-size: clamp(0.875rem, 1.4vw, 1rem);
+  color: #BCB7A9;
+  opacity: 0.8;
+}
+</style>

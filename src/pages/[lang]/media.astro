@@ -1,0 +1,70 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Footer from '../../components/astro/Footer.astro';
+import MasonryGallery from '../../components/vue/MasonryGallery.vue';
+import type { Lang } from '../../lib/types';
+import { LANGS, useTranslations } from '../../lib/i18n';
+
+export function getStaticPaths() {
+  return LANGS.map(lang => ({ params: { lang } }));
+}
+
+const { lang } = Astro.params as { lang: Lang };
+const tr = useTranslations(lang);
+
+// Placeholder media items — will come from Sanity
+const mediaItems = [
+  { image: '/images/grilc-03101.jpg', caption: 'Récital — 2025' },
+  { image: '/images/grilc-02541.jpg', caption: 'Niederbayerische Philharmonie' },
+  { image: '/images/grilc-02660.jpg', caption: 'Portrait' },
+  { image: '/images/grilc-02173.jpg', caption: 'Trio Linaris' },
+  { image: '/images/grilc-01839.jpg', caption: 'Concert' },
+  { image: '/images/grilc-02056.jpg', caption: 'Studio' },
+  { image: '/images/grilc-03039.jpg', caption: 'Festival Bad Kissingen' },
+  { image: '/images/grilc-03046.jpg', caption: 'Portrait' },
+  { image: '/images/grilc-02256.jpg', caption: 'Répétition' },
+  { image: '/images/grilc-02439.jpg', caption: 'Scène' },
+];
+
+const pageTitle = {
+  fr: 'Media — Vinciane Vinckenbosch',
+  en: 'Media — Vinciane Vinckenbosch',
+  de: 'Medien — Vinciane Vinckenbosch',
+}[lang];
+---
+
+<BaseLayout lang={lang} title={pageTitle}>
+  <main class="media-page">
+    <div class="media-page__container">
+      <h1 class="section-title media-page__title">{tr('nav.media')}</h1>
+      <MasonryGallery
+        client:visible
+        items={mediaItems}
+        enableLightbox={true}
+      />
+    </div>
+  </main>
+  <Footer lang={lang} />
+</BaseLayout>
+
+<style>
+.media-page {
+  min-height: 100vh;
+  padding-top: clamp(4rem, 8vw, 7rem);
+  padding-bottom: clamp(4rem, 8vw, 6rem);
+}
+
+.media-page__container {
+  max-width: 1728px;
+  margin: 0 auto;
+  padding: 0 clamp(1.5rem, 4vw, 4rem);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(2.5rem, 4vw, 4rem);
+}
+
+.media-page__title {
+  font-size: clamp(2.5rem, 5.5vw, 5.375rem);
+  color: #ffffff;
+}
+</style>

@@ -1,0 +1,254 @@
+---
+import type { Lang } from '../../lib/types';
+import { useTranslations } from '../../lib/i18n';
+
+interface Props {
+  lang: Lang;
+  email?: string;
+  socialLinks?: { youtube?: string; facebook?: string; instagram?: string };
+}
+
+const {
+  lang,
+  email = 'vinciane.vinckenbosch@gmail.com',
+  socialLinks = { youtube: '#', facebook: '#', instagram: '#' },
+} = Astro.props;
+
+const tr = useTranslations(lang);
+
+const galleryImages = [
+  { src: '/images/grilc-03039.jpg', alt: 'Vinciane Vinckenbosch' },
+  { src: '/images/grilc-02056.jpg', alt: 'Vinciane Vinckenbosch' },
+  { src: '/images/grilc-02256.jpg', alt: 'Vinciane Vinckenbosch' },
+  { src: '/images/grilc-02439.jpg', alt: 'Vinciane Vinckenbosch' },
+];
+---
+
+<section class="contact" id="contact" aria-labelledby="contact-title">
+  <div class="contact__container">
+
+    <!-- Header row: title + social links -->
+    <div class="contact__header">
+      <h2 id="contact-title" class="section-title contact__title">{tr('contact.title')}</h2>
+      <div class="contact__socials">
+        {socialLinks.youtube && (
+          <a href={socialLinks.youtube} target="_blank" rel="noopener noreferrer" class="contact__social-link">
+            Youtube
+          </a>
+        )}
+        {socialLinks.facebook && (
+          <a href={socialLinks.facebook} target="_blank" rel="noopener noreferrer" class="contact__social-link">
+            Facebook
+          </a>
+        )}
+        {socialLinks.instagram && (
+          <a href={socialLinks.instagram} target="_blank" rel="noopener noreferrer" class="contact__social-link">
+            Instagram
+          </a>
+        )}
+      </div>
+    </div>
+
+    <!-- Email -->
+    <div class="contact__email-wrap">
+      <a href={`mailto:${email}`} class="contact__email">
+        {email}
+      </a>
+    </div>
+
+    <!-- Gallery row + media CTA -->
+    <div class="contact__media-row">
+      <!-- Thumbnail gallery -->
+      <div class="contact__gallery">
+        {galleryImages.map(img => (
+          <div class="contact__thumb">
+            <img src={img.src} alt={img.alt} loading="lazy" decoding="async" />
+          </div>
+        ))}
+      </div>
+
+      <!-- Video preview + media CTA -->
+      <div class="contact__media-cta">
+        <div class="contact__video-preview">
+          <img
+            src="/images/grilc-02056.jpg"
+            alt="Vidéo — Vinciane Vinckenbosch"
+            loading="lazy"
+            decoding="async"
+          />
+          <div class="contact__video-label" aria-hidden="true">
+            {tr('media.video')}
+          </div>
+        </div>
+        <a href={`/${lang}/media`} class="btn-pill">
+          {tr('media.cta')}
+        </a>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<style>
+.contact {
+  padding: clamp(4rem, 8vw, 8rem) 0;
+}
+
+.contact__container {
+  max-width: 1728px;
+  margin: 0 auto;
+  padding: 0 clamp(1.5rem, 4vw, 4rem);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(2.5rem, 4vw, 5rem);
+}
+
+/* Header */
+.contact__header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+
+.contact__title {
+  font-size: clamp(2.5rem, 5.5vw, 5.375rem);
+  line-height: 1;
+  color: #ffffff;
+}
+
+.contact__socials {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
+}
+
+.contact__social-link {
+  font-family: "Ortica Linear", Georgia, serif;
+  font-weight: 300;
+  font-size: clamp(0.875rem, 1.4vw, 1.0625rem);
+  color: #ffffff;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.contact__social-link:hover {
+  color: #DA7F52;
+}
+
+/* Email */
+.contact__email-wrap {
+  text-align: left;
+}
+
+.contact__email {
+  font-family: "Ortica Linear", Georgia, serif;
+  font-weight: 300;
+  font-size: clamp(1.25rem, 4vw, 3.625rem);
+  color: #F7F5F3;
+  text-decoration: underline;
+  text-underline-offset: 6px;
+  text-decoration-thickness: 1px;
+  word-break: break-all;
+  transition: color 0.2s ease;
+}
+
+.contact__email:hover {
+  color: #DA7F52;
+}
+
+/* Media row */
+.contact__media-row {
+  display: flex;
+  align-items: flex-end;
+  gap: clamp(1.5rem, 3vw, 3rem);
+}
+
+.contact__gallery {
+  display: flex;
+  gap: clamp(0.75rem, 1.5vw, 1.5rem);
+  flex: 1;
+}
+
+.contact__thumb {
+  flex: 1;
+  aspect-ratio: 3/2;
+  overflow: hidden;
+}
+
+.contact__thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.contact__thumb:hover img {
+  transform: scale(1.04);
+}
+
+/* Video preview */
+.contact__media-cta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1.5rem;
+  flex-shrink: 0;
+}
+
+.contact__video-preview {
+  position: relative;
+  width: clamp(280px, 30vw, 520px);
+  aspect-ratio: 3/2;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.contact__video-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.contact__video-preview:hover img {
+  transform: scale(1.03);
+}
+
+.contact__video-label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Ortica Linear", Georgia, serif;
+  font-weight: 300;
+  font-size: clamp(2rem, 5vw, 5rem);
+  color: #ffffff;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background-color: rgba(35, 35, 35, 0.2);
+  pointer-events: none;
+}
+
+@media (max-width: 900px) {
+  .contact__media-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .contact__gallery {
+    flex-wrap: wrap;
+  }
+  .contact__thumb {
+    flex: 0 0 calc(50% - 0.5rem);
+  }
+  .contact__video-preview {
+    width: 100%;
+  }
+  .contact__media-cta {
+    align-items: stretch;
+  }
+}
+</style>

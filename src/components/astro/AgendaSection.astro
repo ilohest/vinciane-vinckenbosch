@@ -1,0 +1,172 @@
+---
+import EventRow from './EventRow.astro';
+import type { Lang } from '../../lib/types';
+import { useTranslations } from '../../lib/i18n';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const tr = useTranslations(lang);
+
+const events = [
+  {
+    date: "21 mai 2026",
+    time: "20h",
+    city: "Lyon, FR",
+    venue: "Conservatoire national",
+    role: "Alto solo",
+    program: [
+      "Danses roumaines — Bartók",
+      "Beau soir — Debussy",
+      "Pavane pour une infante défunte — Ravel",
+      "Tzigane — Ravel",
+    ],
+  },
+  {
+    date: "14 juin 2026",
+    time: "19h30",
+    city: "Munich, DE",
+    venue: "Prinzregententheater",
+    role: "Chambre",
+    program: [
+      "Trio pour flûte, alto et harpe — Debussy",
+    ],
+  },
+  {
+    date: "20 juin 2026",
+    time: "18h",
+    city: "Bad Kissingen, DE",
+    venue: "Rossini-Saal",
+    role: "Récital",
+    program: [
+      "Fantaisie — Saint-Saëns",
+      "L’histoire du tango — Piazzolla",
+    ],
+  },
+  {
+    date: "5 sept. 2026",
+    time: "20h",
+    city: "Deggendorf, DE",
+    venue: "Stadttheater",
+    role: "Création mondiale",
+    program: [
+      "Œuvre pour alto — Nicolas Bacri (création)",
+    ],
+  },
+  {
+    date: "12 sept. 2026",
+    time: "17h",
+    city: "Regensburg, DE",
+    venue: "Audimax",
+    role: "Alto solo",
+    program: [
+      "Concerto pour alto — Walton",
+    ],
+  },
+];
+---
+
+<section class="agenda" id="agenda" aria-labelledby="agenda-title">
+  <div class="agenda__container">
+
+    <div class="agenda__header">
+      <h2 id="agenda-title" class="section-title agenda__title">{tr('agenda.title')}</h2>
+      <a
+        href="https://www.instagram.com"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="agenda__insta"
+        aria-label="Instagram"
+      >
+        <svg width="50" height="50" viewBox="0 0 50 50" fill="none" stroke="currentColor" stroke-width="1.2">
+          <rect x="8" y="8" width="34" height="34" rx="9" ry="9"/>
+          <circle cx="25" cy="25" r="8"/>
+          <circle cx="34" cy="16" r="1.5" fill="currentColor" stroke="none"/>
+        </svg>
+      </a>
+    </div>
+
+    <div class="agenda__list">
+      {events.map((event, i) => (
+        <>
+          <EventRow
+            date={event.date}
+            time={event.time}
+            city={event.city}
+            venue={event.venue}
+            role={event.role}
+            program={event.program}
+            lang={lang}
+          />
+          {i < events.length - 1 && <hr class="agenda__divider" aria-hidden="true" />}
+        </>
+      ))}
+    </div>
+
+    <div class="agenda__footer">
+      <a href={`/${lang}/archives`} class="btn-pill">
+        {tr('agenda.more')}
+      </a>
+    </div>
+
+  </div>
+</section>
+
+<style>
+.agenda {
+  padding: clamp(4rem, 8vw, 8rem) 0;
+}
+
+.agenda__container {
+  max-width: 1728px;
+  margin: 0 auto;
+  padding: 0 clamp(1.5rem, 4vw, 4rem);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(2rem, 3vw, 3rem);
+}
+
+.agenda__header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+
+.agenda__title {
+  font-size: clamp(2.5rem, 5.5vw, 5.375rem);
+  line-height: 1.28;
+  color: #ffffff;
+}
+
+.agenda__insta {
+  color: #ffffff;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.agenda__insta:hover {
+  opacity: 1;
+}
+
+.agenda__list {
+  display: flex;
+  flex-direction: column;
+}
+
+.agenda__divider {
+  border: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  margin: 0;
+}
+
+.agenda__footer {
+  display: flex;
+  justify-content: center;
+  padding-top: 1rem;
+}
+</style>

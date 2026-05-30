@@ -1,0 +1,255 @@
+---
+import type { Lang } from '../../lib/types';
+import { LANGS, localePath } from '../../lib/i18n';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+
+const navItems = {
+  fr: [
+    { label: 'agenda',   href: `/${lang}/#agenda` },
+    { label: 'contact',  href: `/${lang}/#contact` },
+    { label: 'media',    href: `/${lang}/media` },
+    { label: 'presse',   href: `/${lang}/presse` },
+    { label: 'archives', href: `/${lang}/archives` },
+  ],
+  en: [
+    { label: 'agenda',   href: `/${lang}/#agenda` },
+    { label: 'contact',  href: `/${lang}/#contact` },
+    { label: 'media',    href: `/${lang}/media` },
+    { label: 'press',    href: `/${lang}/presse` },
+    { label: 'archives', href: `/${lang}/archives` },
+  ],
+  de: [
+    { label: 'agenda',   href: `/${lang}/#agenda` },
+    { label: 'kontakt',  href: `/${lang}/#contact` },
+    { label: 'media',    href: `/${lang}/media` },
+    { label: 'presse',   href: `/${lang}/presse` },
+    { label: 'archiv',   href: `/${lang}/archives` },
+  ],
+};
+
+const items = navItems[lang];
+---
+
+<footer class="footer" role="contentinfo">
+  <!-- Background image -->
+  <div class="footer__bg" aria-hidden="true">
+    <img
+      src="/images/grilc-02660.jpg"
+      alt=""
+      class="footer__bg-img"
+      loading="lazy"
+      decoding="async"
+    />
+    <div class="footer__bg-overlay"></div>
+  </div>
+
+  <div class="footer__content">
+    <!-- Nav bar integrated -->
+    <div class="footer__nav-bar">
+      <div class="footer__nav-left">
+        <!-- spacer / logo placeholder -->
+      </div>
+      <nav class="footer__nav" aria-label="Navigation pied de page">
+        <ul role="list">
+          {items.map(item => (
+            <li>
+              <a href={item.href} class="footer__nav-link">{item.label}</a>
+            </li>
+          ))}
+        </ul>
+        <div class="footer__nav-right">
+          <span class="footer__lang-current">{lang.toUpperCase()}</span>
+          <a
+            href="https://instagram.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="footer__insta"
+            aria-label="Instagram"
+          >
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+              <circle cx="12" cy="12" r="4"/>
+              <circle cx="17.5" cy="6.5" r="0.5" fill="currentColor" stroke="none"/>
+            </svg>
+          </a>
+        </div>
+      </nav>
+    </div>
+
+    <!-- Big name -->
+    <div class="footer__name-wrap" aria-hidden="true">
+      <p class="footer__name">Vinciane Vinckenbosch</p>
+    </div>
+
+    <!-- Bottom bar -->
+    <div class="footer__bottom">
+      <span class="footer__credits">Crédits photo : © Andrej Grilc</span>
+      <span class="footer__made-by">
+        WEBSITE BY <a href="https://isaurelohest.com" target="_blank" rel="noopener noreferrer" class="footer__made-by-link">ISAURE</a>
+      </span>
+    </div>
+  </div>
+</footer>
+
+<style>
+.footer {
+  position: relative;
+  overflow: hidden;
+  padding-bottom: 4rem; /* room for fixed nav */
+}
+
+.footer__bg {
+  position: absolute;
+  inset: 0;
+}
+
+.footer__bg-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.footer__bg-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(35, 35, 35, 0.5) 0%,
+    rgba(35, 35, 35, 0.65) 100%
+  );
+}
+
+.footer__content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Nav bar row */
+.footer__nav-bar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  height: 57px;
+  padding: 0 2rem;
+  background-color: rgba(35, 35, 35, 0.5);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.footer__nav {
+  display: flex;
+  align-items: center;
+  gap: 2.75rem;
+}
+
+.footer__nav ul {
+  display: flex;
+  align-items: center;
+  gap: 2.75rem;
+  list-style: none;
+}
+
+.footer__nav-link {
+  font-family: "Ortica Linear", Georgia, serif;
+  font-weight: 400;
+  font-size: 0.875rem;
+  color: #E6E3DB;
+  text-decoration: none;
+  letter-spacing: 0.02em;
+  transition: color 0.2s ease;
+}
+
+.footer__nav-link:hover {
+  color: #DA7F52;
+}
+
+.footer__nav-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-left: 2rem;
+}
+
+.footer__lang-current {
+  font-family: "Ortica Linear", Georgia, serif;
+  font-weight: 400;
+  font-size: 0.8125rem;
+  color: #E6E3DB;
+  letter-spacing: 0.1em;
+}
+
+.footer__insta {
+  color: #E6E3DB;
+  display: flex;
+  align-items: center;
+  transition: color 0.2s ease;
+}
+
+.footer__insta:hover {
+  color: #DA7F52;
+}
+
+/* Big name */
+.footer__name-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(3rem, 6vw, 5rem) 1rem;
+  overflow: hidden;
+}
+
+.footer__name {
+  font-family: "Coconat", Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(4rem, 10vw, 10.125rem);
+  line-height: 1;
+  color: #E6E3DB;
+  text-align: center;
+  white-space: nowrap;
+  letter-spacing: -0.01em;
+}
+
+/* Bottom credits */
+.footer__bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 2rem;
+  border-top: 1px solid rgba(230, 227, 219, 0.15);
+}
+
+.footer__credits,
+.footer__made-by {
+  font-family: "Andale Mono", "Courier New", monospace;
+  font-size: 0.6875rem;
+  color: #E6E3DB;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  opacity: 0.7;
+}
+
+.footer__made-by-link {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+@media (max-width: 768px) {
+  .footer__name {
+    font-size: clamp(2.5rem, 8vw, 5rem);
+    white-space: normal;
+    text-align: center;
+  }
+  .footer__nav ul {
+    gap: 1.25rem;
+  }
+}
+</style>
