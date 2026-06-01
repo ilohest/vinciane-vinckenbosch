@@ -32,9 +32,16 @@ const { date, time, city, venue, role, program = [] } = Astro.props;
 <style>
 .event {
   display: grid;
-  grid-template-columns: 12rem 8rem 1fr 10rem auto;
-  gap: 2rem;
+  grid-template-columns:
+    14rem
+    9rem
+    16rem
+    10rem
+    minmax(18rem, 1fr);
+  column-gap: clamp(1.5rem, 2.6vw, 3rem);
+  row-gap: 1rem;
   align-items: center;
+  justify-items: start;
   min-height: 12rem;
   padding: 1.5rem 0;
 }
@@ -66,9 +73,12 @@ const { date, time, city, venue, role, program = [] } = Astro.props;
   font-size: clamp(0.875rem, 1.4vw, 1.0625rem);
   color: #ffffff;
   align-self: center;
+  text-align: left;
 }
 
 .event__role {
+  justify-self: start;
+  text-align: left;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   font-size: clamp(0.8125rem, 1.3vw, 1.0625rem);
@@ -80,6 +90,8 @@ const { date, time, city, venue, role, program = [] } = Astro.props;
   flex-direction: column;
   gap: 2px;
   align-self: center;
+  justify-self: start;
+  text-align: left;
 }
 
 .event__program li {

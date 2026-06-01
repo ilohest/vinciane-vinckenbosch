@@ -1,0 +1,627 @@
+<template>
+  <section class="agenda" id="agenda" aria-labelledby="agenda-title">
+    <div class="agenda__container">
+
+      <!-- Header -->
+      <div class="agenda__header">
+        <h2 id="agenda-title" class="section-title agenda__title">{{ titleLabel }}</h2>
+        <label class="agenda__search-label" :class="{ 'agenda__search-label--active': query }">
+          <svg class="agenda__search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+            <circle cx="11" cy="11" r="8"/>
+            <path d="M21 21l-4.35-4.35"/>
+          </svg>
+          <input
+            v-model="query"
+            type="search"
+            class="agenda__search"
+            :placeholder="searchPlaceholder"
+            aria-label="Filtrer les concerts"
+          />
+          <button v-if="query" class="agenda__search-clear" @click="query = ''" aria-label="Effacer">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <path d="M18 6L6 18M6 6l12 12"/>
+            </svg>
+          </button>
+        </label>
+      </div>
+
+      <!-- List -->
+      <p v-if="filteredEvents.length === 0" class="agenda__empty">
+        Aucun résultat pour «&#160;{{ query }}&#160;»
+      </p>
+
+      <TransitionGroup v-else tag="div" name="event-reveal" class="agenda__list">
+        <div
+          v-for="(event, idx) in visibleEvents"
+          :key="`${event.date}-${event.city}`"
+          class="event-wrap"
+          :class="{ 'event-wrap--linked': !!event.ticketUrl }"
+          :style="{ '--stagger': `${Math.max(0, idx - MAX + 1) * 60}ms` }"
+        >
+          <component
+            :is="event.ticketUrl ? 'a' : 'div'"
+            :href="event.ticketUrl || undefined"
+            :target="event.ticketUrl ? '_blank' : undefined"
+            :rel="event.ticketUrl ? 'noopener noreferrer' : undefined"
+            class="event"
+          >
+            <div class="event__date-col">
+              <!-- Figma : Coconat Regular, minuscules, pas d'uppercase -->
+              <time class="event__date">{{ event.date }}</time>
+              <span v-if="event.time" class="event__time">{{ event.time }}</span>
+            </div>
+            <div class="event__city">{{ event.city }}</div>
+            <div class="event__venue">{{ event.venue }}</div>
+            <div class="event__role">{{ event.role }}</div>
+            <ul
+              v-if="event.program && event.program.length"
+              class="event__program"
+              aria-label="Programme"
+            >
+              <li v-for="p in event.program" :key="p">{{ p }}</li>
+            </ul>
+          </component>
+
+          <!-- Animated divider line -->
+          <div class="event-line" aria-hidden="true">
+            <div class="event-line__sweep"></div>
+            <svg
+              v-if="event.ticketUrl"
+              class="event-line__arrow"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path d="M7 17L17 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              <path d="M9 7H17V15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+      </TransitionGroup>
+
+      <!-- Footer -->
+      <div class="agenda__footer">
+        <div class="agenda__footer-left">
+          <Transition name="slide-left">
+            <a
+              v-if="showAll"
+              :href="`/${lang}/archives`"
+              class="btn-pill"
+            >{{ archivesLabel }}</a>
+          </Transition>
+        </div>
+        <div class="agenda__footer-right">
+          <Transition name="slide-right">
+            <button
+              v-if="!showAll && hasMore"
+              class="btn-pill agenda__more-btn"
+              @click="showAll = true"
+            >{{ moreLabel }}</button>
+          </Transition>
+        </div>
+      </div>
+
+    </div>
+  </section>
+</template>
+
+<script setup lang="ts">
+import { ref, computed } from 'vue';
+
+interface Event {
+  date: string;
+  time?: string;
+  city: string;
+  venue: string;
+  role: string;
+  program?: string[];
+  ticketUrl?: string;
+}
+
+const props = defineProps<{
+  events: Event[];
+  lang: 'fr' | 'en' | 'de';
+}>();
+
+const MAX = 6;
+const query = ref('');
+const showAll = ref(false);
+
+const i18n = {
+  fr: { title: 'agenda', more: 'plus de dates →', archives: 'archives →', search: 'rechercher…', empty: 'Aucun résultat pour' },
+  en: { title: 'agenda', more: 'more dates →',   archives: 'archives →', search: 'search…',      empty: 'No results for' },
+  de: { title: 'agenda', more: 'mehr termine →', archives: 'archiv →',   search: 'suchen…',       empty: 'Keine Ergebnisse für' },
+} as const;
+
+const t = computed(() => i18n[props.lang] ?? i18n.fr);
+const titleLabel    = computed(() => t.value.title);
+const moreLabel     = computed(() => t.value.more);
+const archivesLabel = computed(() => t.value.archives);
+const searchPlaceholder = computed(() => t.value.search);
+
+function normalize(str: string): string {
+  return str.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+}
+
+const filteredEvents = computed(() => {
+  if (!query.value.trim()) return props.events;
+  const q = normalize(query.value.trim());
+  return props.events.filter(event => {
+    const haystack = normalize([
+      event.date,
+      event.time ?? '',
+      event.city,
+      event.venue,
+      event.role,
+      ...(event.program ?? []),
+    ].join(' '));
+    return haystack.includes(q);
+  });
+});
+
+const visibleEvents = computed(() =>
+  showAll.value ? filteredEvents.value : filteredEvents.value.slice(0, MAX)
+);
+
+const hasMore = computed(() => filteredEvents.value.length > MAX);
+</script>
+
+<style scoped>
+/* ─── Layout ────────────────────────────────────────────── */
+
+/* CSS variable shared by grid + animation */
+.agenda__container {
+  /*
+    Proportions Figma (1728px base, gap 128px) :
+      date 15.1% | city 5.6% | venue 14.8% | role 7.9% | program 1fr
+    On élargit la date pour que "21 mai 2026" tienne sur une ligne
+    sans text-transform: uppercase
+  */
+  --date-col: clamp(12rem, 15vw, 18rem);
+  --city-col: clamp(5rem, 5.5vw, 7rem);
+  --venue-col: clamp(8rem, 14.8vw, 16rem);
+  --role-col: clamp(6rem, 7.9vw, 9rem);
+  max-width: 1728px;
+  margin: 0 auto;
+  padding: clamp(4rem, 8vw, 8rem) clamp(1.5rem, 4vw, 4rem);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(2rem, 3vw, 3rem);
+}
+
+/* ─── Header ─────────────────────────────────────────────── */
+
+.agenda__header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 2rem;
+}
+
+.agenda__title {
+  font-size: clamp(2.5rem, 5.5vw, 5.375rem);
+  line-height: 1.28;
+  color: #ffffff;
+}
+
+/* ─── Search ─────────────────────────────────────────────── */
+
+.agenda__search-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 9999px;
+  padding: 0.55rem 1.1rem;
+  background: transparent;
+  cursor: text;
+  min-width: 220px;
+  transition: border-color 0.2s ease;
+}
+
+.agenda__search-label--active,
+.agenda__search-label:focus-within {
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.agenda__search-icon {
+  color: rgba(255, 255, 255, 0.45);
+  flex-shrink: 0;
+}
+
+.agenda__search {
+  background: none;
+  border: none;
+  outline: none;
+  color: #F7F5F3;
+  font-family: "Ortica Linear", Georgia, serif;
+  font-weight: 300;
+  font-size: 0.875rem;
+  width: 100%;
+  /* remove browser default search cancel button */
+}
+.agenda__search::-webkit-search-cancel-button { display: none; }
+
+.agenda__search::placeholder {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.agenda__search-clear {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.4);
+  flex-shrink: 0;
+  transition: color 0.15s;
+}
+.agenda__search-clear:hover { color: #F7F5F3; }
+
+/* ─── List / table ───────────────────────────────────────── */
+
+.agenda__list {
+  display: flex;
+  flex-direction: column;
+}
+
+.agenda__empty {
+  font-family: "Ortica Linear", Georgia, serif;
+  font-weight: 300;
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.5);
+  padding: 2rem 0;
+}
+
+/* ─── Event wrap ─────────────────────────────────────────── */
+
+.event-wrap {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ─── Event row ──────────────────────────────────────────── */
+
+.event {
+  display: grid;
+  /* Distribution homogène : 5 colonnes égales sur toute la largeur */
+  grid-template-columns: repeat(5, 1fr);
+  column-gap: clamp(1rem, 3vw, 3rem);
+  row-gap: 1rem;
+  align-items: start;
+  justify-items: start;
+  min-height: 8rem;
+  padding: 1.5rem 0 1.25rem;
+  text-decoration: none;
+  color: inherit;
+  width: 100%;
+}
+
+.event__city,
+.event__venue,
+.event__role,
+.event__program {
+  text-align: left;
+}
+
+/* only <a> gets cursor pointer */
+a.event {
+  cursor: pointer;
+}
+
+.event__date-col {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  min-height: 5rem;
+}
+
+.event__date {
+  /* Figma : Coconat Regular, fontSize 40px, letterSpacing 10%, minuscules */
+  font-family: "Coconat", Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(1.25rem, 2.5vw, 2.375rem);
+  letter-spacing: 0.1em;
+  /* PAS de text-transform: uppercase — le Figma garde les minuscules */
+  color: #ffffff;
+  line-height: 1.1;
+  display: block;
+}
+
+.event__time {
+  /* Figma : Coconat Regular, fontSize 29px, letterSpacing 10%, minuscules */
+  font-family: "Coconat", Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(1rem, 1.8vw, 1.625rem);
+  letter-spacing: 0.1em;
+  color: #ffffff;
+  display: block;
+  margin-top: auto;
+}
+
+.event__city,
+.event__venue {
+  font-family: "Ortica Linear", Georgia, serif;
+  font-weight: 300;
+  font-size: clamp(0.875rem, 1.4vw, 1rem);
+  color: #ffffff;
+  padding-top: 0.3rem;
+  transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.event__role {
+  font-family: "Ortica Linear", Georgia, serif;
+  font-weight: 300;
+  font-size: clamp(0.8125rem, 1.2vw, 0.9375rem);
+  color: #ffffff;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding-top: 0.3rem;
+  justify-self: start;
+  text-align: left;
+  transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.event__program {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding-top: 0.3rem;
+  justify-self: start;
+  text-align: left;
+  transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.event__program li {
+  font-family: "Ortica Linear", Georgia, serif;
+  font-weight: 300;
+  font-size: clamp(0.8125rem, 1.15vw, 0.9rem);
+  color: rgba(255, 255, 255, 0.75);
+  line-height: 1.4;
+}
+
+/* ─── Hover effects on linked rows ───────────────────────── */
+
+/* 1. Slide columns slightly right */
+.event-wrap--linked:hover .event__city,
+.event-wrap--linked:hover .event__venue,
+.event-wrap--linked:hover .event__role,
+.event-wrap--linked:hover .event__program {
+  transform: translateX(10px);
+}
+
+/* 2. Date text stays white on hover */
+
+/* 3. Fade out all other rows when one is hovered */
+.agenda__list:has(.event-wrap--linked:hover) .event-wrap {
+  opacity: 0.35;
+  transition: opacity 0.3s ease;
+}
+.agenda__list:has(.event-wrap--linked:hover) .event-wrap:hover {
+  opacity: 1;
+}
+
+/* ─── Animated divider ───────────────────────────────────── */
+
+.event-line {
+  position: relative;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.15);
+  overflow: visible;
+}
+
+.event-line__sweep {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.65);
+  transition: width 0.45s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.event-wrap--linked:hover .event-line__sweep {
+  width: calc(100% - 38px);
+}
+
+.event-line__arrow {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(calc(-50% + 6px));
+  width: 32px;
+  height: 32px;
+  color: #F7F5F3;
+  opacity: 0;
+  transition: opacity 0.2s ease 0.3s, transform 0.25s ease 0.3s;
+}
+
+.event-wrap--linked:hover .event-line__arrow {
+  opacity: 1;
+  transform: translateY(-50%);
+}
+
+/* ─── Footer ─────────────────────────────────────────────── */
+
+.agenda__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 3.5rem;
+}
+
+.agenda__footer-left,
+.agenda__footer-right {
+  display: flex;
+  align-items: center;
+}
+
+/* reset <button> to match <a> for btn-pill */
+.agenda__more-btn {
+  cursor: pointer;
+  background: none;
+  border: 1px solid currentColor;
+  font-family: inherit;
+  color: #F7F5F3;
+}
+
+.agenda__more-btn:hover {
+  background-color: #F7F5F3;
+  color: #232323;
+}
+
+/* ─── TransitionGroup : dévoilement des dates supplémentaires ── */
+
+.event-reveal-enter-active {
+  transition:
+    opacity 0.5s ease var(--stagger, 0ms),
+    transform 0.5s cubic-bezier(0.22, 1, 0.36, 1) var(--stagger, 0ms);
+}
+
+.event-reveal-enter-from {
+  opacity: 0;
+  transform: translateY(18px);
+}
+
+/* ─── Footer button transitions ──────────────────────────── */
+
+.slide-left-enter-active,
+.slide-left-leave-active,
+.slide-right-enter-active,
+.slide-right-leave-active {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.slide-left-enter-from { opacity: 0; transform: translateX(-12px); }
+.slide-left-leave-to   { opacity: 0; transform: translateX(-12px); }
+
+.slide-right-enter-from { opacity: 0; transform: translateX(12px); }
+.slide-right-leave-to   { opacity: 0; transform: translateX(12px); }
+
+/* ─── Désactiver les effets hover sur écrans tactiles ──────── */
+@media (hover: none) {
+  /* Pas de slide des colonnes */
+  .event-wrap--linked:hover .event__city,
+  .event-wrap--linked:hover .event__venue,
+  .event-wrap--linked:hover .event__role,
+  .event-wrap--linked:hover .event__program {
+    transform: none;
+  }
+
+  /* Pas de fade des autres lignes */
+  .agenda__list:has(.event-wrap--linked:hover) .event-wrap {
+    opacity: 1;
+  }
+
+  /* Pas de sweep + flèche */
+  .event-wrap--linked:hover .event-line__sweep {
+    width: 0;
+  }
+  .event-wrap--linked:hover .event-line__arrow {
+    opacity: 0;
+    transform: translateY(calc(-50% + 6px));
+  }
+
+  /* Supprimer les transitions qui resteraient actives */
+  .event__city,
+  .event__venue,
+  .event__role,
+  .event__program {
+    transition: none;
+  }
+}
+
+/* ─── Responsive ─────────────────────────────────────────── */
+
+@media (max-width: 1024px) {
+  /* repeat(5, 1fr) déjà homogène, juste réduire le gap */
+  .event { column-gap: 1rem; }
+}
+
+@media (max-width: 768px) {
+  .agenda__header { flex-direction: column; align-items: flex-start; gap: 1.25rem; }
+  .agenda__search-label { min-width: 100%; }
+
+  /*
+    Figma iPhone agenda (layout_SNSWT9) :
+      - colonne, gap 7px
+      - Ligne 1 : date (gauche)  + city (droite)   → space-between
+      - Ligne 2 : time (gauche)  + venue (droite)   → space-between
+      - Ligne 3 : role (pleine largeur)
+      - Ligne 4 : programme (pleine largeur)
+
+    Technique : date-col → display:contents pour que date et time
+    deviennent des cellules grid indépendantes.
+  */
+  .event {
+    display: grid;
+    grid-template-columns: 1fr auto;   /* date/time à gauche, city/venue à droite */
+    grid-template-rows: repeat(4, auto);
+    column-gap: 1rem;
+    row-gap: 0.4375rem;               /* Figma : gap 7px */
+    padding: 1rem 0 0.875rem;
+    min-height: unset;
+  }
+
+  /* date-col transparent → date + time deviennent des cellules grid */
+  .event__date-col {
+    display: contents;
+    min-height: unset;
+  }
+
+  /* Ligne 1 : date gauche */
+  .event__date {
+    grid-column: 1; grid-row: 1;
+    align-self: baseline;
+    font-size: clamp(1rem, 6.2vw, 1.5625rem); /* Figma : 25px */
+  }
+
+  /* Ligne 1 : city droite */
+  .event__city {
+    grid-column: 2; grid-row: 1;
+    justify-self: end;
+    text-align: right;
+    align-self: baseline;
+    font-size: 0.75rem; /* Figma : 12px */
+  }
+
+  /* Ligne 2 : time gauche */
+  .event__time {
+    grid-column: 1; grid-row: 2;
+    align-self: baseline;
+    margin-top: 0;
+    font-size: 0.8125rem; /* Figma : 13px */
+  }
+
+  /* Ligne 2 : venue droite */
+  .event__venue {
+    grid-column: 2; grid-row: 2;
+    justify-self: end;
+    text-align: right;
+    align-self: baseline;
+    font-size: 0.75rem; /* Figma : 12px */
+  }
+
+  /* Ligne 3 : role pleine largeur */
+  .event__role {
+    grid-column: 1 / -1; grid-row: 3;
+    justify-self: start;
+    text-align: left;
+    font-size: 0.75rem; /* Figma : 12px */
+  }
+
+  /* Ligne 4 : programme pleine largeur */
+  .event__program {
+    grid-column: 1 / -1; grid-row: 4;
+    justify-self: start;
+  }
+
+  .event__program li {
+    font-size: 0.75rem; /* Figma : 12px */
+  }
+}
+</style>

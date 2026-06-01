@@ -3,6 +3,7 @@ import '../styles/global.css';
 import NavBar from '../components/vue/NavBar.vue';
 import { LANGS, localePath } from '../lib/i18n';
 import type { Lang } from '../lib/types';
+import { ClientRouter } from 'astro:transitions';
 
 interface Props {
   lang: Lang;
@@ -48,15 +49,80 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
     <meta property="og:type" content="website" />
     <meta property="og:locale" content={lang === 'fr' ? 'fr_FR' : lang === 'en' ? 'en_GB' : 'de_DE'} />
 
-    <!-- Structured data -->
+    <script is:inline>
+      document.documentElement.classList.add('reveal-enabled');
+    </script>
+
+    <!-- ── Structured data — Person ──────────────────── -->
     <script type="application/ld+json" set:html={JSON.stringify({
       "@context": "https://schema.org",
       "@type": "Person",
       "name": "Vinciane Vinckenbosch",
-      "jobTitle": "Violist",
+      "alternateName": ["Vinciane Vinckenbosch altiste", "Vinciane Vinckenbosch viola"],
+      "jobTitle": "Violiste / Altiste",
+      "description": "Altiste belge saluée par la critique internationale pour la grande classe de son jeu. Co-solo de la Niederbayerische Philharmonie, membre fondatrice du Trio Linaris, soliste invitée dans de nombreux orchestres européens.",
       "url": "https://vincianevinckenbosch.com",
-      "sameAs": [],
-      "nationality": "Belgian",
+      "image": "https://vincianevinckenbosch.com/images/grilc-03101.jpg",
+      "nationality": { "@type": "Country", "name": "Belgium" },
+      "birthPlace": { "@type": "Place", "address": { "@type": "PostalAddress", "addressCountry": "BE" } },
+      "knowsAbout": ["Alto", "Viola", "Musique de chambre", "Chamber Music", "Kammermusik", "Musique d'orchestre", "Musique classique"],
+      "knowsLanguage": ["fr", "en", "de"],
+      "sameAs": [
+        "https://www.youtube.com/@vincianevinckenbosch",
+        "https://www.instagram.com/vinciane.vinckenbosch",
+        "https://www.facebook.com/vinciane.vinckenbosch"
+      ],
+      "memberOf": {
+        "@type": "MusicGroup",
+        "name": "Trio Linaris",
+        "description": "Trio pour flûte, alto et harpe fondé par Vinciane Vinckenbosch, Pierre Cornu-Deyme et Alexandra Bidi."
+      },
+      "alumniOf": [
+        {
+          "@type": "EducationalOrganization",
+          "name": "Hochschule für Musik und Tanz Köln",
+          "address": { "@type": "PostalAddress", "addressLocality": "Cologne", "addressCountry": "DE" }
+        },
+        {
+          "@type": "EducationalOrganization",
+          "name": "Haute École de Musique de Genève",
+          "address": { "@type": "PostalAddress", "addressLocality": "Geneva", "addressCountry": "CH" }
+        },
+        {
+          "@type": "EducationalOrganization",
+          "name": "Institut royal de Musique et de Pédagogie de Namur",
+          "address": { "@type": "PostalAddress", "addressLocality": "Namur", "addressCountry": "BE" }
+        }
+      ],
+      "award": [
+        "Soutien Yamaha Music Foundation of Europe",
+        "Fonds Thirionet",
+        "Tonkünstler Live Special 2025 et 2026 — Ministère bavarois de la Culture"
+      ],
+      "performer": true,
+      "email": "vinciane.vinckenbosch@gmail.com"
+    })} />
+
+    <!-- ── Structured data — WebSite ──────────────────── -->
+    <script type="application/ld+json" set:html={JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "Vinciane Vinckenbosch",
+      "description": "Site officiel de Vinciane Vinckenbosch, altiste belge.",
+      "url": "https://vincianevinckenbosch.com",
+      "inLanguage": ["fr", "en", "de"],
+      "author": {
+        "@type": "Person",
+        "name": "Vinciane Vinckenbosch"
+      },
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": "https://vincianevinckenbosch.com/fr/#agenda?q={search_term_string}"
+        },
+        "query-input": "required name=search_term_string"
+      }
     })} />
 
     <!-- Preload critical fonts -->
@@ -65,9 +131,88 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 
     <meta name="theme-color" content="#232323" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!-- View Transitions (Astro 6 : ClientRouter) -->
+    <ClientRouter />
   </head>
   <body>
     <slot />
     <NavBar client:load lang={lang} currentPath={Astro.url.pathname} />
+
+    <!-- ── Curseur personnalisé — point orange (desktop only) ── -->
+    <div id="custom-cursor" aria-hidden="true"></div>
+
+    <script is:inline>
+      /* ── Scroll reveal ──────────────────────────────────── */
+      function initReveal() {
+        const targets = document.querySelectorAll('[data-reveal]');
+        const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (reduced || !('IntersectionObserver' in window)) {
+          targets.forEach(el => el.classList.add('is-visible'));
+          return;
+        }
+        const io = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (!entry.isIntersecting) return;
+            entry.target.classList.add('is-visible');
+            io.unobserve(entry.target);
+          });
+        }, { rootMargin: '0px 0px -8% 0px', threshold: 0.08 });
+        targets.forEach(el => io.observe(el));
+      }
+
+      /* ── LQIP blur-up : images lazy ─────────────────────── */
+      function initBlurUp() {
+        document.querySelectorAll('img[loading="lazy"]').forEach(img => {
+          if (img.complete && img.naturalWidth > 0) {
+            img.classList.add('img-loaded');
+          } else {
+            img.addEventListener('load', () => img.classList.add('img-loaded'), { once: true });
+            img.addEventListener('error', () => img.classList.add('img-loaded'), { once: true });
+          }
+        });
+      }
+
+      /* ── Curseur personnalisé ────────────────────────────── */
+      function initCursor() {
+        const cursor = document.getElementById('custom-cursor');
+        if (!cursor) return;
+        // Masqué sur touch
+        if (!window.matchMedia('(hover: hover)').matches) {
+          cursor.style.display = 'none';
+          return;
+        }
+
+        let cx = -100, cy = -100;
+
+        document.addEventListener('mousemove', e => {
+          cx = e.clientX;
+          cy = e.clientY;
+          cursor.style.transform = `translate(${cx}px, ${cy}px)`;
+        }, { passive: true });
+
+        document.addEventListener('mouseleave', () => cursor.classList.add('cursor--hidden'));
+        document.addEventListener('mouseenter', () => cursor.classList.remove('cursor--hidden'));
+
+        // Agrandir sur éléments interactifs
+        function addHover(selector) {
+          document.querySelectorAll(selector).forEach(el => {
+            el.addEventListener('mouseenter', () => cursor.classList.add('cursor--hover'));
+            el.addEventListener('mouseleave', () => cursor.classList.remove('cursor--hover'));
+          });
+        }
+        addHover('a, button, [role="button"], label[for]');
+      }
+
+      /* ── Init & re-init après View Transitions ───────────── */
+      function initAll() {
+        initReveal();
+        initBlurUp();
+        initCursor();
+      }
+
+      initAll();
+      document.addEventListener('astro:page-load', initAll);
+    </script>
   </body>
 </html>

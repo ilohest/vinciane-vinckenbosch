@@ -31,14 +31,52 @@ const pageTitle = {
   en: 'Media — Vinciane Vinckenbosch',
   de: 'Medien — Vinciane Vinckenbosch',
 }[lang];
+
+const pageDescription = {
+  fr: 'Galerie photos et vidéos de Vinciane Vinckenbosch, altiste belge : portraits, concerts, répétitions et performances avec le Trio Linaris et la Niederbayerische Philharmonie.',
+  en: 'Photo gallery and videos of Vinciane Vinckenbosch, Belgian violist: portraits, concerts, rehearsals and performances with Trio Linaris and the Niederbayerische Philharmonie.',
+  de: 'Fotogalerie und Videos von Vinciane Vinckenbosch, belgische Bratschistin: Porträts, Konzerte, Proben und Auftritte mit dem Trio Linaris und der Niederbayerischen Philharmonie.',
+}[lang];
+
+// VideoObject schema pour Google Rich Results
+const videoSchema = {
+  "@context": "https://schema.org",
+  "@type": "VideoObject",
+  "name": "Vinciane Vinckenbosch — Vocalise Op. 3",
+  "description": "Performance de Vinciane Vinckenbosch, altiste belge, jouant la Vocalise Op. 3.",
+  "thumbnailUrl": "https://i.ytimg.com/vi/zZCX7xCGYc8/hqdefault.jpg",
+  "uploadDate": "2024-01-01",
+  "contentUrl": "https://www.youtube.com/watch?v=zZCX7xCGYc8",
+  "embedUrl": "https://www.youtube-nocookie.com/embed/zZCX7xCGYc8",
+  "publisher": {
+    "@type": "Person",
+    "name": "Vinciane Vinckenbosch",
+    "url": "https://vincianevinckenbosch.com"
+  }
+};
+
+// ImageGallery schema
+const gallerySchema = {
+  "@context": "https://schema.org",
+  "@type": "ImageGallery",
+  "name": `${pageTitle}`,
+  "description": pageDescription,
+  "url": `https://vincianevinckenbosch.com/${lang}/media`,
+  "author": {
+    "@type": "Person",
+    "name": "Vinciane Vinckenbosch"
+  }
+};
 ---
 
-<BaseLayout lang={lang} title={pageTitle}>
+<BaseLayout lang={lang} title={pageTitle} description={pageDescription} ogImage="/images/grilc-02541.jpg">
+  <script type="application/ld+json" slot="head" set:html={JSON.stringify(videoSchema)} />
+  <script type="application/ld+json" slot="head" set:html={JSON.stringify(gallerySchema)} />
   <main class="media-page">
     <div class="media-page__container">
-      <h1 class="section-title media-page__title">{tr('nav.media')}</h1>
+      <h1 class="section-title media-page__title" data-reveal>{tr('nav.media')}</h1>
       <MasonryGallery
-        client:visible
+        client:only="vue"
         items={mediaItems}
         enableLightbox={true}
       />
@@ -49,15 +87,17 @@ const pageTitle = {
 
 <style>
 .media-page {
+  --page-padding: clamp(1.5rem, 4vw, 4rem);
   min-height: 100vh;
-  padding-top: clamp(4rem, 8vw, 7rem);
-  padding-bottom: clamp(4rem, 8vw, 6rem);
+  /* Navbar fixe (57px) + padding de page */
+  padding-top: calc(var(--navbar-height, 57px) + var(--page-padding));
+  padding-bottom: var(--page-padding);
 }
 
 .media-page__container {
   max-width: 1728px;
   margin: 0 auto;
-  padding: 0 clamp(1.5rem, 4vw, 4rem);
+  padding: 0 var(--page-padding);
   display: flex;
   flex-direction: column;
   gap: clamp(2.5rem, 4vw, 4rem);

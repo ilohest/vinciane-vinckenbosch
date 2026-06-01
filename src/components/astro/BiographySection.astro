@@ -10,95 +10,215 @@ interface Props {
 const { lang, pdfUrl = '#' } = Astro.props;
 const tr = useTranslations(lang);
 
-const sections = [
-  {
-    image: '/images/grilc-02541.jpg',
-    imageAlt: 'Vinciane Vinckenbosch',
-    imagePosition: 'left',
-    paragraphs: [
-      "Régulièrement invitée en tant qu'alto solo par plusieurs orchestres européens, elle collabore notamment avec l'Orchestre symphonique de Porto à la Casa da Música, l'Orchestre philharmonique de Ratisbonne, le Clara-Schumann Philharmoniker et l'Opéra Royal de Wallonie. Elle se produit entre autres sous la direction de chefs tels que Christian Zacharias, Stefan Blunier, Paul Weikert et Giampaolo Bisanti. Elle occupe parallèlement le poste d'alto co-solo de la Niederbayerische Philharmonie depuis 2018.",
-      "Lauréate de plusieurs concours nationaux et internationaux destinés aux jeunes talents, elle a également bénéficié du soutien de la Yamaha Music Foundation of Europe et du Fonds Thirionet.",
-    ],
-  },
-  {
-    image: '/images/grilc-02173.jpg',
-    imageAlt: 'Vinciane Vinckenbosch — Trio Linaris',
-    imagePosition: 'right',
-    trioText: "Chambriste passionnée, Vinciane Vinckenbosch est membre fondatrice du <span class=\"text-accent\">Trio Linaris</span>, qu'elle forme aux côtés du flûtiste Pierre Cornu-Deyme et de la harpiste Alexandra Bidi (harpe solo de l'Orchestre de Paris).",
-    paragraphs: [
-      "Invitée régulière de festivals en Europe et aux États-Unis, elle partage la scène aux côtés d'artistes tels que Philippe Graffin, Petru Iuga, Ariadne Daskalakis, Julie Sévilla-Fraysse, Philippe Zuckerman, Nazareno Ferruggio, Sodi Braide et Silvia Denk.",
-      "Elle se produit également en soliste avec orchestre, notamment avec le Concertino Ensemble d'Augsbourg, l'Orchestre des étudiants de l'IMEP et l'Orchestre symphonique de Namur.",
-      "En 2026, Vinciane Vinckenbosch bénéficie, pour la deuxième année consécutive, du soutien du ministère bavarois de la Culture dans le cadre du programme « Tonkünstler Live Special », qui distingue son engagement en faveur de la musique de chambre et de la scène musicale indépendante.",
-      "Dans ce contexte, elle assurera en septembre 2026 <em class=\"text-accent\">la création mondiale d'une œuvre pour alto</em> de Nicolas Bacri, aux côtés du pianiste Jean-Baptiste Fonlupt.",
-    ],
-  },
-  {
-    image: '/images/grilc-02256.jpg',
-    imageAlt: 'Vinciane Vinckenbosch — Formation',
-    imagePosition: 'left',
-    paragraphs: [
-      "Après avoir débuté ses études à Bruxelles auprès de Shirly Laub, Vinciane Vinckenbosch obtient en 2011 un Master en violon avec la plus grande distinction dans la classe d'Igor Tkatchouk, à l'Institut royal de Musique et de Pédagogie de Namur. Parallèlement, elle découvre l'alto auprès de Daniel Rubenstein, avant de poursuivre son perfectionnement en violon en Allemagne dans la classe de Petru Munteanu, au Leopold Mozart College of Music de l'université d'Augsbourg.",
-      "Elle se consacre ensuite pleinement à l'alto à la Haute École de Musique de Genève, puis à la Hochschule für Musik und Tanz de Cologne dans la classe de Matthias Buchholz. Sélectionnée pour représenter la Hochschule de Cologne à New York, lors de concerts de musique de chambre en partenariat avec la Juilliard School, elle obtient en 2016 un Master en alto avec la plus haute mention.",
-      "Son parcours se nourrit également des précieux conseils d'Augustin Dumay, Boris Kuschnir, Atar Arad, Walter Küssner et Wilfried Strehle.",
-      "Parallèlement à sa carrière d'interprète, Vinciane Vinckenbosch se passionne pour la pédagogie. Elle joue un alto du luthier Nicolas Gilles, réalisé en 2015.",
-    ],
-  },
-];
+const trioTextBefore = 'Chambriste passionnée, Vinciane Vinckenbosch est membre fondatrice du ';
+const trioTextHighlight = 'Trio Linaris';
+const trioTextAfter = ', qu\'elle forme aux côtés du flûtiste Pierre Cornu-Deyme et de la harpiste Alexandra Bidi (harpe solo de l\'Orchestre de Paris).';
+const trioTextBeforeChars = Array.from(trioTextBefore);
+const trioTextAfterChars = Array.from(trioTextAfter);
 ---
 
 <section class="bio" id="biographie">
-  <div class="bio__container">
+  <div class="bio__wrap">
 
-    <!-- Header: quote + title + intro image -->
-    <div class="bio__header">
-      <div class="bio__intro-quote">
-        <p class="bio__intro-text">
-          Saluée par la critique internationale pour la « grande classe » de son jeu,
-          Vinciane Vinckenbosch mène une carrière artistique riche et multiple,
-          entre scène soliste, musique de chambre et orchestre.
-        </p>
-        <span class="bio__intro-attr">(Passauer Neue Presse)</span>
+    <!-- ════════════════════════════════════════════════════════
+         RANGÉE 1 — Citation (gauche ~80%) + attribution (droite)
+         Figma : Frame 1000001808 — row, justify: space-between,
+                 align: flex-end, width: 1672
+    ═════════════════════════════════════════════════════════ -->
+    <div class="bio__quote-row" data-reveal>
+      <p class="bio__quote-text">
+        Saluée par la critique internationale pour la «&#160;grande classe&#160;» de son jeu,
+        Vinciane Vinckenbosch mène une carrière artistique riche et multiple,
+        entre scène soliste, musique de chambre et orchestre.
+      </p>
+      <span class="bio__quote-attr">(Passauer Neue Presse)</span>
+    </div>
+
+    <!-- ════════════════════════════════════════════════════════
+         RANGÉE 2 — Titre "BIOGRAPHIE" (gauche) + photo (droite)
+         Figma : Frame 1000001830 — row, justify: space-between,
+                 align: flex-end, width: 1669
+                 Image : 1099×628 → ratio 1.75
+    ═════════════════════════════════════════════════════════ -->
+    <div class="bio__title-row" data-reveal>
+      <h2 class="bio__section-title">{tr('bio.title')}</h2>
+      <div class="bio__intro-img-wrap">
+        <img
+          src="/images/biographie-portrait-blue-viola.jpg"
+          alt="Vinciane Vinckenbosch — portrait officiel, altiste belge"
+          class="bio__intro-img"
+          loading="lazy"
+          decoding="async"
+        />
       </div>
-      <div class="bio__header-right">
-        <h2 class="section-title bio__title">{tr('bio.title')}</h2>
-        <div class="bio__intro-img-wrap">
+    </div>
+
+    <!-- ════════════════════════════════════════════════════════
+         BLOC 1 — Image gauche (798×919, portrait ~47.7%)
+                 + texte droite (789px ~47.2%)
+         Figma : Frame 1000001825 — row, justify: space-between
+    ═════════════════════════════════════════════════════════ -->
+    <div class="bio__row bio__row--img-left" data-reveal>
+      <div class="bio__img-wrap bio__img-wrap--portrait-tall">
+        <img
+          src="/images/grilc-02541.jpg"
+          alt="Vinciane Vinckenbosch jouant de l'alto, portrait artistique"
+          loading="lazy"
+          decoding="async"
+        />
+      </div>
+      <div class="bio__text-col">
+        <p class="bio__p">
+          Régulièrement invitée en tant qu'alto solo par plusieurs orchestres
+          européens, elle collabore notamment avec l'Orchestre symphonique de
+          Porto à la Casa da Música, l'Orchestre philharmonique de Ratisbonne,
+          le Clara-Schumann Philharmoniker et l'Opéra Royal de Wallonie. Elle
+          se produit entre autres sous la direction de chefs tels que Christian
+          Zacharias, Stefan Blunier, Paul Weikert et Giampaolo Bisanti. Elle
+          occupe parallèlement le poste d'alto co-solo de la Niederbayerische
+          Philharmonie depuis 2018.
+        </p>
+        <p class="bio__p">
+          Lauréate de plusieurs concours nationaux et internationaux destinés
+          aux jeunes talents, elle a également bénéficié du soutien de la
+          Yamaha Music Foundation of Europe et du Fonds Thirionet.
+        </p>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════════════════
+         TEXTE TRIO LINARIS — pleine largeur, 56px, couleur muted
+         "Trio Linaris" en accent orange
+         Figma : style_7U6T38, fontSize 56, lineHeight 64px
+    ═════════════════════════════════════════════════════════ -->
+    <p class="bio__trio-text" data-reveal data-scroll-text>
+      {trioTextBeforeChars.map((char, index) => (
+        <span class="bio__trio-letter" data-letter-index={index}>{char}</span>
+      ))}
+      <span class="text-accent bio__trio-static">{trioTextHighlight}</span>
+      {trioTextAfterChars.map((char, index) => (
+        <span class="bio__trio-letter" data-letter-index={trioTextBeforeChars.length + index}>{char}</span>
+      ))}
+    </p>
+
+    <!-- ════════════════════════════════════════════════════════
+         IMAGES TRIO — deux photos côte à côte
+         Figma : 532×726 (33%) + 1060×726 (67%), gap: 80px
+    ═════════════════════════════════════════════════════════ -->
+    <div class="bio__trio-imgs" data-reveal>
+      <div class="bio__trio-img bio__trio-img--narrow">
+        <img
+          src="/images/trio-linaris-studio-portrait.jpg"
+          alt="Vinciane Vinckenbosch — Trio Linaris"
+          loading="lazy"
+          decoding="async"
+        />
+      </div>
+      <div class="bio__trio-img bio__trio-img--wide">
+        <img
+          src="/images/trio-linaris-harp-room.jpeg"
+          alt="Harpe dans une salle de concert"
+          loading="lazy"
+          decoding="async"
+        />
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════════════════
+         BLOC 2 — Image gauche (803×881) + texte droite
+         Figma : Frame 1000001828 — row, justify: space-between
+    ═════════════════════════════════════════════════════════ -->
+    <div class="bio__row bio__row--img-left" data-reveal>
+      <div class="bio__img-wrap bio__img-wrap--portrait">
+        <img
+          src="/images/grilc-02173.jpg"
+          alt="Vinciane Vinckenbosch en concert, altiste"
+          loading="lazy"
+          decoding="async"
+        />
+      </div>
+      <div class="bio__text-col">
+        <p class="bio__p">
+          Invitée régulière de festivals en Europe et aux États-Unis, elle
+          partage la scène aux côtés d'artistes tels que Philippe Graffin,
+          Petru Iuga, Ariadne Daskalakis, Julie Sévilla-Fraysse, Philippe
+          Zuckerman, Nazareno Ferruggio, Sodi Braide et Silvia Denk.
+        </p>
+        <p class="bio__p">
+          Elle se produit également en soliste avec orchestre, notamment avec
+          le Concertino Ensemble d'Augsbourg, l'Orchestre des étudiants de
+          l'IMEP et l'Orchestre symphonique de Namur.
+        </p>
+        <p class="bio__p">
+          En 2026, Vinciane Vinckenbosch bénéficie, pour la deuxième année
+          consécutive, du soutien du ministère bavarois de la Culture dans le
+          cadre du programme «&#160;Tonkünstler Live Special&#160;», qui distingue son
+          engagement en faveur de la musique de chambre et de la scène
+          musicale indépendante.
+        </p>
+        <p class="bio__p">
+          Dans ce contexte, elle assurera en septembre 2026
+          <span class="text-accent">la création mondiale d'une œuvre pour alto</span>
+          de Nicolas Bacri, aux côtés du pianiste Jean-Baptiste Fonlupt.
+        </p>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════════════════
+         BLOC 3 — Texte gauche + (image 803×535 + texte) droite
+         Figma : Frame 1000001829 — row, justify: space-between
+    ═════════════════════════════════════════════════════════ -->
+    <div class="bio__row bio__row--text-left" data-reveal>
+      <div class="bio__text-col">
+        <p class="bio__p">
+          Après avoir débuté ses études à Bruxelles auprès de Shirly Laub,
+          Vinciane Vinckenbosch obtient en 2011 un Master en violon avec la
+          plus grande distinction dans la classe d'Igor Tkatchouk, à l'Institut
+          royal de Musique et de Pédagogie de Namur. Parallèlement, elle
+          découvre l'alto auprès de Daniel Rubenstein, avant de poursuivre son
+          perfectionnement en violon en Allemagne dans la classe de Petru
+          Munteanu, au Leopold Mozart College of Music de l'université
+          d'Augsbourg.
+        </p>
+      </div>
+      <div class="bio__right-col">
+        <div class="bio__img-wrap bio__img-wrap--landscape">
           <img
-            src="/images/grilc-03046.jpg"
-            alt="Vinciane Vinckenbosch"
-            class="bio__intro-img"
+            src="/images/grilc-02256.jpg"
+            alt="Vinciane Vinckenbosch — Formation"
             loading="lazy"
             decoding="async"
           />
+        </div>
+        <div class="bio__text-col">
+          <p class="bio__p">
+            Elle se consacre ensuite pleinement à l'alto à la Haute École de
+            Musique de Genève, puis à la Hochschule für Musik und Tanz de
+            Cologne dans la classe de Matthias Buchholz. Sélectionnée pour
+            représenter la Hochschule de Cologne à New York lors de concerts
+            de musique de chambre en partenariat avec la Juilliard School,
+            elle obtient en 2016 un Master en alto avec la plus haute mention.
+          </p>
+          <p class="bio__p">
+            Son parcours se nourrit également des précieux conseils
+            d'Augustin Dumay, Boris Kuschnir, Atar Arad, Walter Küssner et
+            Wilfried Strehle.
+          </p>
+          <p class="bio__p">
+            Parallèlement à sa carrière d'interprète, Vinciane Vinckenbosch
+            se passionne pour la pédagogie. Elle joue un alto du luthier
+            Nicolas Gilles, réalisé en 2015.
+          </p>
         </div>
       </div>
     </div>
 
-    <!-- Alternating sections -->
-    {sections.map((s) => (
-      <div class:list={['bio__section', `bio__section--${s.imagePosition}`]}>
-        <div class="bio__section-img-wrap">
-          <img
-            src={s.image}
-            alt={s.imageAlt}
-            class="bio__section-img"
-            loading="lazy"
-            decoding="async"
-          />
-        </div>
-        <div class="bio__section-text">
-          {s.trioText && (
-            <p class="bio__trio-text" set:html={s.trioText} />
-          )}
-          {s.paragraphs.map(p => (
-            <p class="bio__paragraph" set:html={p} />
-          ))}
-        </div>
-      </div>
-    ))}
-
-    <!-- Download CTA -->
-    <div class="bio__cta-wrap">
-      <a href={pdfUrl} class="cta-underline" download>
+    <!-- ════════════════════════════════════════════════════════
+         CTA — Télécharger biographie
+         Figma : "télécharger la biographie →", uppercase, underline
+    ═════════════════════════════════════════════════════════ -->
+    <div class="bio__cta-row" data-reveal>
+      <a href={pdfUrl} class="bio__cta" download>
         {tr('bio.download')}
       </a>
     </div>
@@ -107,63 +227,95 @@ const sections = [
 </section>
 
 <style>
+/* ── Conteneur ────────────────────────────────────────────── */
 .bio {
-  padding: clamp(4rem, 8vw, 8rem) 0;
+  padding-top: clamp(2rem,8vw,3rem);
+  padding-bottom: 0;
 }
 
-.bio__container {
+.bio__wrap {
   max-width: 1728px;
   margin: 0 auto;
-  padding: 0 clamp(1.5rem, 4vw, 4rem);
+  /* Figma : 28px left inset dans un 1728px frame */
+  padding: 0 clamp(1.5rem, 3.7vw, 4rem);
   display: flex;
   flex-direction: column;
-  gap: clamp(4rem, 6vw, 6rem);
+  /* Figma Frame 24 : gap 80px */
+  gap: clamp(3rem, 5.5vw, 5rem);
 }
 
-.bio__header {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 4rem;
+/* ── RANGÉE 1 — Citation ──────────────────────────────────── */
+/*
+  Figma Frame 1000001808 :
+  row, justify-content: space-between, align-items: flex-end
+  Quote : width 1332 / 1672 = 79.7%
+  Attribution : width ~265 / 1672 = 15.9%, right side
+*/
+.bio__quote-row {
+  display: flex;
+  justify-content: space-between;
   align-items: flex-end;
+  gap: 2rem;
 }
 
-.bio__intro-quote {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.bio__intro-text {
+.bio__quote-text {
   font-family: "Ortica Linear", Georgia, serif;
   font-weight: 300;
-  font-size: clamp(2rem, 5.5vw, 5.3125rem);
+  /* Figma : 85px / 1728px = 4.92vw */
+  font-size: clamp(2rem, 4.9vw, 5.3125rem);
   line-height: 1.06;
   color: #DA7F52;
+  /* Prend ~80% de la largeur */
+  flex: 0 0 calc(79.7% - 1rem);
+  max-width: calc(79.7% - 1rem);
 }
 
-.bio__intro-attr {
+.bio__quote-attr {
   font-family: "Ortica Linear", Georgia, serif;
   font-weight: 300;
-  font-size: clamp(0.875rem, 1.5vw, 1.4375rem);
+  /* Figma : 23px */
+  font-size: clamp(0.8125rem, 1.33vw, 1.4375rem);
   color: #F7F5F3;
   opacity: 0.75;
+  flex-shrink: 1;
+  max-width: 55%;
+  text-align: right;
+  /* bottom-aligned : aligné en bas grâce au align-items: flex-end du parent */
+  padding-bottom: 0.25rem;
 }
 
-.bio__header-right {
+/* ── RANGÉE 2 — Titre + photo intro ──────────────────────── */
+/*
+  Figma Frame 1000001830 :
+  row, justify-content: space-between, align-items: flex-end
+  Titre : hug (gauche)
+  Image : 1099×628 → ~65.8% de 1669px
+*/
+.bio__title-row {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 1.5rem;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 2rem;
 }
 
-.bio__title {
-  font-size: clamp(2.5rem, 5vw, 4.5625rem);
+.bio__section-title {
+  font-family: "Coconat", Georgia, serif;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  /* Figma : 73px / 1728px = 4.22vw */
+  font-size: clamp(2.25rem, 4.2vw, 4.5625rem);
   line-height: 0.84;
   color: #ffffff;
+  flex-shrink: 0;
+  /* Aligne en bas de la photo */
+  padding-bottom: 0.5rem;
 }
 
 .bio__intro-img-wrap {
-  width: 100%;
+  /* Figma : 1099/1669 = 65.8% */
+  flex: 0 0 65.8%;
+  max-width: 65.8%;
   aspect-ratio: 1099 / 628;
   overflow: hidden;
 }
@@ -172,82 +324,349 @@ const sections = [
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center top;
+  display: block;
 }
 
-.bio__section {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: clamp(2rem, 4vw, 4rem);
-  align-items: start;
+/* ── Blocs biographie alternés ───────────────────────────── */
+/*
+  Figma Frame ZWMDHS : row, justify-content: space-between
+  Gauche ~47.7% (798/1672) | Droite ~47.2% (789/1672)
+*/
+.bio__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: clamp(1.5rem, 3vw, 3rem);
 }
 
-.bio__section--right {
-  direction: rtl;
-}
-.bio__section--right > * {
-  direction: ltr;
+/* Image à gauche */
+.bio__row--img-left .bio__img-wrap {
+  /* Figma : 798/1672 = 47.7% */
+  flex: 0 0 47.7%;
+  max-width: 47.7%;
 }
 
-.bio__section-img-wrap {
+.bio__row--img-left .bio__text-col {
+  /* Figma : 789/1672 = 47.2% */
+  flex: 0 0 47.2%;
+  max-width: 47.2%;
+}
+
+/* Texte à gauche + colonne droite composée */
+.bio__row--text-left > .bio__text-col {
+  flex: 0 0 47.7%;
+  max-width: 47.7%;
+}
+
+.bio__right-col {
+  flex: 0 0 47.2%;
+  max-width: 47.2%;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1.5rem, 3vw, 3rem);
+}
+
+.bio__right-col .bio__text-col {
+  width: 100%;
+  max-width: 100%;
+}
+
+/* ── Wrappers d'images avec aspect ratio Figma ───────────── */
+.bio__img-wrap {
   overflow: hidden;
 }
 
-.bio__section-img {
+.bio__img-wrap--portrait-tall {
+  /* Figma : 798×919 → ratio 0.868 */
+  aspect-ratio: 798 / 919;
+}
+
+.bio__img-wrap--portrait {
+  /* Figma : 803×881 → ratio 0.912 */
+  aspect-ratio: 803 / 881;
+}
+
+.bio__img-wrap--landscape {
+  /* Figma : 803×535 → ratio 1.501 */
+  aspect-ratio: 803 / 535;
+}
+
+.bio__img-wrap img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
 }
 
-.bio__section-text {
+/* ── Colonne texte ────────────────────────────────────────── */
+.bio__text-col {
   display: flex;
   flex-direction: column;
-  gap: 1.3rem;
-  padding-top: 0.5rem;
+  gap: var(--para-gap); /* global --para-gap ≈ 10px */
 }
 
+.bio__p {
+  font-family: "Ortica Linear", Georgia, serif;
+  font-weight: 300;
+  /* Figma : 26px / 1728px = 1.505vw */
+  font-size: clamp(0.9375rem, 1.5vw, 1.625rem);
+  color: #F7F5F3;
+  line-height: 1.55;
+}
+
+/* ── Texte Trio Linaris ───────────────────────────────────── */
+/*
+  Figma style_7U6T38 : Ortica 56px, lineHeight 64px, color #BCB7A9
+  Prend toute la largeur du conteneur
+*/
 .bio__trio-text {
   font-family: "Ortica Linear", Georgia, serif;
   font-weight: 300;
-  font-size: clamp(1.5rem, 3.5vw, 3.5rem);
+  /* Figma : 56px / 1728px = 3.24vw */
+  font-size: clamp(1.5rem, 3.24vw, 3.5rem);
   line-height: 1.14;
   color: #BCB7A9;
-  margin-bottom: 0.5rem;
+  overflow-wrap: break-word;
+  /*
+    1ère ligne indentée pour s'aligner avec le bord gauche de la colonne
+    de texte du bloc précédent (image 47.7% + gap entre colonnes).
+    Dans le Figma : espaces préfixes dans le texte créent cet effet.
+  */
+  /*
+    Avec justify-content:space-between, le gap = 100% - 47.7% (img) - 47.2% (texte) = 5.1%
+    → colonne texte commence à 47.7% + 5.1% = 52.8% du container
+  */
+  text-indent: 52.8%;
 }
 
-.bio__paragraph {
+.bio__trio-letter {
+  color: #BCB7A9;
+  transition: color 0.12s linear;
+}
+
+.bio__trio-letter.is-active {
+  color: #ffffff;
+}
+
+.bio__trio-static {
+  color: #DA7F52;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bio__trio-letter {
+    color: #ffffff;
+    transition: none;
+  }
+}
+
+/* ── Images Trio (deux côte à côte) ──────────────────────── */
+/*
+  Figma Frame 1000001849 : row, gap 80px
+  Image 1 : 532×726 → 532/(532+1060+80) = 33.4%
+  Image 2 : 1060×726 → 1060/1592 = 66.6%
+*/
+.bio__trio-imgs {
+  display: flex;
+  /* Figma : gap 80px / 1728px = 4.63vw */
+  gap: clamp(1.5rem, 4.6vw, 5rem);
+  align-items: stretch;
+  height: clamp(28rem, 42vw, 45.375rem);
+}
+
+.bio__trio-img {
+  overflow: hidden;
+  height: 100%;
+}
+
+.bio__trio-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.bio__trio-img--narrow {
+  /* 532×726 → aspect ratio portrait + width 33.4% */
+  flex: 0 0 33.4%;
+  max-width: 33.4%;
+}
+
+.bio__trio-img--wide {
+  /* 1060×726 → aspect ratio paysage + width 66.6% */
+  flex: 0 0 calc(66.6% - clamp(1.5rem, 4.6vw, 5rem));
+  max-width: calc(66.6% - clamp(1.5rem, 4.6vw, 5rem));
+}
+
+/* ── CTA Télécharger ─────────────────────────────────────── */
+/*
+  Figma : Ortica 25px, uppercase, underline line dessous
+*/
+.bio__cta-row {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 0.5rem;
+}
+
+.bio__cta {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 6px;
   font-family: "Ortica Linear", Georgia, serif;
   font-weight: 300;
-  font-size: clamp(0.9375rem, 1.6vw, 1.1875rem);
-  color: #F7F5F3;
-  line-height: 1.6;
-}
-
-.bio__cta-wrap {
-  display: flex;
-  justify-content: flex-start;
-  padding-top: 1rem;
-}
-
-.cta-underline {
-  font-size: clamp(0.875rem, 1.4vw, 1.0625rem);
+  /* Figma : 25px / 1728px = 1.45vw */
+  font-size: clamp(0.875rem, 1.45vw, 1.5625rem);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
   color: #ffffff;
   text-decoration: none;
   transition: color 0.2s ease;
 }
 
-.cta-underline:hover {
+.bio__cta::after {
+  content: "";
+  display: block;
+  height: 1px;
+  background-color: currentColor;
+  transition: background-color 0.2s ease;
+}
+
+.bio__cta:hover {
   color: #DA7F52;
 }
 
-@media (max-width: 900px) {
-  .bio__header {
-    grid-template-columns: 1fr;
+/* ── Responsive ───────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .bio__quote-text {
+    flex: 1;
+    max-width: none;
   }
-  .bio__section,
-  .bio__section--right {
-    grid-template-columns: 1fr;
-    direction: ltr;
+  .bio__intro-img-wrap {
+    flex: 0 0 55%;
+    max-width: 55%;
   }
 }
+
+@media (max-width: 768px) {
+  /*
+    Rythme vertical uniforme sur mobile :
+    même espace au-dessus ET en-dessous du texte partout.
+    → une seule variable appliquée à TOUS les gaps (wrap, rows, colonnes)
+  */
+  .bio__wrap {
+    gap: clamp(2rem, 8vw, 3rem);
+  }
+
+  .bio__quote-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+  /* Attribution/source alignée à droite sur mobile */
+  .bio__quote-attr {
+    text-align: right;
+    align-self: flex-end;
+  }
+  .bio__title-row {
+    flex-direction: column;
+    align-items: flex-start;
+    /* même gap que bio__wrap pour cohérence */
+    gap: clamp(2rem, 8vw, 3rem);
+  }
+  .bio__intro-img-wrap {
+    flex: none;
+    width: 100%;
+    max-width: 100%;
+  }
+  .bio__row {
+    flex-direction: column;
+    /* même gap que bio__wrap → espace identique au-dessus et en-dessous du texte */
+    gap: clamp(2rem, 8vw, 3rem);
+  }
+
+  /* Mobile : texte EN HAUT, image EN BAS pour les blocs image-gauche */
+  .bio__row--img-left .bio__text-col {
+    order: -1;
+  }
+
+  .bio__row--img-left .bio__img-wrap,
+  .bio__row--img-left .bio__text-col,
+  .bio__row--text-left .bio__text-col,
+  .bio__right-col {
+    flex: none;
+    max-width: 100%;
+    width: 100%;
+    /* même gap dans right-col */
+    gap: clamp(2rem, 8vw, 3rem);
+  }
+
+  .bio__row--img-left .bio__text-col,
+  .bio__row--text-left .bio__text-col,
+  .bio__right-col .bio__text-col {
+    gap: var(--para-gap);
+  }
+
+  .bio__trio-imgs {
+    flex-direction: column;
+    height: auto;
+    /* même gap entre les deux images empilées */
+    gap: clamp(2rem, 8vw, 3rem);
+  }
+  .bio__trio-img--narrow,
+  .bio__trio-img--wide {
+    flex: none;
+    max-width: 100%;
+    width: 100%;
+    height: auto;
+  }
+  .bio__trio-img--narrow { aspect-ratio: 532 / 726; }
+  .bio__trio-img--wide { aspect-ratio: 1060 / 726; }
+}
 </style>
+
+<script>
+const scrollTextBlocks = Array.from(document.querySelectorAll<HTMLElement>('[data-scroll-text]'));
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function clamp(value: number, min: number, max: number) {
+  return Math.min(Math.max(value, min), max);
+}
+
+function updateScrollText() {
+  scrollTextBlocks.forEach((block) => {
+    const letters = Array.from(block.querySelectorAll<HTMLElement>('[data-letter-index]'));
+    if (letters.length === 0) return;
+
+    if (prefersReducedMotion) {
+      letters.forEach((letter) => letter.classList.add('is-active'));
+      return;
+    }
+
+    const rect = block.getBoundingClientRect();
+    const viewportHeight = window.innerHeight;
+    const start = viewportHeight * 0.5;
+    const end = viewportHeight * 0.12;
+    const progress = clamp((start - rect.top) / (start - end), 0, 1);
+    const activeCount = Math.round(progress * letters.length);
+
+    letters.forEach((letter, index) => {
+      letter.classList.toggle('is-active', index < activeCount);
+    });
+  });
+}
+
+let scrollTextTicking = false;
+
+function requestScrollTextUpdate() {
+  if (scrollTextTicking) return;
+  scrollTextTicking = true;
+  window.requestAnimationFrame(() => {
+    updateScrollText();
+    scrollTextTicking = false;
+  });
+}
+
+updateScrollText();
+window.addEventListener('scroll', requestScrollTextUpdate, { passive: true });
+window.addEventListener('resize', requestScrollTextUpdate);
+</script>

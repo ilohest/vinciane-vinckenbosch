@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <rect width="32" height="32" fill="#232323"/>
-  <text x="16" y="22" text-anchor="middle"
-    font-family="Georgia, serif" font-size="20" font-weight="400" fill="#DA7F52">V</text>
+<svg width="156" height="126" viewBox="0 0 156 126" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Logo VV — orange #DA7F52, fond transparent -->
+  <path d="M17.16 0C17.64 4.44 18.96 10.92 21.72 17.76L42.72 68.52L63.48 14.04C64.56 10.44 66.84 3 66.84 0H77.64C73.32 7.2 71.52 12.6 68.64 19.8L44.04 82.2L37.44 83.88L14.64 29.28C14.64 29.28 6.24 9.72 0 0H17.16Z" fill="#DA7F52"/>
+  <path d="M94.7596 42C95.2396 46.44 96.5596 52.92 99.3196 59.76L120.32 110.52L141.08 56.04C142.16 52.44 144.44 45 144.44 42H155.24C150.92 49.2 149.12 54.6 146.24 61.8L121.64 124.2L115.04 125.88L92.2396 71.28C92.2396 71.28 83.8396 51.72 77.5996 42H94.7596Z" fill="#DA7F52"/>
 </svg>

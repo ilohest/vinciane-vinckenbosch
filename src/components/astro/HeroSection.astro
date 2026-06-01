@@ -1,176 +1,378 @@
 ---
-import type { Lang } from '../../lib/types';
+import type { HeroEventTeaser, Lang } from '../../lib/types';
 
 interface Props {
   lang: Lang;
   upcomingDates?: string[];
+  heroEvents?: HeroEventTeaser[];
 }
 
-const { lang, upcomingDates = ['1 Mai | Vienne, AU', '20, 21 Mai | Lucerne, CH', '20 Juin | Bad Kissingen, DE'] } = Astro.props;
+const {
+  lang,
+  upcomingDates = ['1 Mai | Vienne, AU', '20, 21 Mai | Lucerne, CH', '20 Juin | Bad Kissingen, DE'],
+  heroEvents = [],
+} = Astro.props;
 
-const agendaLabel = { fr: 'AGENDA', en: 'AGENDA', de: 'AGENDA' }[lang];
+const locales: Record<Lang, string> = {
+  fr: 'fr-FR',
+  en: 'en-GB',
+  de: 'de-DE',
+};
+
+function formatHeroDate(date: string): string {
+  const parsedDate = new Date(`${date}T00:00:00`);
+  if (Number.isNaN(parsedDate.getTime())) return date;
+  return new Intl.DateTimeFormat(locales[lang], {
+    day: 'numeric',
+    month: 'short',
+  }).format(parsedDate);
+}
+
+function countryInitial(country: string): string {
+  return country.trim().charAt(0).toUpperCase();
+}
+
+const displayedDates = heroEvents.length > 0
+  ? heroEvents.map((event) => `${formatHeroDate(event.date)} / ${event.city}, ${countryInitial(event.country)}`)
+  : upcomingDates;
 ---
 
 <section class="hero" aria-label="Vinciane Vinckenbosch">
-  <!-- Background image -->
-  <div class="hero__bg">
+
+  <!-- Image + overlay -->
+  <div class="hero__frame" aria-hidden="true">
     <img
       src="/images/grilc-03101.jpg"
-      alt="Vinciane Vinckenbosch"
+      alt="Vinciane Vinckenbosch, altiste belge, jouant de l'alto"
       class="hero__img"
       fetchpriority="high"
       decoding="async"
     />
-    <div class="hero__overlay" aria-hidden="true"></div>
+    <div class="hero__overlay"></div>
   </div>
 
-  <!-- Scroll indicator -->
-  <div class="hero__scroll" aria-hidden="true">
-    <svg width="40" height="80" viewBox="0 0 40 80" fill="none">
-      <line x1="20" y1="0" x2="20" y2="60" stroke="white" stroke-width="1" opacity="0.6"/>
-      <line x1="20" y1="60" x2="8" y2="48" stroke="white" stroke-width="1" opacity="0.6"/>
-      <line x1="20" y1="60" x2="32" y2="48" stroke="white" stroke-width="1" opacity="0.6"/>
-    </svg>
-  </div>
+  <!--
+    hero__content :
+    • Desktop  → display: contents (transparent, les enfants gardent
+                  leur position: absolute individuelle)
+    • Mobile   → flex column unifié, positionné en bas de l'écran
+                  (Figma iPhone : x:32 y:511 dans 402×874)
+  -->
+  <div class="hero__content">
 
-  <!-- Upcoming dates (top-right) -->
-  {upcomingDates.length > 0 && (
-    <ul class="hero__dates" aria-label="Prochaines dates">
-      {upcomingDates.map(d => (
-        <li class="hero__date">{d}</li>
-      ))}
-    </ul>
-  )}
-
-  <!-- Bottom content -->
-  <div class="hero__bottom">
+    <!-- Nom + sous-titre -->
     <div class="hero__name-block">
       <p class="hero__subtitle">altiste belge</p>
       <h1 class="hero__name">
         Vinciane<br />Vinckenbosch
       </h1>
     </div>
-    <a href={`/${lang}/#agenda`} class="btn-pill hero__cta" aria-label="Voir l'agenda">
-      {agendaLabel} →
-    </a>
+
+    <!-- Dates + CTA (desktop : bas droit | mobile : dans le bloc) -->
+    <div class="hero__agenda-block">
+      {displayedDates.length > 0 && (
+        <ul class="hero__dates" aria-label="Prochaines dates">
+          {displayedDates.map(d => <li class="hero__date">{d}</li>)}
+        </ul>
+      )}
+      <a href={`/${lang}/#agenda`} class="hero__cta btn-pill" aria-label="Voir l'agenda">
+        AGENDA →
+      </a>
+    </div>
+
   </div>
+
+  <!-- Scroll indicator (desktop uniquement) -->
+  <div class="hero__scroll" aria-hidden="true">
+    <svg width="24" height="52" viewBox="0 0 24 52" fill="none">
+      <line x1="12" y1="0" x2="12" y2="44" stroke="white" stroke-width="1" opacity="0.55"/>
+      <polyline points="5,37 12,44 19,37" stroke="white" stroke-width="1" fill="none" opacity="0.55"/>
+    </svg>
+  </div>
+
 </section>
 
 <style>
+/* ────────────────────────────────────────────────────────
+   SECTION
+──────────────────────────────────────────────────────── */
 .hero {
+  --hero-inset:          clamp(12px, 1.62vw, 28px);
+  --hero-content-bottom: calc(var(--hero-inset) + clamp(1rem, 2vh, 2rem));
+  --hero-label-gap:      clamp(1.25rem, 4.3vh, 3.5rem);
   position: relative;
   width: 100%;
-  height: 100svh;
-  min-height: 600px;
-  overflow: hidden;
+  height: 100vh;
+  min-height: 500px;
+  display: block;
 }
 
-.hero__bg {
+/* ────────────────────────────────────────────────────────
+   CADRE IMAGE
+──────────────────────────────────────────────────────── */
+.hero__frame {
   position: absolute;
-  inset: 0;
+  inset: var(--hero-inset);
+  overflow: hidden;
 }
 
 .hero__img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center top;
+  object-position: 48% top;
+  display: block;
 }
 
+/* ────────────────────────────────────────────────────────
+   OVERLAY
+──────────────────────────────────────────────────────── */
 .hero__overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    to bottom,
-    rgba(35, 35, 35, 0.1) 0%,
-    rgba(35, 35, 35, 0.05) 40%,
-    rgba(35, 35, 35, 0.55) 80%,
-    rgba(35, 35, 35, 0.85) 100%
-  );
+  background:
+    linear-gradient(
+      to right,
+      rgba(35,35,35, 0.0) 0%,
+      rgba(35,35,35, 0.0) 45%,
+      rgba(35,35,35, 0.35) 75%,
+      rgba(35,35,35, 0.65) 100%
+    ),
+    linear-gradient(
+      to bottom,
+      rgba(35,35,35, 0.0) 0%,
+      rgba(35,35,35, 0.0) 40%,
+      rgba(35,35,35, 0.55) 75%,
+      rgba(35,35,35, 0.92) 100%
+    );
 }
 
-.hero__scroll {
-  position: absolute;
-  bottom: 5rem;
-  left: 50%;
-  transform: translateX(-50%);
-  opacity: 0.7;
-  animation: scrollBounce 2.2s ease-in-out infinite;
+/* ────────────────────────────────────────────────────────
+   WRAPPER CONTENU — transparent sur desktop
+──────────────────────────────────────────────────────── */
+.hero__content {
+  display: contents; /* enfants positionnés individuellement */
 }
 
-@keyframes scrollBounce {
-  0%, 100% { transform: translateX(-50%) translateY(0); }
-  50%       { transform: translateX(-50%) translateY(8px); }
-}
-
-.hero__dates {
-  position: absolute;
-  top: 50%;
-  right: clamp(1.5rem, 4vw, 3.5rem);
-  transform: translateY(-50%);
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 0.6rem;
-}
-
-.hero__date {
-  font-family: "Ortica Linear", Georgia, serif;
-  font-weight: 300;
-  font-size: clamp(0.875rem, 1.8vw, 1.125rem);
-  color: #F7F5F3;
-  text-align: right;
-  opacity: 0.9;
-}
-
-.hero__bottom {
-  position: absolute;
-  bottom: clamp(4rem, 7vw, 6rem);
-  left: clamp(1.5rem, 4vw, 4rem);
-  right: clamp(1.5rem, 4vw, 4rem);
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-}
-
+/* ────────────────────────────────────────────────────────
+   NOM (desktop : bas gauche)
+──────────────────────────────────────────────────────── */
 .hero__name-block {
+  position: absolute;
+  left:   calc(var(--hero-inset) + clamp(1.75rem, 2vw, 2.5rem));
+  bottom: var(--hero-content-bottom);
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: var(--hero-label-gap);
+  z-index: 1;
 }
 
 .hero__subtitle {
   font-family: "Ortica Linear", Georgia, serif;
   font-weight: 300;
-  font-size: clamp(1rem, 2vw, 1.25rem);
+  font-size: clamp(0.875rem, 1.74vw, 1.875rem);
   color: #F7F5F3;
-  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
 }
 
 .hero__name {
   font-family: "Coconat", Georgia, serif;
   font-weight: 400;
-  font-size: clamp(3rem, 8vw, 8.125rem);
-  line-height: 0.95;
+  font-size: clamp(3.25rem, 7.5vw, 8.125rem);
+  line-height: 0.92;
   color: #ffffff;
   letter-spacing: -0.01em;
 }
 
-.hero__cta {
-  color: #ffffff;
-  align-self: flex-end;
-  margin-bottom: 0.5rem;
+/* ────────────────────────────────────────────────────────
+   DATES + CTA (desktop : bas droit)
+──────────────────────────────────────────────────────── */
+.hero__agenda-block {
+  position: absolute;
+  right:  calc(var(--hero-inset) + clamp(1.75rem, 2vw, 2.5rem));
+  bottom: var(--hero-content-bottom);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--hero-label-gap);
+  z-index: 1;
 }
 
+.hero__dates {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.55rem;
+}
+
+.hero__date {
+  font-family: "Ortica Linear", Georgia, serif;
+  font-weight: 300;
+  font-size: clamp(0.875rem, 1.74vw, 1.875rem);
+  color: #F7F5F3;
+  text-align: right;
+  opacity: 0.9;
+  white-space: nowrap;
+}
+
+.hero__cta {
+  color: #ffffff;
+  font-size: clamp(0.8rem, 1.74vw, 1.875rem);
+}
+
+.hero__cta:hover {
+  background-color: #ffffff;
+  border-color: #232323;
+  color: #232323;
+}
+
+/* ────────────────────────────────────────────────────────
+   SCROLL INDICATOR
+──────────────────────────────────────────────────────── */
+.hero__scroll {
+  position: absolute;
+  bottom: calc(clamp(20px, 4.1vh, 48px) + 0.5rem);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1;
+  /* L'animation est définie dans le bloc hero entrance ci-dessous */
+}
+
+@keyframes scrollBounce {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50%       { transform: translateX(-50%) translateY(7px); }
+}
+
+/* ────────────────────────────────────────────────────────
+   HERO ENTRANCE — fade-in au chargement
+   Joue une seule fois grâce à animation-fill-mode: both
+──────────────────────────────────────────────────────── */
+@keyframes heroFadeUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+.hero__name-block {
+  animation: heroFadeUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.4s both;
+}
+
+.hero__subtitle {
+  /* Le subtitle est dans name-block, on anime juste le bloc parent */
+}
+
+.hero__agenda-block {
+  animation: heroFadeUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.65s both;
+}
+
+.hero__scroll {
+  animation:
+    heroFadeUp   0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.9s both,
+    scrollBounce 2.2s ease-in-out                     2s    infinite;
+}
+
+/* ════════════════════════════════════════════════════════
+   MOBILE — Figma iPhone 17 : 402×874
+   Image inset ~20px | Content block x:32 y:511
+════════════════════════════════════════════════════════ */
 @media (max-width: 768px) {
+
+  .hero {
+    /* Pas de bord sur mobile : image plein écran */
+    --hero-inset: 0px;
+  }
+
+  /* Supprimer le border-radius éventuel du frame */
+  .hero__frame {
+    border-radius: 0;
+  }
+
+  /* Overlay renforcé en bas pour la lisibilité du texte */
+  .hero__overlay {
+    background: linear-gradient(
+      to bottom,
+      rgba(35,35,35, 0.0)  0%,
+      rgba(35,35,35, 0.0)  25%,
+      rgba(35,35,35, 0.45) 55%,
+      rgba(35,35,35, 0.92) 100%
+    );
+  }
+
+  /* Recadrage : privilégie le visage (col. gauche de la photo) */
+  .hero__img {
+    object-position: 30% top;
+  }
+
+  /* ── hero__content devient un vrai flex column positionné en bas ── */
+  /*
+    Figma :
+      x:32 dans 402px → 7.96% = ~5vw depuis le bord
+      y:511 dans 874px → bottom ≈ (874-511)/874 = 41.5% ≈ 12vh depuis le bas
+      gap: 20px = 1.25rem
+  */
+  .hero__content {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    position: absolute;
+    bottom:  clamp(16px, 8vw, 36px);
+    left:  clamp(16px, 8vw, 36px);
+    right: clamp(16px, 8vw, 36px);
+    z-index: 1;
+  }
+
+  /* Enfants : sortent de leur position: absolute desktop */
+  .hero__name-block,
+  .hero__agenda-block {
+    position: static;
+    bottom: auto;
+    right: auto;
+    left: auto;
+  }
+
+  /* Name block : gap réduit entre subtitle et nom */
+  .hero__name-block {
+    gap: 0.4rem;
+  }
+
+  /* Figma : 20px Ortica uppercase */
+  .hero__subtitle {
+    font-size: 1.25rem;
+  }
+
+  /* Figma : 53px Coconat, lineHeight 52px */
+  .hero__name {
+    font-size: clamp(2.75rem, 13.2vw, 3.3125rem);
+    line-height: 0.98;
+  }
+
+  /* Dates : alignées à GAUCHE sur mobile */
+  .hero__agenda-block {
+    align-items: stretch;
+    gap: 1.25rem;
+  }
+
   .hero__dates {
-    top: 2rem;
-    transform: none;
-    right: 1.5rem;
+    align-items: flex-start;
+    width: 100%;
   }
+
+  .hero__date {
+    font-size: 1.25rem;
+    text-align: left;
+    white-space: normal;
+  }
+
+  /* CTA : visible sur mobile, aligné à gauche */
   .hero__cta {
-    display: none;
+    display: inline-flex;
+    align-self: flex-start;
+    font-size: 1.25rem;     /* Figma : 20px */
+    padding: 0.4rem 1.1rem;
   }
+
+  /* Scroll indicator : caché sur mobile */
+  .hero__scroll { display: none; }
 }
 </style>

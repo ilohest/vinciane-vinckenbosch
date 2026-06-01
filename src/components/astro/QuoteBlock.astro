@@ -1,4 +1,14 @@
 ---
+/**
+ * QuoteBlock — même layout que le bio__quote-row du Figma :
+ *   row · justify-content: space-between · align-items: flex-end
+ *   Texte : ~79.7% de la largeur  |  Attribution : droite, bottom-alignée
+ *
+ * Figma (Frame 1000001808 & Frame 1000001845) :
+ *   - quote text  : Ortica Light 85px, lineHeight 90px, color #DA7F52
+ *   - attribution : Ortica Light 23px, color #F7F5F3
+ */
+
 interface Props {
   quote: string;
   attribution?: string;
@@ -8,41 +18,82 @@ interface Props {
 const { quote, attribution, size = 'large' } = Astro.props;
 ---
 
-<blockquote class:list={['quote', `quote--${size}`]}>
+<blockquote class:list={['quote', `quote--${size}`]} >
   <p class="quote__text" set:html={quote} />
   {attribution && (
-    <cite class="quote__attribution">{attribution}</cite>
+    <cite class="quote__attr">{attribution}</cite>
   )}
 </blockquote>
 
 <style>
+/* ── Conteneur ───────────────────────────────────────────── */
 .quote {
   font-style: normal;
+  /* Identique à .bio__quote-row */
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 2rem;
 }
 
+/* ── Texte de la citation ────────────────────────────────── */
+/*
+  Figma : width 1332 / 1672 = 79.7 %
+  Même police et taille que .bio__quote-text
+*/
 .quote__text {
   font-family: "Ortica Linear", Georgia, serif;
   font-weight: 300;
   color: #DA7F52;
+  /* Figma : 85px / 1728px = 4.92vw */
   line-height: 1.06;
+  flex: 0 0 calc(79.7% - 1rem);
+  max-width: calc(79.7% - 1rem);
 }
 
 .quote--large .quote__text {
-  font-size: clamp(2rem, 5.5vw, 5.3125rem);
+  font-size: clamp(2rem, 4.9vw, 5.3125rem);
 }
 
 .quote--medium .quote__text {
-  font-size: clamp(1.5rem, 3.5vw, 3.5rem);
+  font-size: clamp(1.25rem, 3vw, 3rem);
 }
 
-.quote__attribution {
-  display: block;
-  margin-top: 1.25rem;
+/* ── Attribution ─────────────────────────────────────────── */
+/*
+  Figma : Ortica Light 23px, color #F7F5F3, right-aligned
+  Bottom-aligné grâce à align-items: flex-end du parent
+*/
+.quote__attr {
   font-family: "Ortica Linear", Georgia, serif;
   font-weight: 300;
-  font-size: clamp(0.8125rem, 1.4vw, 1.0625rem);
+  /* Figma : 23px / 1728px = 1.33vw */
+  font-size: clamp(0.8125rem, 1.33vw, 1.4375rem);
   color: #F7F5F3;
   font-style: normal;
   opacity: 0.75;
+  text-align: right;
+  flex-shrink: 1;
+  max-width: 55%;
+  /* Petit décalage vers le bas pour aligner la baseline */
+  padding-bottom: 0.25rem;
+}
+
+/* ── Mobile : on empile ──────────────────────────────────── */
+@media (max-width: 768px) {
+  .quote {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+  .quote__text {
+    flex: none;
+    max-width: 100%;
+  }
+  .quote__attr {
+    text-align: right;
+    align-self: flex-end;
+    white-space: normal;
+  }
 }
 </style>

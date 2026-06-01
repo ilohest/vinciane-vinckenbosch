@@ -1,35 +1,34 @@
 <template>
-  <div class="masonry" :style="{ columnCount: columns }">
-    <div
-      v-for="(item, i) in items"
-      :key="i"
-      class="masonry__item"
-    >
-      <component
-        :is="item.href ? 'a' : 'div'"
-        :href="item.href"
-        :target="item.href ? '_blank' : undefined"
-        :rel="item.href ? 'noopener noreferrer' : undefined"
-        class="masonry__link"
-        :aria-label="item.caption || `Image ${i + 1}`"
-        @click="!item.href && openLightbox(i)"
+  <div class="masonry-gallery" v-bind="$attrs">
+    <div class="masonry" :style="{ columnCount: columns }">
+      <div
+        v-for="(item, i) in items"
+        :key="i"
+        class="masonry__item"
       >
-        <div class="masonry__img-wrap">
-          <img
-            :src="item.image"
-            :alt="item.caption || ''"
-            class="masonry__img"
-            loading="lazy"
-            decoding="async"
-          />
-          <div v-if="item.caption" class="masonry__caption">{{ item.caption }}</div>
-        </div>
-      </component>
+        <component
+          :is="item.href ? 'a' : 'div'"
+          :href="item.href"
+          :target="item.href ? '_blank' : undefined"
+          :rel="item.href ? 'noopener noreferrer' : undefined"
+          class="masonry__link"
+          :aria-label="item.caption || `Image ${i + 1}`"
+          @click="!item.href && openLightbox(i)"
+        >
+          <div class="masonry__img-wrap">
+            <img
+              :src="item.image"
+              :alt="item.caption || ''"
+              class="masonry__img"
+              loading="lazy"
+              decoding="async"
+            />
+            <div v-if="item.caption" class="masonry__caption">{{ item.caption }}</div>
+          </div>
+        </component>
+      </div>
     </div>
-  </div>
 
-  <!-- Lightbox -->
-  <Teleport to="body">
     <div
       v-if="lightboxIndex !== null"
       class="lightbox"
@@ -59,11 +58,15 @@
         </svg>
       </button>
     </div>
-  </Teleport>
+  </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue';
+
+defineOptions({
+  inheritAttrs: false,
+});
 
 interface GalleryItem {
   image: string;
@@ -123,6 +126,10 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
+.masonry-gallery {
+  display: block;
+}
+
 .masonry {
   column-gap: 1rem;
 }
@@ -171,6 +178,13 @@ onUnmounted(() => {
 
 .masonry__link:hover .masonry__caption {
   opacity: 1;
+}
+
+/* Mobile : pas de hover → captions toujours visibles */
+@media (hover: none), (max-width: 768px) {
+  .masonry__caption {
+    opacity: 1;
+  }
 }
 
 /* Lightbox */

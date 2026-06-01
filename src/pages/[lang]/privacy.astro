@@ -1,0 +1,265 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Footer from '../../components/astro/Footer.astro';
+import type { Lang } from '../../lib/types';
+import { LANGS } from '../../lib/i18n';
+
+export function getStaticPaths() {
+  return LANGS.map(lang => ({ params: { lang } }));
+}
+
+const { lang } = Astro.params as { lang: Lang };
+
+const content = {
+  fr: {
+    title: 'Politique de confidentialite',
+    intro: 'Cette page explique quelles donnees peuvent etre traitees lors de votre visite sur le site officiel de Vinciane Vinckenbosch.',
+    updated: 'Derniere mise a jour : 31 mai 2026',
+    sections: [
+      {
+        title: 'Responsable du traitement',
+        paragraphs: [
+          'Le responsable du traitement est Vinciane Vinckenbosch.',
+          'Pour toute question relative a vos donnees personnelles, vous pouvez ecrire a : vinciane.vinckenbosch@gmail.com.',
+        ],
+      },
+      {
+        title: 'Donnees traitees',
+        paragraphs: [
+          'Ce site ne propose pas de formulaire de contact et ne collecte pas directement de donnees personnelles via un compte utilisateur.',
+          'Si vous contactez Vinciane Vinckenbosch par email, les informations que vous envoyez volontairement seront utilisees uniquement pour repondre a votre demande.',
+          'Comme tout site web, l\'hebergeur peut traiter certaines donnees techniques, comme l\'adresse IP, la date de visite, le navigateur utilise ou les pages consultees, afin d\'assurer la securite et le bon fonctionnement du site.',
+        ],
+      },
+      {
+        title: 'Cookies et mesure d\'audience',
+        paragraphs: [
+          'Ce site n\'utilise pas de cookies publicitaires ni de cookies de suivi marketing.',
+          'Aucun outil d\'analyse d\'audience n\'est active a ce stade. Si un outil d\'analyse est ajoute plus tard, cette politique devra etre mise a jour.',
+        ],
+      },
+      {
+        title: 'Videos YouTube',
+        paragraphs: [
+          'Certaines pages peuvent afficher une video YouTube. Le site utilise le domaine youtube-nocookie.com et ne charge le lecteur YouTube qu\'apres action de l\'utilisateur.',
+          'Lorsque vous lancez une video, YouTube/Google peut traiter certaines donnees selon ses propres regles de confidentialite.',
+        ],
+      },
+      {
+        title: 'Base legale et duree de conservation',
+        paragraphs: [
+          'Les donnees techniques sont traitees sur la base de l\'interet legitime a maintenir un site securise et fonctionnel.',
+          'Les messages envoyes par email sont conserves uniquement le temps necessaire au suivi de la demande ou de la relation professionnelle.',
+        ],
+      },
+      {
+        title: 'Vos droits',
+        paragraphs: [
+          'Selon la legislation applicable, vous pouvez demander l\'acces, la rectification ou la suppression de vos donnees personnelles.',
+          'Vous pouvez exercer ces droits en ecrivant a : vinciane.vinckenbosch@gmail.com.',
+        ],
+      },
+    ],
+  },
+  en: {
+    title: 'Privacy Policy',
+    intro: 'This page explains which data may be processed when you visit the official website of Vinciane Vinckenbosch.',
+    updated: 'Last updated: May 31, 2026',
+    sections: [
+      {
+        title: 'Data Controller',
+        paragraphs: [
+          'The data controller is Vinciane Vinckenbosch.',
+          'For any question about personal data, you can write to: vinciane.vinckenbosch@gmail.com.',
+        ],
+      },
+      {
+        title: 'Data Processed',
+        paragraphs: [
+          'This website does not provide a contact form and does not directly collect personal data through user accounts.',
+          'If you contact Vinciane Vinckenbosch by email, the information you voluntarily send will only be used to respond to your request.',
+          'Like any website, the hosting provider may process technical data such as IP address, visit date, browser used or pages viewed, in order to ensure security and proper website operation.',
+        ],
+      },
+      {
+        title: 'Cookies and Analytics',
+        paragraphs: [
+          'This website does not use advertising cookies or marketing tracking cookies.',
+          'No analytics tool is active at this stage. If analytics are added later, this privacy policy should be updated.',
+        ],
+      },
+      {
+        title: 'YouTube Videos',
+        paragraphs: [
+          'Some pages may display a YouTube video. The website uses the youtube-nocookie.com domain and only loads the YouTube player after a user action.',
+          'When you play a video, YouTube/Google may process certain data according to its own privacy rules.',
+        ],
+      },
+      {
+        title: 'Legal Basis and Retention',
+        paragraphs: [
+          'Technical data is processed on the basis of the legitimate interest in maintaining a secure and functional website.',
+          'Email messages are kept only as long as necessary to handle the request or professional relationship.',
+        ],
+      },
+      {
+        title: 'Your Rights',
+        paragraphs: [
+          'Depending on applicable law, you may request access, correction or deletion of your personal data.',
+          'You can exercise these rights by writing to: vinciane.vinckenbosch@gmail.com.',
+        ],
+      },
+    ],
+  },
+  de: {
+    title: 'Datenschutzerklaerung',
+    intro: 'Diese Seite erklaert, welche Daten beim Besuch der offiziellen Website von Vinciane Vinckenbosch verarbeitet werden koennen.',
+    updated: 'Letzte Aktualisierung: 31. Mai 2026',
+    sections: [
+      {
+        title: 'Verantwortliche Stelle',
+        paragraphs: [
+          'Verantwortlich fuer die Datenverarbeitung ist Vinciane Vinckenbosch.',
+          'Bei Fragen zu personenbezogenen Daten koennen Sie schreiben an: vinciane.vinckenbosch@gmail.com.',
+        ],
+      },
+      {
+        title: 'Verarbeitete Daten',
+        paragraphs: [
+          'Diese Website stellt kein Kontaktformular bereit und erhebt keine personenbezogenen Daten ueber Benutzerkonten.',
+          'Wenn Sie Vinciane Vinckenbosch per E-Mail kontaktieren, werden die freiwillig uebermittelten Informationen nur zur Beantwortung Ihrer Anfrage verwendet.',
+          'Wie bei jeder Website kann der Hosting-Anbieter technische Daten wie IP-Adresse, Besuchsdatum, verwendeten Browser oder aufgerufene Seiten verarbeiten, um Sicherheit und Funktion der Website zu gewaehrleisten.',
+        ],
+      },
+      {
+        title: 'Cookies und Analyse',
+        paragraphs: [
+          'Diese Website verwendet keine Werbe-Cookies und keine Marketing-Tracking-Cookies.',
+          'Derzeit ist kein Analyse-Tool aktiv. Falls spaeter ein Analyse-Tool hinzugefuegt wird, sollte diese Datenschutzerklaerung aktualisiert werden.',
+        ],
+      },
+      {
+        title: 'YouTube-Videos',
+        paragraphs: [
+          'Einige Seiten koennen ein YouTube-Video anzeigen. Die Website nutzt die Domain youtube-nocookie.com und laedt den YouTube-Player erst nach einer Aktion des Nutzers.',
+          'Wenn Sie ein Video abspielen, kann YouTube/Google bestimmte Daten nach eigenen Datenschutzregeln verarbeiten.',
+        ],
+      },
+      {
+        title: 'Rechtsgrundlage und Speicherdauer',
+        paragraphs: [
+          'Technische Daten werden auf Grundlage des berechtigten Interesses verarbeitet, eine sichere und funktionsfaehige Website bereitzustellen.',
+          'E-Mail-Nachrichten werden nur so lange aufbewahrt, wie es fuer die Bearbeitung der Anfrage oder der beruflichen Beziehung erforderlich ist.',
+        ],
+      },
+      {
+        title: 'Ihre Rechte',
+        paragraphs: [
+          'Je nach anwendbarem Recht koennen Sie Auskunft, Berichtigung oder Loeschung Ihrer personenbezogenen Daten verlangen.',
+          'Sie koennen diese Rechte ausueben, indem Sie schreiben an: vinciane.vinckenbosch@gmail.com.',
+        ],
+      },
+    ],
+  },
+}[lang];
+---
+
+<BaseLayout
+  lang={lang}
+  title={`${content.title} — Vinciane Vinckenbosch`}
+  description={content.intro}
+>
+  <main class="privacy-page">
+    <div class="privacy-page__container">
+      <header class="privacy-page__header" data-reveal>
+        <h1 class="section-title privacy-page__title">{content.title}</h1>
+        <p class="privacy-page__intro">{content.intro}</p>
+        <p class="privacy-page__updated">{content.updated}</p>
+      </header>
+
+      <div class="privacy-page__content">
+        {content.sections.map(section => (
+          <section class="privacy-page__section" data-reveal>
+            <h2>{section.title}</h2>
+            {section.paragraphs.map(paragraph => <p>{paragraph}</p>)}
+          </section>
+        ))}
+      </div>
+    </div>
+  </main>
+  <Footer lang={lang} />
+</BaseLayout>
+
+<style>
+.privacy-page {
+  --page-padding: clamp(1.5rem, 4vw, 4rem);
+  min-height: 100vh;
+  padding: clamp(4rem, 8vw, 7rem) var(--page-padding);
+}
+
+.privacy-page__container {
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+.privacy-page__header {
+  margin-bottom: clamp(3rem, 6vw, 5rem);
+}
+
+.privacy-page__title {
+  margin-bottom: 1.5rem;
+  font-size: clamp(2.5rem, 5.5vw, 5.375rem);
+  line-height: 1;
+  color: #ffffff;
+}
+
+.privacy-page__intro,
+.privacy-page__updated,
+.privacy-page__section p {
+  font-family: "Ortica Linear", Georgia, serif;
+  font-weight: 300;
+  color: #E6E3DB;
+}
+
+.privacy-page__intro {
+  max-width: 42rem;
+  font-size: clamp(1.125rem, 1.8vw, 1.45rem);
+  line-height: 1.45;
+}
+
+.privacy-page__updated {
+  margin-top: 1.25rem;
+  font-size: 0.95rem;
+  color: #BCB7A9;
+}
+
+.privacy-page__content {
+  display: grid;
+  gap: clamp(2rem, 4vw, 3.5rem);
+}
+
+.privacy-page__section {
+  padding-top: clamp(1.5rem, 3vw, 2rem);
+  border-top: 1px solid rgba(230, 227, 219, 0.18);
+}
+
+.privacy-page__section h2 {
+  margin: 0 0 1rem;
+  font-family: "Andale Mono", "Courier New", monospace;
+  font-size: clamp(0.875rem, 1vw, 1rem);
+  line-height: 1.4;
+  color: #DA7F52;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.privacy-page__section p {
+  margin: 0;
+  font-size: clamp(1rem, 1.35vw, 1.125rem);
+  line-height: 1.65;
+}
+
+.privacy-page__section p + p {
+  margin-top: var(--para-gap);
+}
+</style>

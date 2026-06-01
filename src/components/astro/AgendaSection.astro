@@ -1,14 +1,12 @@
 ---
-import EventRow from './EventRow.astro';
+import AgendaSectionVue from '../vue/AgendaSection.vue';
 import type { Lang } from '../../lib/types';
-import { useTranslations } from '../../lib/i18n';
 
 interface Props {
   lang: Lang;
 }
 
 const { lang } = Astro.props;
-const tr = useTranslations(lang);
 
 const events = [
   {
@@ -23,6 +21,7 @@ const events = [
       "Pavane pour une infante défunte — Ravel",
       "Tzigane — Ravel",
     ],
+    ticketUrl: "https://www.billetweb.fr",
   },
   {
     date: "14 juin 2026",
@@ -33,6 +32,7 @@ const events = [
     program: [
       "Trio pour flûte, alto et harpe — Debussy",
     ],
+    ticketUrl: "https://www.muenchenticket.de",
   },
   {
     date: "20 juin 2026",
@@ -42,8 +42,9 @@ const events = [
     role: "Récital",
     program: [
       "Fantaisie — Saint-Saëns",
-      "L’histoire du tango — Piazzolla",
+      "L'histoire du tango — Piazzolla",
     ],
+    ticketUrl: "",
   },
   {
     date: "5 sept. 2026",
@@ -54,6 +55,7 @@ const events = [
     program: [
       "Œuvre pour alto — Nicolas Bacri (création)",
     ],
+    ticketUrl: "https://www.stadttheater-deggendorf.de",
   },
   {
     date: "12 sept. 2026",
@@ -64,109 +66,97 @@ const events = [
     program: [
       "Concerto pour alto — Walton",
     ],
+    ticketUrl: "https://www.regensburg-tickets.de",
+  },
+  {
+    date: "3 oct. 2026",
+    time: "20h",
+    city: "Bruxelles, BE",
+    venue: "Bozar",
+    role: "Récital",
+    program: [
+      "Suite pour alto seul — Reger",
+      "Sonate — Brahms",
+    ],
+    ticketUrl: "https://www.bozar.be",
+  },
+  {
+    date: "18 oct. 2026",
+    time: "15h",
+    city: "Paris, FR",
+    venue: "Cité de la Musique",
+    role: "Chambre",
+    program: [
+      "Quintette « La Truite » — Schubert",
+    ],
+    ticketUrl: "https://philharmoniedeparis.fr",
+  },
+  {
+    date: "7 nov. 2026",
+    time: "20h",
+    city: "Passau, DE",
+    venue: "Theater Passau",
+    role: "Alto solo",
+    program: [
+      "Concerto pour alto — Bartók",
+    ],
+    ticketUrl: "https://www.theater-passau.de",
   },
 ];
+
+// Convertir les dates FR lisibles en ISO 8601 pour Schema.org
+function toISO(dateStr: string, timeStr: string): string {
+  const months: Record<string, string> = {
+    'jan': '01', 'fév': '02', 'mar': '03', 'avr': '04',
+    'mai': '05', 'jun': '06', 'juil': '07', 'aoû': '08',
+    'sep': '09', 'oct': '10', 'nov': '11', 'déc': '12',
+    'juin': '06', 'juillet': '07', 'août': '08', 'sept': '09',
+  };
+  const parts = dateStr.toLowerCase().replace('.', '').split(' ');
+  const day   = parts[0].padStart(2, '0');
+  const month = months[parts[1]] ?? '01';
+  const year  = parts[2] ?? '2026';
+  const time  = timeStr.replace('h', ':').padEnd(5, '00');
+  return `${year}-${month}-${day}T${time}:00`;
+}
+
+const eventSchemas = events.map(e => ({
+  "@context": "https://schema.org",
+  "@type": "Event",
+  "name": `Concert de Vinciane Vinckenbosch — ${e.role}`,
+  "description": `${e.role} — Programme : ${e.program.join(', ')}`,
+  "startDate": toISO(e.date, e.time ?? '20:00'),
+  "location": {
+    "@type": "Place",
+    "name": e.venue,
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": e.city.split(',')[0].trim(),
+      "addressCountry": e.city.split(',')[1]?.trim() ?? 'DE',
+    }
+  },
+  "performer": {
+    "@type": "Person",
+    "name": "Vinciane Vinckenbosch",
+    "url": "https://vincianevinckenbosch.com"
+  },
+  "organizer": {
+    "@type": "Organization",
+    "name": e.venue
+  },
+  "eventStatus": "https://schema.org/EventScheduled",
+  "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+  ...(e.ticketUrl ? { "offers": {
+    "@type": "Offer",
+    "url": e.ticketUrl,
+    "availability": "https://schema.org/InStock"
+  }} : {})
+}));
 ---
 
-<section class="agenda" id="agenda" aria-labelledby="agenda-title">
-  <div class="agenda__container">
+<!-- JSON-LD Event pour chaque concert — aide Google Rich Results -->
+{eventSchemas.map(schema => (
+  <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+))}
 
-    <div class="agenda__header">
-      <h2 id="agenda-title" class="section-title agenda__title">{tr('agenda.title')}</h2>
-      <a
-        href="https://www.instagram.com"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="agenda__insta"
-        aria-label="Instagram"
-      >
-        <svg width="50" height="50" viewBox="0 0 50 50" fill="none" stroke="currentColor" stroke-width="1.2">
-          <rect x="8" y="8" width="34" height="34" rx="9" ry="9"/>
-          <circle cx="25" cy="25" r="8"/>
-          <circle cx="34" cy="16" r="1.5" fill="currentColor" stroke="none"/>
-        </svg>
-      </a>
-    </div>
-
-    <div class="agenda__list">
-      {events.map((event, i) => (
-        <>
-          <EventRow
-            date={event.date}
-            time={event.time}
-            city={event.city}
-            venue={event.venue}
-            role={event.role}
-            program={event.program}
-            lang={lang}
-          />
-          {i < events.length - 1 && <hr class="agenda__divider" aria-hidden="true" />}
-        </>
-      ))}
-    </div>
-
-    <div class="agenda__footer">
-      <a href={`/${lang}/archives`} class="btn-pill">
-        {tr('agenda.more')}
-      </a>
-    </div>
-
-  </div>
-</section>
-
-<style>
-.agenda {
-  padding: clamp(4rem, 8vw, 8rem) 0;
-}
-
-.agenda__container {
-  max-width: 1728px;
-  margin: 0 auto;
-  padding: 0 clamp(1.5rem, 4vw, 4rem);
-  display: flex;
-  flex-direction: column;
-  gap: clamp(2rem, 3vw, 3rem);
-}
-
-.agenda__header {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-}
-
-.agenda__title {
-  font-size: clamp(2.5rem, 5.5vw, 5.375rem);
-  line-height: 1.28;
-  color: #ffffff;
-}
-
-.agenda__insta {
-  color: #ffffff;
-  opacity: 0.7;
-  transition: opacity 0.2s ease;
-  display: flex;
-  align-items: center;
-  margin-bottom: 0.5rem;
-}
-
-.agenda__insta:hover {
-  opacity: 1;
-}
-
-.agenda__list {
-  display: flex;
-  flex-direction: column;
-}
-
-.agenda__divider {
-  border: none;
-  border-top: 1px solid rgba(255, 255, 255, 0.2);
-  margin: 0;
-}
-
-.agenda__footer {
-  display: flex;
-  justify-content: center;
-  padding-top: 1rem;
-}
-</style>
+<AgendaSectionVue client:load events={events} lang={lang} />

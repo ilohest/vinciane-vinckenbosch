@@ -51,21 +51,29 @@ const pageTitle = {
   en: 'Press — Vinciane Vinckenbosch',
   de: 'Presse — Vinciane Vinckenbosch',
 }[lang];
+
+const pageDescription = {
+  fr: 'Revue de presse de Vinciane Vinckenbosch : articles et critiques parus dans Passauer Neue Presse, Klassik Heute, La Libre Belgique, Bachtrack et d\'autres médias spécialisés.',
+  en: 'Press reviews of Vinciane Vinckenbosch: articles and reviews published in Passauer Neue Presse, Klassik Heute, La Libre Belgique, Bachtrack and other specialist media.',
+  de: 'Pressestimmen zu Vinciane Vinckenbosch: Artikel und Kritiken in der Passauer Neuen Presse, Klassik Heute, La Libre Belgique, Bachtrack und anderen Fachmedien.',
+}[lang];
 ---
 
-<BaseLayout lang={lang} title={pageTitle}>
+<BaseLayout lang={lang} title={pageTitle} description={pageDescription} ogImage="/images/grilc-02173.jpg">
   <main class="presse-page">
     <div class="presse-page__container">
-      <h1 class="section-title presse-page__title">{tr('nav.presse')}</h1>
-      <p class="presse-page__intro">
+      <h1 class="section-title presse-page__title" data-reveal>{tr('nav.presse')}</h1>
+      <p class="presse-page__intro" data-reveal>
         {lang === 'fr' && 'Revue de presse — cliquez sur chaque article pour le lire.'}
         {lang === 'en' && 'Press coverage — click each article to read it.'}
         {lang === 'de' && 'Pressestimmen — klicken Sie auf einen Artikel, um ihn zu lesen.'}
       </p>
-      <MasonryGallery
-        client:visible
-        items={pressItems}
-      />
+      <div data-reveal>
+        <MasonryGallery
+          client:visible
+          items={pressItems}
+        />
+      </div>
     </div>
   </main>
   <Footer lang={lang} />
@@ -73,15 +81,17 @@ const pageTitle = {
 
 <style>
 .presse-page {
+  --page-padding: clamp(1.5rem, 4vw, 4rem);
   min-height: 100vh;
-  padding-top: clamp(4rem, 8vw, 7rem);
-  padding-bottom: clamp(4rem, 8vw, 6rem);
+  /* Navbar fixe (57px) + padding de page */
+  padding-top: calc(var(--navbar-height, 57px) + var(--page-padding));
+  padding-bottom: var(--page-padding);
 }
 
 .presse-page__container {
   max-width: 1728px;
   margin: 0 auto;
-  padding: 0 clamp(1.5rem, 4vw, 4rem);
+  padding: 0 var(--page-padding);
   display: flex;
   flex-direction: column;
   gap: clamp(2rem, 3vw, 3rem);

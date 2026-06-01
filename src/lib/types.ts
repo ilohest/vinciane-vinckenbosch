@@ -30,6 +30,13 @@ export interface Event {
   isFeatured: boolean;
 }
 
+export interface HeroEventTeaser {
+  _id: string;
+  date: string;
+  city: string;
+  country: string;
+}
+
 export interface BiographyBlock {
   image: SanityImageAsset;
   imagePosition: 'left' | 'right';
@@ -40,13 +47,14 @@ export interface Homepage {
   heroImage: SanityImageAsset;
   heroQuote: LocalizedText;
   heroQuoteAttribution: string;
-  upcomingDatesTeaser: string[];
+  heroEvents?: HeroEventTeaser[];
   biographyIntroImage: SanityImageAsset;
   biographySections: BiographyBlock[];
   biographyPDFUrl: string;
   quote2Text: LocalizedText;
   quote2Attribution: string;
   contactEmail: string;
+  contactVideoUrl?: string;
   socialLinks: {
     youtube?: string;
     facebook?: string;

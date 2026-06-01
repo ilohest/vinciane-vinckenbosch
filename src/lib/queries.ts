@@ -1,5 +1,5 @@
 import { sanityClient } from './sanity';
-import type { Homepage, Event, MediaItem, PressItem } from './types';
+import type { Homepage, Event, HeroEventTeaser, MediaItem, PressItem } from './types';
 
 export async function getHomepage(): Promise<Homepage | null> {
   try {
@@ -7,7 +7,12 @@ export async function getHomepage(): Promise<Homepage | null> {
       heroImage { asset->{ url }, alt },
       heroQuote,
       heroQuoteAttribution,
-      upcomingDatesTeaser,
+      heroEvents[]->{
+        _id,
+        date,
+        city,
+        country
+      },
       biographyIntroImage { asset->{ url }, alt },
       biographySections[] {
         image { asset->{ url }, alt },
@@ -18,10 +23,48 @@ export async function getHomepage(): Promise<Homepage | null> {
       quote2Text,
       quote2Attribution,
       contactEmail,
+      contactVideoUrl,
       socialLinks
     }`);
   } catch {
     return null;
+  }
+}
+
+function todayIsoDate(): string {
+  return new Date().toISOString().slice(0, 10);
+}
+
+export async function getHeroEvents(limit = 3): Promise<HeroEventTeaser[]> {
+  try {
+    const homepage = await sanityClient.fetch<Pick<Homepage, 'heroEvents'> | null>(
+      `*[_type == "homepage"][0]{
+        heroEvents[]->{
+          _id,
+          date,
+          city,
+          country
+        }
+      }`
+    );
+
+    const selectedEvents = homepage?.heroEvents?.filter((event) => event?.date && event?.city && event?.country) ?? [];
+    if (selectedEvents.length > 0) {
+      return selectedEvents.slice(0, limit);
+    }
+
+    return await sanityClient.fetch<HeroEventTeaser[]>(
+      `*[_type == "event" && defined(date) && defined(city) && defined(country) && date >= $today]
+        | order(date asc) [0...$limit]{
+          _id,
+          date,
+          city,
+          country
+        }`,
+      { today: todayIsoDate(), limit }
+    );
+  } catch {
+    return [];
   }
 }
 

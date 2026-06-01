@@ -29,12 +29,12 @@ export const homepage = defineType({
       type: 'string',
     }),
     defineField({
-      name: 'upcomingDatesTeaser',
-      title: 'Prochaines dates (hero)',
+      name: 'heroEvents',
+      title: 'Concerts affichés dans le hero',
       type: 'array',
-      of: [{ type: 'string' }],
-      description: 'Ex: "1 Mai | Vienne, AU"',
-      validation: (R) => R.max(3),
+      of: [{ type: 'reference', to: [{ type: 'event' }] }],
+      description: 'Sélectionnez jusqu\'à 3 concerts. Si rien n\'est sélectionné, les 3 prochains concerts seront affichés automatiquement.',
+      validation: (R) => R.max(3).unique(),
     }),
     defineField({
       name: 'biographyIntroImage',
@@ -91,6 +91,16 @@ export const homepage = defineType({
       name: 'contactEmail',
       title: 'Email de contact',
       type: 'string',
+    }),
+    defineField({
+      name: 'contactVideoUrl',
+      title: 'Vidéo YouTube contact',
+      type: 'url',
+      description: 'Collez ici le lien YouTube complet de la vidéo affichée dans la section contact.',
+      validation: (R) => R.uri({
+        scheme: ['http', 'https'],
+        allowRelative: false,
+      }),
     }),
     defineField({
       name: 'socialLinks',
