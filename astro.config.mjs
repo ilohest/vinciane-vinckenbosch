@@ -3,9 +3,13 @@ import { defineConfig } from 'astro/config';
 import vue from '@astrojs/vue';
 import tailwindcss from '@tailwindcss/vite';
 import sitemap from '@astrojs/sitemap';
+import vercel from '@astrojs/vercel';
 
 export default defineConfig({
   site: 'https://vincianevinckenbosch.com',
+  // Site statique par défaut ; les routes serveur (ex: /api/contact)
+  // déclarent `export const prerender = false` pour tourner en serverless.
+  adapter: vercel(),
   integrations: [
     vue(),
     sitemap({

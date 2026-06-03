@@ -4,6 +4,7 @@ import Footer from '../../components/astro/Footer.astro';
 import MasonryGallery from '../../components/vue/MasonryGallery.vue';
 import type { Lang } from '../../lib/types';
 import { LANGS, useTranslations } from '../../lib/i18n';
+import { getMediaGalleryItems } from '../../lib/queries';
 
 export function getStaticPaths() {
   return LANGS.map(lang => ({ params: { lang } }));
@@ -12,19 +13,25 @@ export function getStaticPaths() {
 const { lang } = Astro.params as { lang: Lang };
 const tr = useTranslations(lang);
 
-// Placeholder media items — will come from Sanity
-const mediaItems = [
-  { image: '/images/grilc-03101.jpg', caption: 'Récital — 2025' },
-  { image: '/images/grilc-02541.jpg', caption: 'Niederbayerische Philharmonie' },
-  { image: '/images/grilc-02660.jpg', caption: 'Portrait' },
-  { image: '/images/grilc-02173.jpg', caption: 'Trio Linaris' },
-  { image: '/images/grilc-01839.jpg', caption: 'Concert' },
-  { image: '/images/grilc-02056.jpg', caption: 'Studio' },
-  { image: '/images/grilc-03039.jpg', caption: 'Festival Bad Kissingen' },
-  { image: '/images/grilc-03046.jpg', caption: 'Portrait' },
-  { image: '/images/grilc-02256.jpg', caption: 'Répétition' },
-  { image: '/images/grilc-02439.jpg', caption: 'Scène' },
+/**
+ * Galerie media gérée via Sanity (schéma « mediaItem »), ordonnable par
+ * glisser-déposer. Tant que Sanity est vide, on affiche le fallback ci-dessous.
+ */
+const FALLBACK_MEDIA = [
+  { image: '/images/grilc-03101.jpg', downloadUrl: '/images/grilc-03101.jpg', caption: '© Andrej Grilc' },
+  { image: '/images/grilc-02541.jpg', downloadUrl: '/images/grilc-02541.jpg', caption: '© Andrej Grilc' },
+  { image: '/images/grilc-02660.jpg', downloadUrl: '/images/grilc-02660.jpg', caption: '© Andrej Grilc' },
+  { image: '/images/grilc-02173.jpg', downloadUrl: '/images/grilc-02173.jpg', caption: '© Andrej Grilc' },
+  { image: '/images/grilc-01839.jpg', downloadUrl: '/images/grilc-01839.jpg', caption: '© Andrej Grilc' },
+  { image: '/images/grilc-02056.jpg', downloadUrl: '/images/grilc-02056.jpg', caption: '© Andrej Grilc' },
+  { image: '/images/grilc-03039.jpg', downloadUrl: '/images/grilc-03039.jpg', caption: '© Andrej Grilc' },
+  { image: '/images/grilc-03046.jpg', downloadUrl: '/images/grilc-03046.jpg', caption: '© Andrej Grilc' },
+  { image: '/images/grilc-02256.jpg', downloadUrl: '/images/grilc-02256.jpg', caption: '© Andrej Grilc' },
+  { image: '/images/grilc-02439.jpg', downloadUrl: '/images/grilc-02439.jpg', caption: '© Andrej Grilc' },
 ];
+
+const sanityMedia = await getMediaGalleryItems(lang);
+const mediaItems = sanityMedia.length > 0 ? sanityMedia : FALLBACK_MEDIA;
 
 const pageTitle = {
   fr: 'Media — Vinciane Vinckenbosch',
@@ -76,9 +83,9 @@ const gallerySchema = {
     <div class="media-page__container">
       <h1 class="section-title media-page__title" data-reveal>{tr('nav.media')}</h1>
       <MasonryGallery
-        client:only="vue"
+        client:load
         items={mediaItems}
-        enableLightbox={true}
+        lang={lang}
       />
     </div>
   </main>

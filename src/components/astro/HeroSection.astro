@@ -1,14 +1,17 @@
 ---
 import type { HeroEventTeaser, Lang } from '../../lib/types';
+import { sanityImageSrcset, sanityImageUrl } from '../../lib/sanity-image';
 
 interface Props {
   lang: Lang;
+  heroImageUrl?: string;
   upcomingDates?: string[];
   heroEvents?: HeroEventTeaser[];
 }
 
 const {
   lang,
+  heroImageUrl = '/images/grilc-03101.jpg',
   upcomingDates = ['1 Mai | Vienne, AU', '20, 21 Mai | Lucerne, CH', '20 Juin | Bad Kissingen, DE'],
   heroEvents = [],
 } = Astro.props;
@@ -28,26 +31,48 @@ function formatHeroDate(date: string): string {
   }).format(parsedDate);
 }
 
-function countryInitial(country: string): string {
-  return country.trim().charAt(0).toUpperCase();
+function countryIso(country: string): string {
+  return country.trim().toUpperCase();
 }
 
 const displayedDates = heroEvents.length > 0
-  ? heroEvents.map((event) => `${formatHeroDate(event.date)} / ${event.city}, ${countryInitial(event.country)}`)
+  ? heroEvents.map((event) => `${formatHeroDate(event.date)} | ${event.city}, ${countryIso(event.country)}`)
   : upcomingDates;
+
+const heroSanitySrcset = sanityImageSrcset(heroImageUrl, [640, 960, 1280, 1600, 2000, 2400]);
+const heroImageSrc = sanityImageUrl(heroImageUrl, 1600);
 ---
 
 <section class="hero" aria-label="Vinciane Vinckenbosch">
 
   <!-- Image + overlay -->
   <div class="hero__frame" aria-hidden="true">
-    <img
-      src="/images/grilc-03101.jpg"
-      alt="Vinciane Vinckenbosch, altiste belge, jouant de l'alto"
-      class="hero__img"
-      fetchpriority="high"
-      decoding="async"
-    />
+    <picture>
+      {heroImageUrl === '/images/grilc-03101.jpg' && (
+        <source
+          type="image/webp"
+          srcset="/images/grilc-03101-828w.webp 828w,
+                  /images/grilc-03101-1600w.webp 1600w,
+                  /images/grilc-03101-2500w.webp 2500w"
+          sizes="100vw"
+        />
+      )}
+      {heroSanitySrcset && (
+        <source
+          srcset={heroSanitySrcset}
+          sizes="100vw"
+        />
+      )}
+      <img
+        src={heroImageSrc}
+        alt="Vinciane Vinckenbosch, altiste belge, jouant de l'alto"
+        class="hero__img"
+        fetchpriority="high"
+        decoding="async"
+        width="9504"
+        height="6336"
+      />
+    </picture>
     <div class="hero__overlay"></div>
   </div>
 
@@ -76,7 +101,7 @@ const displayedDates = heroEvents.length > 0
         </ul>
       )}
       <a href={`/${lang}/#agenda`} class="hero__cta btn-pill" aria-label="Voir l'agenda">
-        AGENDA →
+        AGENDA
       </a>
     </div>
 

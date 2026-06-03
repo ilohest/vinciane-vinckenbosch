@@ -27,7 +27,7 @@
 
       <!-- List -->
       <p v-if="filteredEvents.length === 0" class="agenda__empty">
-        Aucun résultat pour «&#160;{{ query }}&#160;»
+        {{ emptyLabel }}
       </p>
 
       <TransitionGroup v-else tag="div" name="event-reveal" class="agenda__list">
@@ -35,14 +35,14 @@
           v-for="(event, idx) in visibleEvents"
           :key="`${event.date}-${event.city}`"
           class="event-wrap"
-          :class="{ 'event-wrap--linked': !!event.ticketUrl }"
+          :class="{ 'event-wrap--linked': !!event.ticketUrl && !hideLinks }"
           :style="{ '--stagger': `${Math.max(0, idx - MAX + 1) * 60}ms` }"
         >
           <component
-            :is="event.ticketUrl ? 'a' : 'div'"
-            :href="event.ticketUrl || undefined"
-            :target="event.ticketUrl ? '_blank' : undefined"
-            :rel="event.ticketUrl ? 'noopener noreferrer' : undefined"
+            :is="event.ticketUrl && !hideLinks ? 'a' : 'div'"
+            :href="event.ticketUrl && !hideLinks ? event.ticketUrl : undefined"
+            :target="event.ticketUrl && !hideLinks ? '_blank' : undefined"
+            :rel="event.ticketUrl && !hideLinks ? 'noopener noreferrer' : undefined"
             class="event"
           >
             <div class="event__date-col">
@@ -66,7 +66,7 @@
           <div class="event-line" aria-hidden="true">
             <div class="event-line__sweep"></div>
             <svg
-              v-if="event.ticketUrl"
+              v-if="event.ticketUrl && !hideLinks"
               class="event-line__arrow"
               viewBox="0 0 24 24"
               fill="none"
@@ -84,7 +84,7 @@
         <div class="agenda__footer-left">
           <Transition name="slide-left">
             <a
-              v-if="showAll"
+              v-if="showAll && !hideArchivesLink"
               :href="`/${lang}/archives`"
               class="btn-pill"
             >{{ archivesLabel }}</a>
@@ -98,6 +98,11 @@
               @click="showAll = true"
             >{{ moreLabel }}</button>
           </Transition>
+          <a
+            v-if="backHref"
+            :href="backHref"
+            class="btn-pill"
+          >{{ backLabel }}</a>
         </div>
       </div>
 
@@ -121,32 +126,120 @@ interface Event {
 const props = defineProps<{
   events: Event[];
   lang: 'fr' | 'en' | 'de';
+  /** true → affiche uniquement les dates passées (page archives) */
+  showPastOnly?: boolean;
+  /** true → tout affiché d'emblée, sans pagination */
+  showAllByDefault?: boolean;
+  /** true → masque le bouton « archives → » (déjà sur la page archives) */
+  hideArchivesLink?: boolean;
+  /** true → aucun lien ni effet hover (page archives) */
+  hideLinks?: boolean;
+  /** Lien retour vers l'agenda (affiché à droite du footer, page archives) */
+  backHref?: string;
 }>();
 
 const MAX = 6;
 const query = ref('');
-const showAll = ref(false);
+const showAll = ref(props.showAllByDefault ?? false);
 
 const i18n = {
-  fr: { title: 'agenda', more: 'plus de dates →', archives: 'archives →', search: 'rechercher…', empty: 'Aucun résultat pour' },
-  en: { title: 'agenda', more: 'more dates →',   archives: 'archives →', search: 'search…',      empty: 'No results for' },
-  de: { title: 'agenda', more: 'mehr termine →', archives: 'archiv →',   search: 'suchen…',       empty: 'Keine Ergebnisse für' },
+  fr: {
+    titleAgenda:   'agenda',
+    titleArchives: 'archives',
+    more:      'plus de dates',
+    archives:  'archives',
+    backLabel: "voir l'agenda",
+    search:    'rechercher…',
+    noResults: 'Aucun résultat pour',
+    noEvents:  'Aucun concert à venir.',
+    noArchive: 'Aucune archive disponible.',
+  },
+  en: {
+    titleAgenda:   'agenda',
+    titleArchives: 'archives',
+    more:      'more dates',
+    archives:  'archives',
+    backLabel: 'back to agenda',
+    search:    'search…',
+    noResults: 'No results for',
+    noEvents:  'No upcoming concerts.',
+    noArchive: 'No archived concerts yet.',
+  },
+  de: {
+    titleAgenda:   'agenda',
+    titleArchives: 'archiv',
+    more:      'mehr termine',
+    archives:  'archiv',
+    backLabel: 'zum agenda',
+    search:    'suchen…',
+    noResults: 'Keine Ergebnisse für',
+    noEvents:  'Keine bevorstehenden Konzerte.',
+    noArchive: 'Noch keine archivierten Konzerte.',
+  },
 } as const;
 
 const t = computed(() => i18n[props.lang] ?? i18n.fr);
-const titleLabel    = computed(() => t.value.title);
-const moreLabel     = computed(() => t.value.more);
-const archivesLabel = computed(() => t.value.archives);
+const titleLabel        = computed(() => props.showPastOnly ? t.value.titleArchives : t.value.titleAgenda);
+const moreLabel         = computed(() => t.value.more);
+const archivesLabel     = computed(() => t.value.archives);
+const backLabel         = computed(() => t.value.backLabel);
 const searchPlaceholder = computed(() => t.value.search);
+const emptyLabel        = computed(() => {
+  const trimmedQuery = query.value.trim();
+  if (trimmedQuery) return `${t.value.noResults} « ${trimmedQuery} »`;
+  return props.showPastOnly ? t.value.noArchive : t.value.noEvents;
+});
+
+// ── Helpers de date ──────────────────────────────────────────────────────────
+
+const MONTH_MAP: Record<string, number> = {
+  'jan': 0, 'fév': 1, 'février': 1, 'mar': 2, 'mars': 2,
+  'avr': 3, 'avril': 3, 'mai': 4, 'juin': 5,
+  'juil': 6, 'juillet': 6, 'août': 7, 'aoû': 7,
+  'sep': 8, 'sept': 8, 'septembre': 8,
+  'oct': 9, 'octobre': 9, 'nov': 10, 'novembre': 10,
+  'déc': 11, 'dec': 11, 'décembre': 11,
+  'fev': 1, 'aou': 7,
+};
+
+function parseEventDate(dateStr: string): Date {
+  const parts = dateStr.toLowerCase().replace(/\./g, '').trim().split(/\s+/);
+  const day   = parseInt(parts[0] ?? '1');
+  const month = MONTH_MAP[parts[1] ?? ''] ?? 0;
+  const year  = parseInt(parts[2] ?? String(new Date().getFullYear()));
+  return new Date(year, month, day);
+}
+
+function startOfToday(): Date {
+  const d = new Date();
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+}
+
+// ── Filtrage ─────────────────────────────────────────────────────────────────
 
 function normalize(str: string): string {
   return str.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
 }
 
+const dateFilteredEvents = computed(() => {
+  const today = startOfToday();
+  const sorted = [...props.events];
+  if (props.showPastOnly) {
+    // Archives : dates < aujourd'hui, du plus récent au plus ancien
+    return sorted
+      .filter(e => parseEventDate(e.date) < today)
+      .sort((a, b) => parseEventDate(b.date).getTime() - parseEventDate(a.date).getTime());
+  }
+  // Agenda : dates >= aujourd'hui (y compris aujourd'hui), du plus proche au plus lointain
+  return sorted
+    .filter(e => parseEventDate(e.date) >= today)
+    .sort((a, b) => parseEventDate(a.date).getTime() - parseEventDate(b.date).getTime());
+});
+
 const filteredEvents = computed(() => {
-  if (!query.value.trim()) return props.events;
+  if (!query.value.trim()) return dateFilteredEvents.value;
   const q = normalize(query.value.trim());
-  return props.events.filter(event => {
+  return dateFilteredEvents.value.filter(event => {
     const haystack = normalize([
       event.date,
       event.time ?? '',
@@ -177,13 +270,13 @@ const hasMore = computed(() => filteredEvents.value.length > MAX);
     On élargit la date pour que "21 mai 2026" tienne sur une ligne
     sans text-transform: uppercase
   */
-  --date-col: clamp(12rem, 15vw, 18rem);
+  --date-col: clamp(14rem, 17vw, 20rem);
   --city-col: clamp(5rem, 5.5vw, 7rem);
   --venue-col: clamp(8rem, 14.8vw, 16rem);
   --role-col: clamp(6rem, 7.9vw, 9rem);
   max-width: 1728px;
   margin: 0 auto;
-  padding: clamp(4rem, 8vw, 8rem) clamp(1.5rem, 4vw, 4rem);
+  padding: clamp(4rem, 8vw, 8rem) clamp(1.5rem, 4vw, 4rem) clamp(2rem, 3vw, 3rem);
   display: flex;
   flex-direction: column;
   gap: clamp(2rem, 3vw, 3rem);
@@ -329,6 +422,7 @@ a.event {
   color: #ffffff;
   line-height: 1.1;
   display: block;
+  white-space: nowrap;
 }
 
 .event__time {

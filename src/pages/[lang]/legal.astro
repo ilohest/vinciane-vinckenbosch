@@ -3,6 +3,8 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import Footer from '../../components/astro/Footer.astro';
 import type { Lang } from '../../lib/types';
 import { LANGS } from '../../lib/i18n';
+import { getLegalNotice } from '../../lib/queries';
+import { localizedSections } from '../../lib/portable-text';
 
 export function getStaticPaths() {
   return LANGS.map(lang => ({ params: { lang } }));
@@ -10,155 +12,30 @@ export function getStaticPaths() {
 
 const { lang } = Astro.params as { lang: Lang };
 
+const sanityLegal = await getLegalNotice();
+
 const content = {
   fr: {
-    title: 'Mentions legales',
-    intro: 'Informations legales relatives au site officiel de Vinciane Vinckenbosch.',
-    updated: 'Derniere mise a jour : 31 mai 2026',
-    sections: [
-      {
-        title: 'Editeur du site',
-        paragraphs: [
-          'Ce site est le site officiel de Vinciane Vinckenbosch, altiste.',
-          'Responsable du contenu : Vinciane Vinckenbosch.',
-          'Email de contact : vinciane.vinckenbosch@gmail.com.',
-          'Adresse professionnelle, numero d\'entreprise ou numero de TVA : a completer si applicable.',
-        ],
-      },
-      {
-        title: 'Creation du site',
-        paragraphs: [
-          'Conception et developpement : Isaure Lohest.',
-          'Site web : isaure-lohest.com.',
-        ],
-      },
-      {
-        title: 'Hebergement',
-        paragraphs: [
-          'Hebergeur : a completer selon le prestataire utilise pour la mise en ligne du site.',
-          'Les informations exactes de l\'hebergeur devront etre ajoutees avant la publication definitive.',
-        ],
-      },
-      {
-        title: 'Propriete intellectuelle',
-        paragraphs: [
-          'Les textes, photographies, images, videos, graphismes, logos et elements de ce site sont proteges par le droit d\'auteur et les droits voisins.',
-          'Toute reproduction, distribution, modification ou utilisation sans autorisation prealable est interdite.',
-        ],
-      },
-      {
-        title: 'Credits photographiques',
-        paragraphs: [
-          'Photographies : Andrej Grilc, sauf mention contraire.',
-        ],
-      },
-      {
-        title: 'Liens externes',
-        paragraphs: [
-          'Ce site peut contenir des liens vers des sites externes, notamment YouTube ou les reseaux sociaux. Vinciane Vinckenbosch n\'est pas responsable du contenu ni des pratiques de confidentialite de ces sites tiers.',
-        ],
-      },
-    ],
+    title: 'Mentions légales',
+    intro: 'Informations légales relatives au site officiel de Vinciane Vinckenbosch.',
+    updated: 'Dernière mise à jour : 31 mai 2026',
+    empty: 'Le contenu de cette page est en cours de mise à jour.',
   },
   en: {
     title: 'Legal Notice',
     intro: 'Legal information about the official website of Vinciane Vinckenbosch.',
     updated: 'Last updated: May 31, 2026',
-    sections: [
-      {
-        title: 'Website Publisher',
-        paragraphs: [
-          'This website is the official website of Vinciane Vinckenbosch, violist.',
-          'Content owner: Vinciane Vinckenbosch.',
-          'Contact email: vinciane.vinckenbosch@gmail.com.',
-          'Professional address, company number or VAT number: to be completed if applicable.',
-        ],
-      },
-      {
-        title: 'Website Creation',
-        paragraphs: [
-          'Design and development: Isaure Lohest.',
-          'Website: isaure-lohest.com.',
-        ],
-      },
-      {
-        title: 'Hosting',
-        paragraphs: [
-          'Hosting provider: to be completed according to the provider used to publish the website.',
-          'The exact hosting provider details should be added before final publication.',
-        ],
-      },
-      {
-        title: 'Intellectual Property',
-        paragraphs: [
-          'Texts, photographs, images, videos, graphics, logos and other elements of this website are protected by copyright and related rights.',
-          'Any reproduction, distribution, modification or use without prior authorization is prohibited.',
-        ],
-      },
-      {
-        title: 'Photo Credits',
-        paragraphs: [
-          'Photography: Andrej Grilc, unless otherwise stated.',
-        ],
-      },
-      {
-        title: 'External Links',
-        paragraphs: [
-          'This website may contain links to external websites, including YouTube or social networks. Vinciane Vinckenbosch is not responsible for the content or privacy practices of third-party websites.',
-        ],
-      },
-    ],
+    empty: 'The content of this page is being updated.',
   },
   de: {
     title: 'Impressum',
     intro: 'Rechtliche Informationen zur offiziellen Website von Vinciane Vinckenbosch.',
     updated: 'Letzte Aktualisierung: 31. Mai 2026',
-    sections: [
-      {
-        title: 'Website-Betreiberin',
-        paragraphs: [
-          'Diese Website ist die offizielle Website von Vinciane Vinckenbosch, Bratschistin.',
-          'Verantwortlich fuer den Inhalt: Vinciane Vinckenbosch.',
-          'Kontakt-E-Mail: vinciane.vinckenbosch@gmail.com.',
-          'Berufsadresse, Unternehmensnummer oder Umsatzsteuer-Identifikationsnummer: falls zutreffend zu ergaenzen.',
-        ],
-      },
-      {
-        title: 'Erstellung der Website',
-        paragraphs: [
-          'Design und Entwicklung: Isaure Lohest.',
-          'Website: isaure-lohest.com.',
-        ],
-      },
-      {
-        title: 'Hosting',
-        paragraphs: [
-          'Hosting-Anbieter: je nach Anbieter, ueber den die Website veroeffentlicht wird, zu ergaenzen.',
-          'Die genauen Angaben zum Hosting-Anbieter sollten vor der finalen Veroeffentlichung ergaenzt werden.',
-        ],
-      },
-      {
-        title: 'Urheberrecht',
-        paragraphs: [
-          'Texte, Fotografien, Bilder, Videos, Grafiken, Logos und sonstige Inhalte dieser Website sind urheberrechtlich und leistungsschutzrechtlich geschuetzt.',
-          'Jede Vervielfaeltigung, Verbreitung, Bearbeitung oder Nutzung ohne vorherige Genehmigung ist untersagt.',
-        ],
-      },
-      {
-        title: 'Bildnachweise',
-        paragraphs: [
-          'Fotografie: Andrej Grilc, sofern nicht anders angegeben.',
-        ],
-      },
-      {
-        title: 'Externe Links',
-        paragraphs: [
-          'Diese Website kann Links zu externen Websites enthalten, darunter YouTube oder soziale Netzwerke. Vinciane Vinckenbosch ist nicht fuer Inhalte oder Datenschutzpraktiken dieser Drittanbieter-Websites verantwortlich.',
-        ],
-      },
-    ],
+    empty: 'Der Inhalt dieser Seite wird derzeit aktualisiert.',
   },
 }[lang];
+
+const sections = localizedSections(sanityLegal?.content, lang) ?? [];
 ---
 
 <BaseLayout
@@ -175,12 +52,17 @@ const content = {
       </header>
 
       <div class="legal-page__content">
-        {content.sections.map(section => (
-          <section class="legal-page__section" data-reveal>
-            <h2>{section.title}</h2>
-            {section.paragraphs.map(paragraph => <p>{paragraph}</p>)}
-          </section>
-        ))}
+        {sections.length > 0
+          ? sections.map(section => (
+              <section class="legal-page__section" data-reveal>
+                {section.title && <h2>{section.title}</h2>}
+                {section.paragraphs.map(paragraph => <p>{paragraph}</p>)}
+              </section>
+            ))
+          : (
+              <p class="legal-page__empty" data-reveal>{content.empty}</p>
+            )
+        }
       </div>
     </div>
   </main>
@@ -212,7 +94,8 @@ const content = {
 
 .legal-page__intro,
 .legal-page__updated,
-.legal-page__section p {
+.legal-page__section p,
+.legal-page__empty {
   font-family: "Ortica Linear", Georgia, serif;
   font-weight: 300;
   color: #E6E3DB;
@@ -258,5 +141,12 @@ const content = {
 
 .legal-page__section p + p {
   margin-top: var(--para-gap);
+}
+
+.legal-page__empty {
+  padding-top: clamp(1.5rem, 3vw, 2rem);
+  border-top: 1px solid rgba(230, 227, 219, 0.18);
+  font-size: clamp(1rem, 1.35vw, 1.125rem);
+  line-height: 1.65;
 }
 </style>

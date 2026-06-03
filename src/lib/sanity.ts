@@ -10,7 +10,9 @@ export const sanityClient = createClient({
   projectId,
   dataset,
   apiVersion: import.meta.env.SANITY_API_VERSION ?? '2024-01-01',
-  useCdn: true,
+  // false → le build récupère toujours le contenu le plus à jour (pas le cache CDN).
+  // Important : le site est régénéré à chaque publication via webhook.
+  useCdn: false,
 });
 
 export function imageUrl(ref: string): string {

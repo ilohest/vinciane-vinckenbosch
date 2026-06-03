@@ -4,6 +4,7 @@ import Footer from '../../components/astro/Footer.astro';
 import MasonryGallery from '../../components/vue/MasonryGallery.vue';
 import type { Lang } from '../../lib/types';
 import { LANGS, useTranslations } from '../../lib/i18n';
+import { getPressGalleryItems } from '../../lib/queries';
 
 export function getStaticPaths() {
   return LANGS.map(lang => ({ params: { lang } }));
@@ -12,39 +13,32 @@ export function getStaticPaths() {
 const { lang } = Astro.params as { lang: Lang };
 const tr = useTranslations(lang);
 
-// Placeholder press items — screenshots + article links will come from Sanity
-const pressItems = [
+/**
+ * Articles de presse gérables via Sanity (schéma « pressItem »).
+ * `href` est OPTIONNEL : si la source en ligne existe, un bouton « Lire l'article »
+ * apparaît dans l'agrandissement. Sinon (article papier/payant), l'image reste
+ * consultable en grand sans lien.
+ *
+ * Tant que Sanity n'est pas rempli, on utilise le fallback ci-dessous.
+ */
+const FALLBACK_PRESS = [
   {
-    image: '/images/grilc-03101.jpg', // placeholder — replace with actual press screenshots
-    caption: 'Passauer Neue Presse',
-    href: 'https://example.com/article-1',
+    image: '/images/press/heilbronner-stimme-2017.jpg',
+    caption: 'Heilbronner Stimme — 19 août 2017',
   },
   {
-    image: '/images/grilc-02541.jpg',
-    caption: 'Klassik Heute',
-    href: 'https://example.com/article-2',
+    image: '/images/press/pnp-grosse-kammermusik-2024.jpg',
+    caption: 'Passauer Neue Presse — 7 oct. 2024',
+    href: 'https://www.pnp.de/lokales/landkreis-passau/grosse-kammermusik-15534642',
   },
   {
-    image: '/images/grilc-02660.jpg',
-    caption: 'La Libre Belgique',
-    href: 'https://example.com/article-3',
-  },
-  {
-    image: '/images/grilc-01839.jpg',
-    caption: 'Le Soir',
-    href: 'https://example.com/article-4',
-  },
-  {
-    image: '/images/grilc-02173.jpg',
-    caption: 'Crescendo Magazine',
-    href: 'https://example.com/article-5',
-  },
-  {
-    image: '/images/grilc-02056.jpg',
-    caption: 'Bachtrack',
-    href: 'https://example.com/article-6',
+    image: '/images/press/reise-kammermusik-2024.jpg',
+    caption: 'Reise durch die Welt der Kammermusik',
   },
 ];
+
+const sanityPress = await getPressGalleryItems();
+const pressItems = sanityPress.length > 0 ? sanityPress : FALLBACK_PRESS;
 
 const pageTitle = {
   fr: 'Presse — Vinciane Vinckenbosch',
@@ -63,15 +57,11 @@ const pageDescription = {
   <main class="presse-page">
     <div class="presse-page__container">
       <h1 class="section-title presse-page__title" data-reveal>{tr('nav.presse')}</h1>
-      <p class="presse-page__intro" data-reveal>
-        {lang === 'fr' && 'Revue de presse — cliquez sur chaque article pour le lire.'}
-        {lang === 'en' && 'Press coverage — click each article to read it.'}
-        {lang === 'de' && 'Pressestimmen — klicken Sie auf einen Artikel, um ihn zu lesen.'}
-      </p>
-      <div data-reveal>
+      <div>
         <MasonryGallery
-          client:visible
+          client:only="vue"
           items={pressItems}
+          lang={lang}
         />
       </div>
     </div>

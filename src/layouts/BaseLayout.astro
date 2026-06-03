@@ -3,7 +3,6 @@ import '../styles/global.css';
 import NavBar from '../components/vue/NavBar.vue';
 import { LANGS, localePath } from '../lib/i18n';
 import type { Lang } from '../lib/types';
-import { ClientRouter } from 'astro:transitions';
 
 interface Props {
   lang: Lang;
@@ -30,6 +29,8 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonicalURL} />
+    <link rel="preconnect" href="https://cdn.sanity.io" />
+    <link rel="dns-prefetch" href="https://cdn.sanity.io" />
 
     <!-- hreflang for i18n -->
     {LANGS.map(l => (
@@ -132,12 +133,10 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
     <meta name="theme-color" content="#232323" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 
-    <!-- View Transitions (Astro 6 : ClientRouter) -->
-    <ClientRouter />
   </head>
   <body>
     <slot />
-    <NavBar client:load lang={lang} currentPath={Astro.url.pathname} />
+    <NavBar client:idle lang={lang} currentPath={Astro.url.pathname} />
 
     <!-- ── Curseur personnalisé — point orange (desktop only) ── -->
     <div id="custom-cursor" aria-hidden="true"></div>
@@ -212,7 +211,6 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
       }
 
       initAll();
-      document.addEventListener('astro:page-load', initAll);
     </script>
   </body>
 </html>

@@ -1,6 +1,7 @@
 ---
 import AgendaSectionVue from '../vue/AgendaSection.vue';
 import type { Lang } from '../../lib/types';
+import { getAgendaEvents } from '../../lib/queries';
 
 interface Props {
   lang: Lang;
@@ -8,111 +9,16 @@ interface Props {
 
 const { lang } = Astro.props;
 
-const events = [
-  {
-    date: "21 mai 2026",
-    time: "20h",
-    city: "Lyon, FR",
-    venue: "Conservatoire national",
-    role: "Alto solo",
-    program: [
-      "Danses roumaines — Bartók",
-      "Beau soir — Debussy",
-      "Pavane pour une infante défunte — Ravel",
-      "Tzigane — Ravel",
-    ],
-    ticketUrl: "https://www.billetweb.fr",
-  },
-  {
-    date: "14 juin 2026",
-    time: "19h30",
-    city: "Munich, DE",
-    venue: "Prinzregententheater",
-    role: "Chambre",
-    program: [
-      "Trio pour flûte, alto et harpe — Debussy",
-    ],
-    ticketUrl: "https://www.muenchenticket.de",
-  },
-  {
-    date: "20 juin 2026",
-    time: "18h",
-    city: "Bad Kissingen, DE",
-    venue: "Rossini-Saal",
-    role: "Récital",
-    program: [
-      "Fantaisie — Saint-Saëns",
-      "L'histoire du tango — Piazzolla",
-    ],
-    ticketUrl: "",
-  },
-  {
-    date: "5 sept. 2026",
-    time: "20h",
-    city: "Deggendorf, DE",
-    venue: "Stadttheater",
-    role: "Création mondiale",
-    program: [
-      "Œuvre pour alto — Nicolas Bacri (création)",
-    ],
-    ticketUrl: "https://www.stadttheater-deggendorf.de",
-  },
-  {
-    date: "12 sept. 2026",
-    time: "17h",
-    city: "Regensburg, DE",
-    venue: "Audimax",
-    role: "Alto solo",
-    program: [
-      "Concerto pour alto — Walton",
-    ],
-    ticketUrl: "https://www.regensburg-tickets.de",
-  },
-  {
-    date: "3 oct. 2026",
-    time: "20h",
-    city: "Bruxelles, BE",
-    venue: "Bozar",
-    role: "Récital",
-    program: [
-      "Suite pour alto seul — Reger",
-      "Sonate — Brahms",
-    ],
-    ticketUrl: "https://www.bozar.be",
-  },
-  {
-    date: "18 oct. 2026",
-    time: "15h",
-    city: "Paris, FR",
-    venue: "Cité de la Musique",
-    role: "Chambre",
-    program: [
-      "Quintette « La Truite » — Schubert",
-    ],
-    ticketUrl: "https://philharmoniedeparis.fr",
-  },
-  {
-    date: "7 nov. 2026",
-    time: "20h",
-    city: "Passau, DE",
-    venue: "Theater Passau",
-    role: "Alto solo",
-    program: [
-      "Concerto pour alto — Bartók",
-    ],
-    ticketUrl: "https://www.theater-passau.de",
-  },
-];
+const allEventsData = await getAgendaEvents(lang);
 
 // Convertir les dates FR lisibles en ISO 8601 pour Schema.org
 function toISO(dateStr: string, timeStr: string): string {
   const months: Record<string, string> = {
     'jan': '01', 'fév': '02', 'mar': '03', 'avr': '04',
-    'mai': '05', 'jun': '06', 'juil': '07', 'aoû': '08',
-    'sep': '09', 'oct': '10', 'nov': '11', 'déc': '12',
-    'juin': '06', 'juillet': '07', 'août': '08', 'sept': '09',
+    'mai': '05', 'juin': '06', 'juil': '07', 'août': '08',
+    'sep': '09', 'sept': '09', 'oct': '10', 'nov': '11', 'déc': '12',
   };
-  const parts = dateStr.toLowerCase().replace('.', '').split(' ');
+  const parts = dateStr.toLowerCase().replace(/\./g, '').split(' ').filter(Boolean);
   const day   = parts[0].padStart(2, '0');
   const month = months[parts[1]] ?? '01';
   const year  = parts[2] ?? '2026';
@@ -120,7 +26,7 @@ function toISO(dateStr: string, timeStr: string): string {
   return `${year}-${month}-${day}T${time}:00`;
 }
 
-const eventSchemas = events.map(e => ({
+const eventSchemas = allEventsData.map(e => ({
   "@context": "https://schema.org",
   "@type": "Event",
   "name": `Concert de Vinciane Vinckenbosch — ${e.role}`,
@@ -140,10 +46,7 @@ const eventSchemas = events.map(e => ({
     "name": "Vinciane Vinckenbosch",
     "url": "https://vincianevinckenbosch.com"
   },
-  "organizer": {
-    "@type": "Organization",
-    "name": e.venue
-  },
+  "organizer": { "@type": "Organization", "name": e.venue },
   "eventStatus": "https://schema.org/EventScheduled",
   "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
   ...(e.ticketUrl ? { "offers": {
@@ -154,9 +57,10 @@ const eventSchemas = events.map(e => ({
 }));
 ---
 
-<!-- JSON-LD Event pour chaque concert — aide Google Rich Results -->
+<!-- JSON-LD Event — aide Google Rich Results -->
 {eventSchemas.map(schema => (
   <script type="application/ld+json" set:html={JSON.stringify(schema)} />
 ))}
 
-<AgendaSectionVue client:load events={events} lang={lang} />
+<!-- Filtrage past/upcoming géré côté client dans le composant Vue -->
+<AgendaSectionVue client:visible events={allEventsData} lang={lang} />

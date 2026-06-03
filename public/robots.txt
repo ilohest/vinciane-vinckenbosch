@@ -3,11 +3,3 @@ Allow: /
 
 # Sitemap
 Sitemap: https://vincianevinckenbosch.com/sitemap-index.xml
-
-# Bloquer les pages utilitaires
-Disallow: /fr/legal
-Disallow: /en/legal
-Disallow: /de/legal
-Disallow: /fr/privacy
-Disallow: /en/privacy
-Disallow: /de/privacy

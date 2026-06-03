@@ -8,7 +8,7 @@
     <div class="navbar__inner">
 
       <!-- GAUCHE : nom = lien retour accueil, flip lettre par lettre -->
-      <a :href="`/${lang}`" class="navbar__brand" aria-label="Retour à l'accueil">
+      <a :href="`/${lang}`" class="navbar__brand" aria-label="Vinciane Vinckenbosch">
         <span class="flip-word" aria-hidden="true">
           <span
             v-for="(char, ci) in 'Vinciane Vinckenbosch'"
@@ -137,7 +137,6 @@ const props = defineProps<{
 }>();
 
 const langs      = ['fr', 'en', 'de'] as const;
-const isHidden      = ref(true);
 const menuOpen      = ref(false);
 const activePath    = ref(props.currentPath);
 // Section hash active détectée par IntersectionObserver
@@ -148,6 +147,8 @@ const TOP_THRESHOLD = 80;
 function isHomePage(path: string): boolean {
   return /^\/(fr|en|de)?\/?$/.test(path);
 }
+
+const isHidden = ref(isHomePage(props.currentPath));
 
 const labels: Record<string, Record<string, string>> = {
   fr: { agenda: 'agenda', contact: 'contact', media: 'media', presse: 'presse', archives: 'archives' },

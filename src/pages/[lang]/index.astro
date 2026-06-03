@@ -5,10 +5,12 @@ import QuoteBlock from '../../components/astro/QuoteBlock.astro';
 import BiographySection from '../../components/astro/BiographySection.astro';
 import AgendaSection from '../../components/astro/AgendaSection.astro';
 import ContactSection from '../../components/astro/ContactSection.astro';
+import BioDownload from '../../components/vue/BioDownload.vue';
 import Footer from '../../components/astro/Footer.astro';
 import type { Lang } from '../../lib/types';
 import { LANGS } from '../../lib/i18n';
 import { getHeroEvents, getHomepage } from '../../lib/queries';
+import { frenchTypo } from '../../lib/typography';
 
 export function getStaticPaths() {
   return LANGS.map(lang => ({ params: { lang } }));
@@ -17,12 +19,27 @@ export function getStaticPaths() {
 const { lang } = Astro.params as { lang: Lang };
 const heroEvents = await getHeroEvents(3);
 const homepage = await getHomepage();
+// PDF de biographie par langue : Sanity en priorité, sinon fichiers locaux
+const bioPdfs = {
+  fr: homepage?.biographyPdfs?.fr ?? '/pdfs/biographie-fr.pdf',
+  en: homepage?.biographyPdfs?.en ?? '/pdfs/biographie-en.pdf',
+  de: homepage?.biographyPdfs?.de ?? '/pdfs/biographie-de.pdf',
+};
 
-const quote2 = {
+const quote2Fallback = {
   fr: '« Une instrumentiste remarquable » et une « musicienne vivante et intéressante ».',
   en: '« A remarkable instrumentalist » and a « lively and interesting musician ».',
   de: '« Eine bemerkenswerte Instrumentalistin » und eine « lebendige und interessante Musikerin ».',
 };
+
+const quote2 = {
+  fr: frenchTypo(homepage?.quote2Text?.fr || quote2Fallback.fr),
+  en: frenchTypo(homepage?.quote2Text?.en || quote2Fallback.en),
+  de: frenchTypo(homepage?.quote2Text?.de || quote2Fallback.de),
+};
+const quote2Attribution = homepage?.quote2Attribution
+  || '(Wilfried Strehle, ancien alto solo du Berliner Philharmoniker)';
+
 ---
 
 {(() => {
@@ -45,28 +62,37 @@ const quote2 = {
   description={{ fr: 'Vinciane Vinckenbosch, altiste belge. Co-solo de la Niederbayerische Philharmonie, soliste, chambriste, membre fondatrice du Trio Linaris. Saluée par la critique internationale pour la grande classe de son jeu.', en: 'Vinciane Vinckenbosch, Belgian violist. Co-principal at the Niederbayerische Philharmonie, soloist, chamber musician, founding member of Trio Linaris. Acclaimed by international critics.', de: 'Vinciane Vinckenbosch, belgische Bratschistin. Co-Solo der Niederbayerischen Philharmonie, Solistin, Kammermusikerin, Gründungsmitglied des Trio Linaris.' }[lang]}
 >
   <!-- Hero OUTSIDE main → enfant direct de body, zéro contrainte de conteneur -->
-  <HeroSection lang={lang} heroEvents={heroEvents} />
+  <HeroSection
+    lang={lang}
+    heroEvents={heroEvents}
+    heroImageUrl={homepage?.heroImage?.url || '/images/grilc-03101.jpg'}
+  />
   <main>
-    <BiographySection lang={lang} />
+    <BiographySection lang={lang} homepage={homepage} />
 
     <section class="page-section page-section--padded" data-reveal>
       <QuoteBlock
         quote={quote2[lang]}
-        attribution="(Wilfried Strehle, ancien alto solo du Berliner Philharmoniker)"
+        attribution={quote2Attribution}
         size="large"
       />
+      <!-- CTA — Télécharger la biographie (choix de langue) -->
+      <div class="quote-cta-row">
+        <BioDownload client:visible lang={lang} pdfs={bioPdfs} />
+      </div>
     </section>
 
     <AgendaSection lang={lang} />
     <ContactSection
       lang={lang}
-      email={homepage?.contactEmail}
       socialLinks={homepage?.socialLinks}
       videoUrl={homepage?.contactVideoUrl}
+      videoThumbnail={homepage?.contactVideoThumbnail}
+      galleryImages={homepage?.contactGalleryImages}
     />
     <section class="home-final-image" aria-hidden="true" data-reveal>
       <img
-        src="/images/grilc-02660.jpg"
+        src={homepage?.finalImage?.url || '/images/grilc-02660.jpg'}
         alt=""
         loading="lazy"
         decoding="async"
@@ -88,10 +114,25 @@ const quote2 = {
   padding: clamp(4rem, 8vw, 8rem) clamp(1.5rem, 3.7vw, 4rem);
 }
 
+/* CTA télécharger biographie — sous la citation */
+/* Desktop : aligné à DROITE · Mobile : aligné à GAUCHE */
+.quote-cta-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: clamp(2rem, 4vw, 3.5rem);
+}
+
+@media (max-width: 768px) {
+  .quote-cta-row {
+    justify-content: flex-start;
+  }
+}
+
 .home-final-image {
+  width: 100%;
   max-width: 1728px;
   margin: 0 auto;
-  padding: 0 clamp(1.5rem, 4vw, 4rem);
+  padding: clamp(2rem, 4vw, 4rem) clamp(1.5rem, 4vw, 4rem);
 }
 
 .home-final-image img {

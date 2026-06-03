@@ -37,29 +37,44 @@ export interface HeroEventTeaser {
   country: string;
 }
 
-export interface BiographyBlock {
-  image: SanityImageAsset;
-  imagePosition: 'left' | 'right';
-  textBlocks: LocalizedText[];
-}
-
 export interface Homepage {
-  heroImage: SanityImageAsset;
-  heroQuote: LocalizedText;
-  heroQuoteAttribution: string;
+  heroImage?: SanityImageAsset;
+  heroQuote?: LocalizedText;
+  heroQuoteAttribution?: string;
   heroEvents?: HeroEventTeaser[];
-  biographyIntroImage: SanityImageAsset;
-  biographySections: BiographyBlock[];
-  biographyPDFUrl: string;
-  quote2Text: LocalizedText;
-  quote2Attribution: string;
-  contactEmail: string;
+  quote2Text?: LocalizedText;
+  quote2Attribution?: string;
+  biographyPdfs?: { fr?: string; en?: string; de?: string };
+
+  // Images biographie (dans l'ordre d'apparition sur la page)
+  biographyIntroImage?: SanityImageAsset; // ② à droite du titre BIOGRAPHIE
+  bioImage2?: SanityImageAsset;           // ③ portrait gauche paragraphes 1-2
+  trioImageNarrow?: SanityImageAsset;     // ④ Trio Linaris portrait étroit
+  trioImageWide?: SanityImageAsset;       // ⑤ Trio Linaris panoramique
+  bioImage3?: SanityImageAsset;           // ⑥ portrait gauche paragraphes formation
+  bioFormationImage?: SanityImageAsset;   // ⑦ paysage colonne formation droite
+  finalImage?: SanityImageAsset;          // ⑧ grande photo finale bas de page
+
+  // Texte Trio Linaris
+  bioTrioText?: LocalizedText;
+
+  // Paragraphes biographie
+  bioParaOrchestre?: LocalizedText;
+  bioParaPrix?: LocalizedText;
+  bioParaFestivals?: LocalizedText;
+  bioParaSoliste?: LocalizedText;
+  bioParaTonkuenstler?: LocalizedText;
+  bioParaBacri?: LocalizedText;
+  bioParaFormationViolon?: LocalizedText;
+  bioParaFormationAlto?: LocalizedText;
+  bioParaMaitres?: LocalizedText;
+  bioParaPedagogie?: LocalizedText;
+
+  // Contact
+  contactGalleryImages?: SanityImageAsset[];
   contactVideoUrl?: string;
-  socialLinks: {
-    youtube?: string;
-    facebook?: string;
-    instagram?: string;
-  };
+  contactVideoThumbnail?: SanityImageAsset;
+  socialLinks?: { youtube?: string; facebook?: string; instagram?: string };
 }
 
 export interface MediaItem {
@@ -74,10 +89,14 @@ export interface MediaItem {
 
 export interface PressItem {
   _id: string;
-  screenshot: SanityImageAsset;
+  images: SanityImageAsset[];
   articleUrl: string;
-  publication: string;
   date?: string;
-  headline?: string;
+  headline: string;
   order: number;
+}
+
+export interface SiteSettings {
+  creditsIntro?: LocalizedString;
+  photoCredits?: string[];
 }

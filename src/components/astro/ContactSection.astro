@@ -1,12 +1,15 @@
 ---
 import type { Lang } from '../../lib/types';
 import { useTranslations } from '../../lib/i18n';
+import ContactForm from '../vue/ContactForm.vue';
 
 interface Props {
   lang: Lang;
   email?: string;
   socialLinks?: { youtube?: string; facebook?: string; instagram?: string };
   videoUrl?: string;
+  videoThumbnail?: { url?: string };
+  galleryImages?: { url?: string }[];
 }
 
 const {
@@ -14,6 +17,8 @@ const {
   email = 'vinciane.vinckenbosch@gmail.com',
   socialLinks = { youtube: '#', facebook: '#', instagram: '#' },
   videoUrl = 'https://www.youtube.com/watch?v=zZCX7xCGYc8',
+  videoThumbnail,
+  galleryImages,
 } = Astro.props;
 
 const tr = useTranslations(lang);
@@ -40,14 +45,20 @@ const getYouTubeId = (url: string): string | null => {
 
 const contactVideoId = getYouTubeId(videoUrl) ?? 'zZCX7xCGYc8';
 const contactVideoUrl = `https://www.youtube-nocookie.com/embed/${contactVideoId}`;
-const contactVideoThumbnail = `https://i.ytimg.com/vi/${contactVideoId}/hqdefault.jpg`;
+const contactVideoThumbnail = videoThumbnail?.url ?? `https://i.ytimg.com/vi/${contactVideoId}/hqdefault.jpg`;
 
-const galleryImages = [
-  { src: '/images/grilc-02256.jpg', alt: 'Vinciane Vinckenbosch' },
-  { src: '/images/grilc-02541.jpg', alt: 'Vinciane Vinckenbosch' },
-  { src: '/images/grilc-02173.jpg', alt: 'Vinciane Vinckenbosch' },
-  { src: '/images/grilc-02439.jpg', alt: 'Vinciane Vinckenbosch' },
+const FALLBACK_GALLERY = [
+  '/images/grilc-02256.jpg',
+  '/images/grilc-02541.jpg',
+  '/images/grilc-02173.jpg',
+  '/images/grilc-02439.jpg',
 ];
+
+const resolvedGallery = (
+  galleryImages && galleryImages.length > 0
+    ? galleryImages.map(img => img.url).filter(Boolean) as string[]
+    : FALLBACK_GALLERY
+).slice(0, 4);
 ---
 
 <section class="contact" id="contact" aria-labelledby="contact-title">
@@ -75,19 +86,17 @@ const galleryImages = [
       </div>
     </div>
 
-    <!-- Email -->
-    <div class="contact__email-wrap" data-reveal>
-      <a href={`mailto:${email}`} class="contact__email">
-        {email}
-      </a>
+    <!-- Formulaire de contact -->
+    <div class="contact__form-wrap" data-reveal>
+      <ContactForm client:visible lang={lang} />
     </div>
 
     <!-- Gallery + media CTA -->
     <div class="contact__media-row" data-reveal>
       <div class="contact__gallery">
-        {galleryImages.map(img => (
+        {resolvedGallery.map(src => (
           <div class="contact__thumb">
-            <img src={img.src} alt={img.alt} loading="lazy" decoding="async" />
+            <img src={src} alt="Vinciane Vinckenbosch" loading="lazy" decoding="async" />
           </div>
         ))}
       </div>
@@ -217,6 +226,12 @@ const galleryImages = [
     text-decoration-thickness: 1px;
   }
   .contact__email::after { display: none; }
+}
+
+/* Form */
+.contact__form-wrap {
+  max-width: 720px;
+  margin-top: clamp(1rem, 3vw, 2rem);
 }
 
 /* Media row */

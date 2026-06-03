@@ -1,0 +1,144 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Footer from '../../components/astro/Footer.astro';
+import type { Lang } from '../../lib/types';
+import { LANGS } from '../../lib/i18n';
+import { getSiteSettings } from '../../lib/queries';
+
+export function getStaticPaths() {
+  return LANGS.map(lang => ({ params: { lang } }));
+}
+
+const { lang } = Astro.params as { lang: Lang };
+
+const settings = await getSiteSettings();
+const photoCredits = settings.photoCredits ?? [];
+
+const defaultIntro = {
+  fr: "Les photographies présentes sur ce site sont protégées par le droit d'auteur. Merci de créditer les photographes ci-dessous pour toute réutilisation.",
+  en: "The photographs on this website are protected by copyright. Please credit the photographers listed below for any reuse.",
+  de: "Die Fotografien auf dieser Website sind urheberrechtlich geschützt. Bitte nennen Sie bei jeder Weiterverwendung die unten aufgeführten Fotografen.",
+};
+
+const content = {
+  fr: {
+    title: 'Crédits photo',
+    intro: settings.creditsIntro?.fr || defaultIntro.fr,
+    sectionTitle: 'Photographies du site',
+  },
+  en: {
+    title: 'Photo Credits',
+    intro: settings.creditsIntro?.en || defaultIntro.en,
+    sectionTitle: 'Website photographs',
+  },
+  de: {
+    title: 'Bildnachweise',
+    intro: settings.creditsIntro?.de || defaultIntro.de,
+    sectionTitle: 'Fotografien der Website',
+  },
+}[lang];
+---
+
+<BaseLayout
+  lang={lang}
+  title={`${content.title} — Vinciane Vinckenbosch`}
+  description={content.intro}
+>
+  <main class="credits-page">
+    <div class="credits-page__container">
+      <header class="credits-page__header" data-reveal>
+        <h1 class="section-title credits-page__title">{content.title}</h1>
+        <p class="credits-page__intro">{content.intro}</p>
+      </header>
+
+      <section class="credits-page__section" data-reveal>
+        <h2>{content.sectionTitle}</h2>
+        <ul class="credits-page__list">
+          {photoCredits.map(name => (
+            <li class="credits-page__item">
+              <span class="credits-page__photographer">© {name}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+    </div>
+  </main>
+  <Footer lang={lang} />
+</BaseLayout>
+
+<style>
+.credits-page {
+  --page-padding: clamp(1.5rem, 4vw, 4rem);
+  min-height: 100vh;
+  padding: clamp(4rem, 8vw, 7rem) var(--page-padding);
+}
+
+.credits-page__container {
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+.credits-page__header {
+  margin-bottom: clamp(3rem, 6vw, 5rem);
+}
+
+.credits-page__title {
+  margin-bottom: 1.5rem;
+  font-size: clamp(2.5rem, 5.5vw, 5.375rem);
+  line-height: 1;
+  color: #ffffff;
+}
+
+.credits-page__intro {
+  max-width: 42rem;
+  font-family: "Ortica Linear", Georgia, serif;
+  font-weight: 300;
+  font-size: clamp(1.125rem, 1.8vw, 1.45rem);
+  line-height: 1.45;
+  color: #E6E3DB;
+}
+
+.credits-page__section {
+  padding-top: clamp(1.5rem, 3vw, 2rem);
+  border-top: 1px solid rgba(230, 227, 219, 0.18);
+}
+
+.credits-page__section h2 {
+  margin: 0 0 1.5rem;
+  font-family: "Andale Mono", "Courier New", monospace;
+  font-size: clamp(0.875rem, 1vw, 1rem);
+  line-height: 1.4;
+  color: #DA7F52;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.credits-page__list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(0.75rem, 1.5vw, 1.1rem);
+}
+
+.credits-page__item {
+  display: flex;
+  align-items: baseline;
+  gap: 1.25rem;
+  font-family: "Ortica Linear", Georgia, serif;
+  font-weight: 300;
+  font-size: clamp(1rem, 1.35vw, 1.125rem);
+  line-height: 1.5;
+  color: #E6E3DB;
+}
+
+.credits-page__range {
+  flex-shrink: 0;
+  min-width: 4.5rem;
+  color: #BCB7A9;
+  font-variant-numeric: tabular-nums;
+}
+
+.credits-page__photographer {
+  color: #E6E3DB;
+}
+</style>

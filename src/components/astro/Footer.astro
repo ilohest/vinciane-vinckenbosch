@@ -9,14 +9,17 @@ const footerLabels = {
   fr: {
     legal: 'Mentions légales',
     privacy: 'Confidentialité',
+    credits: 'Crédits photo',
   },
   en: {
     legal: 'Legal',
     privacy: 'Privacy',
+    credits: 'Photo Credits',
   },
   de: {
     legal: 'Impressum',
     privacy: 'Datenschutz',
+    credits: 'Bildnachweise',
   },
 }[lang];
 ---
@@ -32,8 +35,8 @@ const footerLabels = {
     <!-- Bottom bar -->
     <div class="footer__bottom">
       <div class="footer__meta">
-        <span class="footer__credits">Crédits photo : © Andrej Grilc</span>
         <nav class="footer__links" aria-label="Legal">
+          <a href={`/${lang}/credits`} class="footer__link">{footerLabels.credits}</a>
           <a href={`/${lang}/legal`} class="footer__link">{footerLabels.legal}</a>
           <a href={`/${lang}/privacy`} class="footer__link">{footerLabels.privacy}</a>
         </nav>
@@ -95,7 +98,6 @@ const footerLabels = {
   gap: 0.45rem;
 }
 
-.footer__credits,
 .footer__made-by,
 .footer__link {
   font-family: "Andale Mono", "Courier New", monospace;
@@ -117,7 +119,7 @@ const footerLabels = {
   font-size: clamp(0.68rem, 0.72vw, 0.78rem);
   text-transform: none;
   letter-spacing: 0.02em;
-  opacity: 0.45;
+  opacity: 0.65;
   text-decoration: none;
   white-space: nowrap;
   transition: color 0.2s ease, opacity 0.2s ease;
@@ -127,7 +129,7 @@ const footerLabels = {
   content: "/";
   margin-right: 0.7rem;
   color: #E6E3DB;
-  opacity: 0.45;
+  opacity: 0.65;
 }
 
 .footer__link:hover {
@@ -157,16 +159,12 @@ const footerLabels = {
     display: contents;
   }
 
-  .footer__credits {
-    order: 1;
-  }
-
   .footer__made-by {
     order: 2;
   }
 
   .footer__links {
-    order: 3;
+    order: 1;
     flex-direction: column;
     align-items: flex-start;
     gap: var(--footer-mobile-gap);

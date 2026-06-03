@@ -100,6 +100,7 @@ main {
 .btn-pill {
   display: inline-flex;
   align-items: center;
+  gap: 0.35em;
   padding: 0.65em 1.5em;
   border: 1px solid currentColor;
   border-radius: 9999px;
@@ -110,6 +111,22 @@ main {
   letter-spacing: 0.02em;
   transition: background-color 0.25s ease, color 0.25s ease;
   white-space: nowrap;
+}
+
+.btn-pill::after {
+  content: "→";
+  display: inline-block;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+@keyframes btn-arrow-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+.btn-pill:hover::after {
+  animation: btn-arrow-spin 0.55s cubic-bezier(0.25, 1, 0.5, 1) forwards;
 }
 
 .btn-pill:hover {
@@ -151,18 +168,15 @@ main {
 ══════════════════════════════════════════════════════ */
 img[loading="lazy"] {
   opacity: 0;
-  filter: blur(12px);
   transform: scale(1.03);
   transition:
     opacity   0.55s ease,
-    filter    0.55s ease,
     transform 0.55s ease;
-  will-change: opacity, filter, transform;
+  will-change: opacity, transform;
 }
 
 img[loading="lazy"].img-loaded {
   opacity: 1;
-  filter: blur(0);
   transform: scale(1);
 }
 
