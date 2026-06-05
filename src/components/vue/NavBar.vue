@@ -537,7 +537,7 @@ onUnmounted(() => {
   border: 0;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 900px) {
   /* Cacher les liens desktop, afficher le hamburger */
   .navbar__right { display: none; }
   .hamburger     { display: flex; }

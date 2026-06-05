@@ -1,4 +1,8 @@
 import { defineField, defineType } from "sanity";
+import { InfoNote } from "../components/InfoNote";
+
+const MAX_HERO_VIDEO_SIZE_MB = 25;
+const MAX_HERO_VIDEO_SIZE_BYTES = MAX_HERO_VIDEO_SIZE_MB * 1024 * 1024;
 
 /** Champ texte localisé FR / EN / DE */
 const loc = (
@@ -20,6 +24,40 @@ const loc = (
     ],
   });
 
+const helpNote = (
+  name: string,
+  title: string,
+  group: string,
+  description: string,
+) =>
+  defineField({
+    name,
+    title,
+    group,
+    type: "string",
+    readOnly: true,
+    description,
+    components: { field: InfoNote },
+  });
+
+const heroVideoValidation = (label: string) => (R: any) =>
+  R.custom(async (value?: { asset?: { _ref?: string } }, context: any) => {
+    const assetId = value?.asset?._ref;
+    if (!assetId) return true;
+
+    const client = context.getClient({ apiVersion: "2024-01-01" });
+    const asset = await client.fetch<{ size?: number } | null>(
+      `*[_id == $assetId][0]{size}`,
+      { assetId },
+    );
+
+    if (asset?.size && asset.size > MAX_HERO_VIDEO_SIZE_BYTES) {
+      return `La vidéo ${label} est trop lourde. Maximum: ${MAX_HERO_VIDEO_SIZE_MB} Mo.`;
+    }
+
+    return true;
+  });
+
 export const homepage = defineType({
   name: "homepage",
   title: "Page d'accueil",
@@ -37,14 +75,68 @@ export const homepage = defineType({
     // ONGLET — HERO & CITATION
     // ════════════════════════════════════════════════════════════
 
+    helpNote(
+      "heroHelp",
+      "Repère — haut de la page",
+      "hero",
+      "Ici, vous pouvez changer le média d'accueil, sélectionner les concerts mis en avant et modifier la citation. Pour ordinateur, privilégiez un média horizontal, plus large que haut. Pour téléphone, privilégiez un média vertical, plus haut que large. Pour une belle qualité sur téléphone, ajoutez si possible un média téléphone dédié. Si la vidéo téléphone est vide, le site utilise la vidéo ordinateur; si tout est vide côté téléphone, il réutilise automatiquement le média ordinateur.",
+    ),
+
+    defineField({
+      name: "heroMediaType",
+      title: "Ancien choix du type de média hero",
+      group: "hero",
+      type: "string",
+      hidden: true,
+      readOnly: true,
+      description:
+        "Ancien champ conservé uniquement pour éviter un avertissement Sanity sur les contenus existants.",
+    }),
+
     defineField({
       name: "heroImage",
-      title: "① Photo hero — plein écran (arrière-plan principal)",
+      title: "① Photo hero ordinateur — plein écran",
       group: "hero",
       type: "image",
       options: { hotspot: true },
       description:
-        "Grande photo qui remplit tout l'écran en arrière-plan du titre.",
+        "Grande photo affichée en haut de la page sur ordinateur. Choisissez idéalement une image horizontale, plus large que haute. Si une vidéo hero est ajoutée, cette photo sert aussi d'aperçu ou de secours pendant le chargement.",
+      validation: (R) =>
+        R.required().error(
+          "Ajoutez une photo hero ordinateur. Elle sert aussi d'image de secours si la vidéo ou les médias téléphone ne sont pas disponibles.",
+        ),
+    }),
+
+    defineField({
+      name: "heroVideo",
+      title: "Vidéo hero ordinateur — plein écran en boucle (optionnelle)",
+      group: "hero",
+      type: "file",
+      options: { accept: "video/mp4,video/webm,video/quicktime" },
+      description:
+        "Si ce champ est rempli, la vidéo remplace la photo en haut de la page sur ordinateur. Choisissez idéalement une vidéo horizontale, plus large que haute. Elle sera lue automatiquement, sans son, en boucle. Laissez vide pour afficher seulement la photo. Idéalement: vidéo courte, sous 10-15 Mo. Maximum accepté: 25 Mo.",
+      validation: heroVideoValidation("ordinateur"),
+    }),
+
+    defineField({
+      name: "heroMobileImage",
+      title: "Photo hero téléphone (optionnelle)",
+      group: "hero",
+      type: "image",
+      options: { hotspot: true },
+      description:
+        "Photo utilisée seulement sur téléphone. Choisissez idéalement une image verticale, plus haute que large, en bonne résolution. Si une vidéo ordinateur existe et que la vidéo téléphone est vide, cette photo sert surtout d'aperçu pendant le chargement.",
+    }),
+
+    defineField({
+      name: "heroMobileVideo",
+      title: "Vidéo hero téléphone en boucle (optionnelle)",
+      group: "hero",
+      type: "file",
+      options: { accept: "video/mp4,video/webm,video/quicktime" },
+      description:
+        "Vidéo utilisée seulement sur téléphone. Choisissez idéalement une vidéo verticale, plus haute que large, en bonne résolution mais légère. Si ce champ est vide, le site utilise la vidéo ordinateur si elle existe; sinon il utilise la photo téléphone. Maximum accepté: 25 Mo.",
+      validation: heroVideoValidation("téléphone"),
     }),
 
     defineField({
@@ -76,6 +168,13 @@ export const homepage = defineType({
     // ════════════════════════════════════════════════════════════
     // ONGLET — BIOGRAPHIE
     // ════════════════════════════════════════════════════════════
+
+    helpNote(
+      "bioHelp",
+      "Repère — biographie",
+      "bio",
+      "Cet onglet contient les textes et photos de la section biographie. Les photos numérotées suivent leur ordre d'apparition sur la page: vous pouvez remplacer une image sans changer la mise en page.",
+    ),
 
     defineField({
       name: "biographyIntroImage",
@@ -210,6 +309,13 @@ export const homepage = defineType({
     // ════════════════════════════════════════════════════════════
     // ONGLET — CONTACT & RÉSEAUX
     // ════════════════════════════════════════════════════════════
+
+    helpNote(
+      "contactHelp",
+      "Repère — contact, réseaux et fin de page",
+      "contact",
+      "Ici, vous pouvez modifier les liens de réseaux sociaux, les 4 photos sous le formulaire, la vidéo YouTube et la grande photo finale.",
+    ),
 
     defineField({
       name: "socialLinks",

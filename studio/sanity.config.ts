@@ -1,9 +1,10 @@
 import { defineConfig } from "sanity";
 import { structureTool } from "sanity/structure";
-import { visionTool } from "@sanity/vision";
 import { orderableDocumentListDeskItem } from "@sanity/orderable-document-list";
 import { frFRLocale } from "@sanity/locale-fr-fr";
 import { schemaTypes } from "./schemas";
+import { StudioHelp } from "./components/StudioHelp";
+import { PreviewDraftAction } from "./components/PreviewDraftAction";
 
 export default defineConfig({
   name: "vinciane-vinckenbosch",
@@ -85,10 +86,33 @@ export default defineConfig({
                   .documentId("privacyPolicy")
                   .title("Politique de confidentialité"),
               ),
+
+            S.divider(),
+
+            S.listItem()
+              .title("Comment modifier le site")
+              .icon(() => "?")
+              .child(
+                S.component(StudioHelp)
+                  .id("studio-help")
+                  .title("Comment modifier le site"),
+              ),
           ]),
     }),
-    visionTool(),
   ],
 
   schema: { types: schemaTypes },
+
+  document: {
+    actions: (prev) => {
+      const publishIndex = prev.findIndex((action) => action.action === "publish");
+      if (publishIndex === -1) return [...prev, PreviewDraftAction];
+
+      return [
+        ...prev.slice(0, publishIndex + 1),
+        PreviewDraftAction,
+        ...prev.slice(publishIndex + 1),
+      ];
+    },
+  },
 });

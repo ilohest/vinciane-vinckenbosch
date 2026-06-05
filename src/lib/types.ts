@@ -18,6 +18,10 @@ export interface SanityImageAsset {
   alt?: LocalizedString;
 }
 
+export interface SanityFileAsset {
+  url: string;
+}
+
 export interface Event {
   _id: string;
   date: string;
@@ -39,6 +43,9 @@ export interface HeroEventTeaser {
 
 export interface Homepage {
   heroImage?: SanityImageAsset;
+  heroVideo?: SanityFileAsset;
+  heroMobileImage?: SanityImageAsset;
+  heroMobileVideo?: SanityFileAsset;
   heroQuote?: LocalizedText;
   heroQuoteAttribution?: string;
   heroEvents?: HeroEventTeaser[];

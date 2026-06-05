@@ -14,6 +14,8 @@
   - `SANITY_PROJECT_ID=00t1p1z7`
   - `SANITY_DATASET=production`
   - `SANITY_API_VERSION=2024-01-01`
+  - `SANITY_API_TOKEN` (token Sanity avec accès lecture, nécessaire pour l'aperçu brouillon)
+  - `SANITY_PREVIEW_SECRET` (secret privé ajouté à l'URL `/preview/fr?secret=...`)
   - `SMTP_HOST`
   - `SMTP_PORT`
   - `SMTP_USER`
@@ -31,6 +33,9 @@
 ## 3. Studio Sanity (interface de Vinciane)
 
 - [ ] Déployer le studio : dans `studio/` → `npx sanity deploy` → choisir une URL (ex. `vinciane.sanity.studio`)
+- [ ] Avant déploiement du studio, renseigner les variables d'aperçu utilisées par les boutons dans l'aide :
+  - `SANITY_STUDIO_PREVIEW_BASE_URL=https://vincianevinckenbosch.com`
+  - `SANITY_STUDIO_PREVIEW_SECRET` (même valeur que `SANITY_PREVIEW_SECRET`)
 - [ ] Sanity → **API → CORS origins** → ajouter le domaine final du site (ex. `https://vincianevinckenbosch.com`)
 - [ ] Sanity → **Members → Invite** → inviter Vinciane (rôle Editor)
 

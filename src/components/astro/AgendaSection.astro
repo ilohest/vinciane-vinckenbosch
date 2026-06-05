@@ -1,15 +1,17 @@
 ---
 import AgendaSectionVue from '../vue/AgendaSection.vue';
 import type { Lang } from '../../lib/types';
+import type { AgendaEvent } from '../../lib/queries';
 import { getAgendaEvents } from '../../lib/queries';
 
 interface Props {
   lang: Lang;
+  events?: AgendaEvent[];
 }
 
-const { lang } = Astro.props;
+const { lang, events } = Astro.props;
 
-const allEventsData = await getAgendaEvents(lang);
+const allEventsData = events ?? await getAgendaEvents(lang);
 
 // Convertir les dates FR lisibles en ISO 8601 pour Schema.org
 function toISO(dateStr: string, timeStr: string): string {

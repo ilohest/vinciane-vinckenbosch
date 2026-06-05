@@ -1,10 +1,12 @@
 ---
 import type { HeroEventTeaser, Lang } from '../../lib/types';
-import { sanityImageSrcset, sanityImageUrl } from '../../lib/sanity-image';
 
 interface Props {
   lang: Lang;
   heroImageUrl?: string;
+  heroVideoUrl?: string;
+  heroMobileImageUrl?: string;
+  heroMobileVideoUrl?: string;
   upcomingDates?: string[];
   heroEvents?: HeroEventTeaser[];
 }
@@ -12,6 +14,9 @@ interface Props {
 const {
   lang,
   heroImageUrl = '/images/grilc-03101.jpg',
+  heroVideoUrl,
+  heroMobileImageUrl,
+  heroMobileVideoUrl,
   upcomingDates = ['1 Mai | Vienne, AU', '20, 21 Mai | Lucerne, CH', '20 Juin | Bad Kissingen, DE'],
   heroEvents = [],
 } = Astro.props;
@@ -39,40 +44,87 @@ const displayedDates = heroEvents.length > 0
   ? heroEvents.map((event) => `${formatHeroDate(event.date)} | ${event.city}, ${countryIso(event.country)}`)
   : upcomingDates;
 
-const heroSanitySrcset = sanityImageSrcset(heroImageUrl, [640, 960, 1280, 1600, 2000, 2400]);
-const heroImageSrc = sanityImageUrl(heroImageUrl, 1600);
+const heroImageSrc = heroImageUrl;
+const showHeroVideo = Boolean(heroVideoUrl);
+const heroVideoSrc = heroVideoUrl ?? '';
+const hasMobileHeroMedia = Boolean(heroMobileImageUrl || heroMobileVideoUrl);
+const mobileHeroImageUrl = heroMobileImageUrl || heroImageUrl;
+const mobileHeroImageSrc = mobileHeroImageUrl;
+const showMobileHeroVideo = Boolean(heroMobileVideoUrl || heroVideoUrl);
+const mobileHeroVideoSrc = heroMobileVideoUrl || heroVideoUrl || '';
+const desktopHeroMediaClass = hasMobileHeroMedia
+  ? 'hero__media hero__media--desktop'
+  : 'hero__media';
 ---
 
 <section class="hero" aria-label="Vinciane Vinckenbosch">
 
   <!-- Image + overlay -->
   <div class="hero__frame" aria-hidden="true">
-    <picture>
-      {heroImageUrl === '/images/grilc-03101.jpg' && (
-        <source
-          type="image/webp"
-          srcset="/images/grilc-03101-828w.webp 828w,
-                  /images/grilc-03101-1600w.webp 1600w,
-                  /images/grilc-03101-2500w.webp 2500w"
-          sizes="100vw"
-        />
+    <div class={desktopHeroMediaClass}>
+      {showHeroVideo ? (
+        <video
+          class="hero__img"
+          autoplay
+          muted
+          loop
+          playsinline
+          preload="metadata"
+          poster={heroImageSrc}
+        >
+          <source src={heroVideoSrc} />
+        </video>
+      ) : (
+        <picture>
+          {heroImageUrl === '/images/grilc-03101.jpg' && (
+            <source
+              type="image/webp"
+              srcset="/images/grilc-03101-828w.webp 828w,
+                      /images/grilc-03101-1600w.webp 1600w,
+                      /images/grilc-03101-2500w.webp 2500w"
+              sizes="100vw"
+            />
+          )}
+          <img
+            src={heroImageSrc}
+            alt="Vinciane Vinckenbosch, altiste belge, jouant de l'alto"
+            class="hero__img"
+            fetchpriority="high"
+            decoding="async"
+            width="9504"
+            height="6336"
+          />
+        </picture>
       )}
-      {heroSanitySrcset && (
-        <source
-          srcset={heroSanitySrcset}
-          sizes="100vw"
-        />
-      )}
-      <img
-        src={heroImageSrc}
-        alt="Vinciane Vinckenbosch, altiste belge, jouant de l'alto"
-        class="hero__img"
-        fetchpriority="high"
-        decoding="async"
-        width="9504"
-        height="6336"
-      />
-    </picture>
+    </div>
+
+    {hasMobileHeroMedia && (
+      <div class="hero__media hero__media--mobile">
+        {showMobileHeroVideo ? (
+          <video
+            class="hero__img"
+            autoplay
+            muted
+            loop
+            playsinline
+            preload="metadata"
+            poster={mobileHeroImageSrc}
+          >
+            <source src={mobileHeroVideoSrc} />
+          </video>
+        ) : (
+          <picture>
+            <img
+              src={mobileHeroImageSrc}
+              alt="Vinciane Vinckenbosch, altiste belge, jouant de l'alto"
+              class="hero__img"
+              loading="eager"
+              decoding="async"
+            />
+          </picture>
+        )}
+      </div>
+    )}
     <div class="hero__overlay"></div>
   </div>
 
@@ -139,6 +191,27 @@ const heroImageSrc = sanityImageUrl(heroImageUrl, 1600);
   position: absolute;
   inset: var(--hero-inset);
   overflow: hidden;
+}
+
+.hero__media,
+.hero__media > picture {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.hero__media > picture {
+  position: static;
+}
+
+.hero__media--desktop {
+  display: block;
+}
+
+.hero__media--mobile {
+  display: none;
 }
 
 .hero__img {
@@ -311,6 +384,14 @@ const heroImageSrc = sanityImageUrl(heroImageUrl, 1600);
   /* Supprimer le border-radius éventuel du frame */
   .hero__frame {
     border-radius: 0;
+  }
+
+  .hero__media--desktop {
+    display: none !important;
+  }
+
+  .hero__media--mobile {
+    display: block !important;
   }
 
   /* Overlay renforcé en bas pour la lisibilité du texte */

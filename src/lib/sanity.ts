@@ -15,6 +15,22 @@ export const sanityClient = createClient({
   useCdn: false,
 });
 
+export function createSanityPreviewClient() {
+  const token = import.meta.env.SANITY_API_TOKEN;
+  if (!token) {
+    throw new Error('SANITY_API_TOKEN is required for draft preview.');
+  }
+
+  return createClient({
+    projectId,
+    dataset,
+    apiVersion: import.meta.env.SANITY_API_VERSION ?? '2024-01-01',
+    useCdn: false,
+    token,
+    perspective: 'drafts',
+  });
+}
+
 export function imageUrl(ref: string): string {
   // Parse Sanity image ref: image-{id}-{width}x{height}-{format}
   const [, id, dimensions, format] = ref.split('-');

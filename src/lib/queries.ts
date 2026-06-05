@@ -2,6 +2,8 @@ import { sanityClient } from './sanity';
 import type { Homepage, Event, HeroEventTeaser, MediaItem, PressItem, SiteSettings } from './types';
 import { sanityImageUrl, sanityImageSrcset, sanityDownloadUrl } from './sanity-image';
 
+type QueryClient = Pick<typeof sanityClient, 'fetch'>;
+
 /** Crédits photo par défaut (utilisés tant que Sanity n'est pas rempli) */
 export const DEFAULT_PHOTO_CREDITS: string[] = ['Andrej Grilc'];
 
@@ -24,10 +26,13 @@ export async function getPhotoCredits(): Promise<string[]> {
   return settings.photoCredits?.length ? settings.photoCredits : DEFAULT_PHOTO_CREDITS;
 }
 
-export async function getHomepage(): Promise<Homepage | null> {
+export async function getHomepage(client: QueryClient = sanityClient): Promise<Homepage | null> {
   try {
-    return await sanityClient.fetch(`*[_type == "homepage"][0]{
+    return await client.fetch(`*[_type == "homepage"][0]{
       "heroImage":           heroImage { "url": asset->url },
+      "heroVideo":           heroVideo { "url": asset->url },
+      "heroMobileImage":     heroMobileImage { "url": asset->url },
+      "heroMobileVideo":     heroMobileVideo { "url": asset->url },
       heroQuote,
       heroQuoteAttribution,
       heroEvents[]->{ _id, date, city, country },
@@ -70,9 +75,9 @@ function todayIsoDate(): string {
   return new Date().toISOString().slice(0, 10);
 }
 
-export async function getHeroEvents(limit = 3): Promise<HeroEventTeaser[]> {
+export async function getHeroEvents(limit = 3, client: QueryClient = sanityClient): Promise<HeroEventTeaser[]> {
   try {
-    const homepage = await sanityClient.fetch<Pick<Homepage, 'heroEvents'> | null>(
+    const homepage = await client.fetch<Pick<Homepage, 'heroEvents'> | null>(
       `*[_type == "homepage"][0]{
         heroEvents[]->{
           _id,
@@ -88,7 +93,7 @@ export async function getHeroEvents(limit = 3): Promise<HeroEventTeaser[]> {
       return selectedEvents.slice(0, limit);
     }
 
-    return await sanityClient.fetch<HeroEventTeaser[]>(
+    return await client.fetch<HeroEventTeaser[]>(
       `*[_type == "event" && defined(date) && defined(city) && defined(country) && date >= $today]
         | order(date asc) [0...$limit]{
           _id,
@@ -158,9 +163,12 @@ interface RawSanityEvent {
  * Récupère TOUS les concerts depuis Sanity, formatés pour le composant Vue.
  * Retourne [] si Sanity est vide → le composant affiche son état vide.
  */
-export async function getAgendaEvents(lang: 'fr' | 'en' | 'de' = 'fr'): Promise<AgendaEvent[]> {
+export async function getAgendaEvents(
+  lang: 'fr' | 'en' | 'de' = 'fr',
+  client: QueryClient = sanityClient,
+): Promise<AgendaEvent[]> {
   try {
-    const raw = await sanityClient.fetch<RawSanityEvent[] | null>(
+    const raw = await client.fetch<RawSanityEvent[] | null>(
       `*[_type == "event" && defined(date)] | order(date asc){
         date, time, city, country, venue, role,
         program[]{ composer, piece },
