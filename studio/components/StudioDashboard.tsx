@@ -93,7 +93,8 @@ const cardMarkStyle: CSSProperties = {
   borderRadius: "50%",
   background: "color-mix(in srgb, var(--card-bg-color, #fff) 82%, #232323 18%)",
   color: "var(--card-muted-fg-color, #5f5f5f)",
-  fontSize: 10,
+  fontSize: 16,
+  lineHeight: 1,
   fontWeight: 700,
   letterSpacing: "0.04em",
 };
@@ -142,39 +143,39 @@ const stepsStyle: CSSProperties = {
 const quickLinks = [
   {
     title: "Page d'accueil",
-    mark: "PG",
-    text: "Hero, biographie, citations, contact et reseaux.",
-    href: "/structure/homepage",
+    mark: "🏠",
+    text: "Hero, biographie, citations, contact et réseaux.",
+    href: "/structure/pageDaccueil",
   },
   {
     title: "Agenda",
-    mark: "AG",
-    text: "Ajouter les concerts et choisir ceux a mettre en avant.",
-    href: "/structure/event",
+    mark: "🎵",
+    text: "Ajouter les concerts et choisir ceux à mettre en avant.",
+    href: "/structure/agenda",
   },
   {
-    title: "Medias",
-    mark: "MD",
-    text: "Photos, videos, credits et ordre d'affichage.",
-    href: "/structure/mediaItem",
+    title: "Médias",
+    mark: "🎬",
+    text: "Photos, vidéos, crédits et ordre d'affichage.",
+    href: "/structure/medias",
   },
   {
     title: "Presse",
-    mark: "PR",
+    mark: "📰",
     text: "Articles, captures et liens vers les publications.",
-    href: "/structure/pressItem",
+    href: "/structure/presse",
   },
   {
-    title: "Credits photo",
-    mark: "CR",
-    text: "Textes de credits affiches sur le site.",
-    href: "/structure/siteSettings",
+    title: "Crédits photo",
+    mark: "📸",
+    text: "Textes de crédits affichés sur le site.",
+    href: "/structure/creditsPhoto",
   },
   {
     title: "Aide",
     mark: "?",
-    text: "Guide rapide pour modifier, previsualiser et publier.",
-    href: "/structure/studio-help",
+    text: "Guide rapide pour modifier, prévisualiser et publier.",
+    href: "/structure/aide",
   },
 ];
 
@@ -187,12 +188,12 @@ export function StudioDashboard() {
             <p style={{ ...eyebrowStyle, color: "#bcb7a9" }}>Studio Sanity</p>
             <h1 style={titleStyle}>Bienvenue dans le studio de Vinciane</h1>
             <p style={{ ...textStyle, color: "#d8d3c8" }}>
-              Modifiez les contenus, verifiez les brouillons, puis publiez quand
+              Modifiez les contenus, vérifiez les brouillons, puis publiez quand
               tout est prêt. Le site public reste inchangé tant qu'un document
               n'est pas publié.
             </p>
             <div style={buttonRowStyle}>
-              <a href="/structure/homepage" style={buttonStyle}>
+              <a href="/structure/pageDaccueil" style={buttonStyle}>
                 Modifier le site
               </a>
               <a

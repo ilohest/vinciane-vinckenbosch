@@ -27,6 +27,7 @@ export default defineConfig({
           .items([
             // ── Contenu principal ──────────────────────────────────
             S.listItem()
+              .id("pageDaccueil")
               .title("Page d'accueil")
               .icon(() => "🏠")
               .child(
@@ -37,12 +38,14 @@ export default defineConfig({
               ),
 
             S.listItem()
+              .id("agenda")
               .title("Agenda")
               .icon(() => "🎵")
               .child(S.documentTypeList("event").title("Agenda")),
 
             // Médias — réordonnable par glisser-déposer
             orderableDocumentListDeskItem({
+              id: "medias",
               type: "mediaItem",
               title: "Médias",
               icon: () => "🎬",
@@ -52,6 +55,7 @@ export default defineConfig({
 
             // Presse — réordonnable par glisser-déposer
             orderableDocumentListDeskItem({
+              id: "presse",
               type: "pressItem",
               title: "Presse",
               icon: () => "📰",
@@ -63,6 +67,7 @@ export default defineConfig({
 
             // ── Informations légales & crédits ─────────────────────
             S.listItem()
+              .id("creditsPhoto")
               .title("Crédits photo")
               .icon(() => "📸")
               .child(
@@ -95,6 +100,7 @@ export default defineConfig({
             S.divider(),
 
             S.listItem()
+              .id("aide")
               .title("Comment modifier le site")
               .icon(() => "?")
               .child(
