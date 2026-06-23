@@ -74,24 +74,28 @@ const cardStyle: CSSProperties = {
   background: "var(--card-bg-color, #fff)",
 };
 
+const cardHeaderStyle: CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: 10,
+  marginBottom: 10,
+};
+
 const cardTitleStyle: CSSProperties = {
-  margin: "0 42px 10px 0",
+  margin: 0,
   fontSize: 17,
   lineHeight: 1.3,
   fontWeight: 600,
 };
 
 const cardMarkStyle: CSSProperties = {
-  position: "absolute",
-  top: 16,
-  right: 16,
+  flexShrink: 0,
   display: "inline-flex",
   alignItems: "center",
   justifyContent: "center",
   width: 30,
   height: 30,
   borderRadius: "50%",
-  background: "color-mix(in srgb, var(--card-bg-color, #fff) 82%, #232323 18%)",
   color: "var(--card-muted-fg-color, #5f5f5f)",
   fontSize: 16,
   lineHeight: 1,
@@ -185,7 +189,6 @@ export function StudioDashboard() {
       <div style={shellStyle}>
         <section style={heroStyle}>
           <div style={darkPanelStyle}>
-            <p style={{ ...eyebrowStyle, color: "#bcb7a9" }}>Studio Sanity</p>
             <h1 style={titleStyle}>Bienvenue dans le studio de Vinciane</h1>
             <p style={{ ...textStyle, color: "#d8d3c8" }}>
               Modifiez les contenus, vérifiez les brouillons, puis publiez quand
@@ -220,10 +223,12 @@ export function StudioDashboard() {
         <section style={gridStyle} aria-label="Raccourcis de contenu">
           {quickLinks.map((link) => (
             <a key={link.href} href={link.href} style={cardStyle}>
-              <span aria-hidden="true" style={cardMarkStyle}>
-                {link.mark}
-              </span>
-              <h2 style={cardTitleStyle}>{link.title}</h2>
+              <div style={cardHeaderStyle}>
+                <span aria-hidden="true" style={cardMarkStyle}>
+                  {link.mark}
+                </span>
+                <h2 style={cardTitleStyle}>{link.title}</h2>
+              </div>
               <p style={cardTextStyle}>{link.text}</p>
             </a>
           ))}

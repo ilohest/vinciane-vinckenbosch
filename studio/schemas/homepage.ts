@@ -4,7 +4,7 @@ import { InfoNote } from "../components/InfoNote";
 const MAX_HERO_VIDEO_SIZE_MB = 25;
 const MAX_HERO_VIDEO_SIZE_BYTES = MAX_HERO_VIDEO_SIZE_MB * 1024 * 1024;
 
-/** Champ texte localisé FR / EN / DE */
+/** Champ texte localisé FR / EN / DE (type partagé `localeText`) */
 const loc = (
   name: string,
   title: string,
@@ -16,12 +16,7 @@ const loc = (
     title,
     group,
     description,
-    type: "object",
-    fields: [
-      { name: "fr", title: "🇫🇷 Français", type: "text", rows: 4 },
-      { name: "en", title: "🇬🇧 Anglais", type: "text", rows: 4 },
-      { name: "de", title: "🇩🇪 Allemand", type: "text", rows: 4 },
-    ],
+    type: "localeText",
   });
 
 const helpNote = (
@@ -65,9 +60,10 @@ export const homepage = defineType({
 
   // ── Onglets ──────────────────────────────────────────────────
   groups: [
-    { name: "hero", title: "Hero & Citation", default: true },
+    // Pas de `default: true` → l'onglet « Tous les champs » est sélectionné par défaut
+    { name: "hero", title: "Hero & Citation" },
     { name: "bio", title: "Biographie" },
-    { name: "contact", title: "Contact & Réseaux" },
+    { name: "contact", title: "Contact, Réseaux et fin de page" },
   ],
 
   fields: [
@@ -77,7 +73,7 @@ export const homepage = defineType({
 
     helpNote(
       "heroHelp",
-      "Repère — haut de la page",
+      "Hero & Citation",
       "hero",
       "Ici, vous pouvez changer le média d'accueil, sélectionner les concerts mis en avant et modifier la citation. Pour ordinateur, privilégiez un média horizontal, plus large que haut. Pour téléphone, privilégiez un média vertical, plus haut que large. Pour une belle qualité sur téléphone, ajoutez si possible un média téléphone dédié. Si la vidéo téléphone est vide, le site utilise la vidéo ordinateur; si tout est vide côté téléphone, il réutilise automatiquement le média ordinateur.",
     ),
@@ -171,7 +167,7 @@ export const homepage = defineType({
 
     helpNote(
       "bioHelp",
-      "Repère — biographie",
+      "Biographie",
       "bio",
       "Cet onglet contient les textes et photos de la section biographie. Les photos numérotées suivent leur ordre d'apparition sur la page: vous pouvez remplacer une image sans changer la mise en page.",
     ),
@@ -307,12 +303,12 @@ export const homepage = defineType({
     }),
 
     // ════════════════════════════════════════════════════════════
-    // ONGLET — CONTACT & RÉSEAUX
+    // ONGLET — Contact, Réseaux et fin de page
     // ════════════════════════════════════════════════════════════
 
     helpNote(
       "contactHelp",
-      "Repère — contact, réseaux et fin de page",
+      "Contact, Réseaux et fin de page",
       "contact",
       "Ici, vous pouvez modifier les liens de réseaux sociaux, les 4 photos sous le formulaire, la vidéo YouTube et la grande photo finale.",
     ),

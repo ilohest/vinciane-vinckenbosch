@@ -61,7 +61,7 @@ const sections = [
     title: "Modifier la page d'accueil",
     items: [
       "Ouvrir « Page d'accueil » dans le menu de gauche.",
-      "Utiliser les onglets « Hero & Citation », « Biographie » et « Contact & Réseaux ».",
+      "Utiliser les onglets « Hero & Citation », « Biographie » et « Contact, Réseaux et fin de page ».",
       "Pour le hero sur ordinateur, choisir si possible un média horizontal, plus large que haut. Pour le hero sur téléphone, choisir si possible un média vertical, plus haut que large.",
       "Les médias hero téléphone sont optionnels: si la vidéo téléphone est vide, le site utilise la vidéo ordinateur; si tout est vide côté téléphone, il réutilise automatiquement le média ordinateur.",
       "Les photos numérotées correspondent à leur ordre d'apparition sur la page.",

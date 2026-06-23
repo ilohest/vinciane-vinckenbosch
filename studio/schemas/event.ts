@@ -13,12 +13,7 @@ const localizedString = (
     name,
     title,
     description,
-    type: "object",
-    fields: [
-      { name: "fr", title: "🇫🇷 Français", type: "string" },
-      { name: "en", title: "🇬🇧 Anglais", type: "string" },
-      { name: "de", title: "🇩🇪 Allemand", type: "string" },
-    ],
+    type: "localeString",
     validation: requiredFrMessage
       ? (R) =>
           R.custom((value?: { fr?: string }) =>
@@ -103,16 +98,7 @@ export const event = defineType({
           type: "object",
           fields: [
             { name: "composer", title: "Compositeur", type: "string" },
-            {
-              name: "piece",
-              title: "Œuvre",
-              type: "object",
-              fields: [
-                { name: "fr", title: "🇫🇷 Français", type: "string" },
-                { name: "en", title: "🇬🇧 Anglais", type: "string" },
-                { name: "de", title: "🇩🇪 Allemand", type: "string" },
-              ],
-            },
+            { name: "piece", title: "Œuvre", type: "localeString" },
           ],
           preview: {
             select: { title: "piece.fr", subtitle: "composer" },

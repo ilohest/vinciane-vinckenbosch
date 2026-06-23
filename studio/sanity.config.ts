@@ -101,13 +101,9 @@ export default defineConfig({
 
             S.listItem()
               .id("aide")
-              .title("Comment modifier le site")
+              .title("Aide")
               .icon(() => "?")
-              .child(
-                S.component(StudioHelp)
-                  .id("studio-help")
-                  .title("Comment modifier le site"),
-              ),
+              .child(S.component(StudioHelp).id("studio-help").title("Aide")),
           ]),
     }),
   ],
@@ -126,7 +122,9 @@ export default defineConfig({
 
   document: {
     actions: (prev) => {
-      const publishIndex = prev.findIndex((action) => action.action === "publish");
+      const publishIndex = prev.findIndex(
+        (action) => action.action === "publish",
+      );
       if (publishIndex === -1) return [...prev, PreviewDraftAction];
 
       return [
