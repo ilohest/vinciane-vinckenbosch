@@ -3,8 +3,13 @@ import { structureTool } from "sanity/structure";
 import { orderableDocumentListDeskItem } from "@sanity/orderable-document-list";
 import { frFRLocale } from "@sanity/locale-fr-fr";
 import { schemaTypes } from "./schemas";
+import { StudioDashboard } from "./components/StudioDashboard";
 import { StudioHelp } from "./components/StudioHelp";
 import { PreviewDraftAction } from "./components/PreviewDraftAction";
+
+function HomeIcon() {
+  return "VV";
+}
 
 export default defineConfig({
   name: "vinciane-vinckenbosch",
@@ -102,6 +107,16 @@ export default defineConfig({
   ],
 
   schema: { types: schemaTypes },
+
+  tools: (prev) => [
+    {
+      name: "home",
+      title: "Accueil",
+      icon: HomeIcon,
+      component: StudioDashboard,
+    },
+    ...prev,
+  ],
 
   document: {
     actions: (prev) => {

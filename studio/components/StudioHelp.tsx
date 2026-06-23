@@ -56,67 +56,6 @@ const previewBoxStyle: CSSProperties = {
     "color-mix(in srgb, var(--card-bg-color, #fff) 92%, var(--card-focus-ring-color, #006fbd) 8%)",
 };
 
-const previewActionsStyle: CSSProperties = {
-  display: "flex",
-  flexWrap: "wrap",
-  gap: 10,
-  marginTop: 14,
-};
-
-const previewButtonStyle: CSSProperties = {
-  display: "inline-flex",
-  alignItems: "center",
-  justifyContent: "center",
-  minHeight: 36,
-  padding: "0 14px",
-  borderRadius: 4,
-  background: "#232323",
-  color: "#fff",
-  fontSize: 14,
-  fontWeight: 600,
-  textDecoration: "none",
-};
-
-const previewBaseUrl =
-  process.env.SANITY_STUDIO_PREVIEW_BASE_URL ??
-  "https://vincianevinckenbosch.com";
-const previewSecret = process.env.SANITY_STUDIO_PREVIEW_SECRET ?? "";
-const previewLanguages = [
-  { label: "Français", lang: "fr" },
-  { label: "Anglais", lang: "en" },
-  { label: "Allemand", lang: "de" },
-];
-
-function previewUrl(lang: string) {
-  return `${previewBaseUrl.replace(/\/$/, "")}/preview/${lang}?secret=${encodeURIComponent(previewSecret)}`;
-}
-
-function PreviewButtons() {
-  if (!previewSecret) {
-    return (
-      <p style={{ margin: "12px 0 0", opacity: 0.75 }}>
-        L'aperçu brouillon doit encore être configuré par Isaure.
-      </p>
-    );
-  }
-
-  return (
-    <div style={previewActionsStyle}>
-      {previewLanguages.map((item) => (
-        <a
-          key={item.lang}
-          href={previewUrl(item.lang)}
-          target="_blank"
-          rel="noreferrer"
-          style={previewButtonStyle}
-        >
-          Aperçu {item.label}
-        </a>
-      ))}
-    </div>
-  );
-}
-
 const sections = [
   {
     title: "Modifier la page d'accueil",
@@ -192,9 +131,6 @@ export function StudioHelp() {
                 <li key={item}>{item}</li>
               ))}
             </ul>
-            {section.title === "Publier et vérifier sur le site" && (
-              <PreviewButtons />
-            )}
           </section>
         ))}
 
@@ -233,12 +169,11 @@ export function StudioHelp() {
           <h2 style={titleStyle}>Aperçu brouillon</h2>
           <p style={{ margin: 0, lineHeight: 1.6 }}>
             Le bouton « Aperçu brouillon » se trouve dans les actions du
-            document, près de « Publier » ou dans les trois petits points si
-            l'écran est trop étroit. Il ouvre une version privée du site avec
-            les changements sauvegardés en brouillon. Le site public ne change
-            pas tant que vous ne cliquez pas sur « Publier ».
+            document, près de « Publier », dans les trois petits points. Il
+            ouvre une version privée du site avec les changements sauvegardés en
+            brouillon. Le site public ne change pas tant que vous ne cliquez pas
+            sur « Publier ».
           </p>
-          <PreviewButtons />
         </section>
       </div>
     </main>

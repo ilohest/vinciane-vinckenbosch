@@ -273,7 +273,7 @@ export async function getMediaGalleryItems(lang: 'fr' | 'en' | 'de' = 'fr'): Pro
         const type = i.type === 'video' ? 'video' : 'photo';
         const rawUrl = i.image;
         const fallbackThumbnail = type === 'video' ? getYouTubeThumbnail(i.videoUrl) : undefined;
-        const image = rawUrl ? sanityImageUrl(rawUrl) : fallbackThumbnail;
+        const image = rawUrl ? sanityImageUrl(rawUrl, 1600) : fallbackThumbnail;
 
         if (!image) return null;
 

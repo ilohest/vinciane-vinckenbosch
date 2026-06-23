@@ -82,8 +82,11 @@
         <img
           v-else
           :src="items[lightboxIndex]?.image"
+          :srcset="items[lightboxIndex]?.srcset"
+          sizes="90vw"
           :alt="items[lightboxIndex]?.caption || ''"
           class="lightbox__img"
+          decoding="async"
         />
         <!-- Légende + actions (téléchargement, lien source) -->
         <div class="lightbox__bar">

@@ -13,21 +13,34 @@ export function getStaticPaths() {
 const { lang } = Astro.params as { lang: Lang };
 const tr = useTranslations(lang);
 
+function localMediaImage(name: string, caption = '© Andrej Grilc') {
+  return {
+    image: `/images/${name}-1600w.webp`,
+    srcset: [
+      `/images/${name}-828w.webp 828w`,
+      `/images/${name}-1600w.webp 1600w`,
+      `/images/${name}-2500w.webp 2500w`,
+    ].join(', '),
+    downloadUrl: `/images/${name}.jpg`,
+    caption,
+  };
+}
+
 /**
  * Galerie media gérée via Sanity (schéma « mediaItem »), ordonnable par
  * glisser-déposer. Tant que Sanity est vide, on affiche le fallback ci-dessous.
  */
 const FALLBACK_MEDIA = [
-  { image: '/images/grilc-03101.jpg', downloadUrl: '/images/grilc-03101.jpg', caption: '© Andrej Grilc' },
-  { image: '/images/grilc-02541.jpg', downloadUrl: '/images/grilc-02541.jpg', caption: '© Andrej Grilc' },
-  { image: '/images/grilc-02660.jpg', downloadUrl: '/images/grilc-02660.jpg', caption: '© Andrej Grilc' },
-  { image: '/images/grilc-02173.jpg', downloadUrl: '/images/grilc-02173.jpg', caption: '© Andrej Grilc' },
-  { image: '/images/grilc-01839.jpg', downloadUrl: '/images/grilc-01839.jpg', caption: '© Andrej Grilc' },
-  { image: '/images/grilc-02056.jpg', downloadUrl: '/images/grilc-02056.jpg', caption: '© Andrej Grilc' },
-  { image: '/images/grilc-03039.jpg', downloadUrl: '/images/grilc-03039.jpg', caption: '© Andrej Grilc' },
-  { image: '/images/grilc-03046.jpg', downloadUrl: '/images/grilc-03046.jpg', caption: '© Andrej Grilc' },
-  { image: '/images/grilc-02256.jpg', downloadUrl: '/images/grilc-02256.jpg', caption: '© Andrej Grilc' },
-  { image: '/images/grilc-02439.jpg', downloadUrl: '/images/grilc-02439.jpg', caption: '© Andrej Grilc' },
+  localMediaImage('grilc-03101'),
+  localMediaImage('grilc-02541'),
+  localMediaImage('grilc-02660'),
+  localMediaImage('grilc-02173'),
+  localMediaImage('grilc-01839'),
+  localMediaImage('grilc-02056'),
+  localMediaImage('grilc-03039'),
+  localMediaImage('grilc-03046'),
+  localMediaImage('grilc-02256'),
+  localMediaImage('grilc-02439'),
 ];
 
 const sanityMedia = await getMediaGalleryItems(lang);
