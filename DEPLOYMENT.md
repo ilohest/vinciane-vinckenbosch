@@ -32,12 +32,32 @@
 
 ## 3. Studio Sanity (interface de Vinciane)
 
-- [ ] Déployer le studio : dans `studio/` → `npx sanity deploy` → choisir une URL (ex. `vinciane.sanity.studio`)
-- [ ] Avant déploiement du studio, renseigner les variables d'aperçu utilisées par les boutons dans l'aide :
+> **Choix d'hébergement : auto-hébergé sur Vercel** (projet Vercel séparé
+> `dev-vinciane-studio`, lié au même repo Git, dossier source = `studio/`).
+> On NE PAS utiliser `sanity deploy` (hébergement natif Sanity) car il ne fournit
+> que des URLs `*.sanity.studio` et ne supporte PAS les domaines personnalisés.
+> Objectif : servir le studio sur **`studio.vincianevinckenbosch.com`**.
+
+- [x] Projet Vercel `dev-vinciane-studio` créé et lié à `studio/`
+- [x] Variables d'env du studio renseignées dans Vercel (projet `dev-vinciane-studio`) :
+  - `SANITY_STUDIO_PROJECT_ID=00t1p1z7`
   - `SANITY_STUDIO_PREVIEW_BASE_URL=https://vincianevinckenbosch.com`
   - `SANITY_STUDIO_PREVIEW_SECRET` (même valeur que `SANITY_PREVIEW_SECRET`)
-- [ ] Sanity → **API → CORS origins** → ajouter le domaine final du site (ex. `https://vincianevinckenbosch.com`)
+  - _(le dataset est codé en dur sur `production` dans `sanity.config.ts`, pas besoin d'env)_
+- [ ] ⚠️ **Root Directory = `studio`** dans Vercel → projet `dev-vinciane-studio` →
+      **Settings → Build and Deployment → Root Directory** → `studio` → Save.
+      **Indispensable** : sinon Vercel build la racine (le site Astro) et l'URL du
+      studio affiche le site. (Réglage PROJET, pas Team Settings ; non modifiable en CLI.)
+- [ ] Brancher le domaine : projet `dev-vinciane-studio` → **Settings → Domains** →
+      ajouter `studio.vincianevinckenbosch.com` → créer l'enregistrement DNS (CNAME) indiqué
+- [ ] Sanity → **API → CORS origins** → ajouter `https://studio.vincianevinckenbosch.com`
+      (avec credentials) **et** le domaine du site `https://vincianevinckenbosch.com`
 - [ ] Sanity → **Members → Invite** → inviter Vinciane (rôle Editor)
+
+> **Déploiement manuel en attendant** (déjà fait une fois) : `cd studio && nvm use && npx vercel --prod`.
+> ⚠️ Tant que le Root Directory n'est pas réglé sur `studio`, un `git push` réécrasera
+> le studio avec le site — d'où l'étape Root Directory ci-dessus.
+> Le studio est actuellement en ligne sur https://dev-vinciane-studio.vercel.app
 
 ## 4. Contact / e-mail
 
