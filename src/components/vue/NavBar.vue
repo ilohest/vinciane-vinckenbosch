@@ -8,7 +8,7 @@
     <div class="navbar__inner">
 
       <!-- GAUCHE : nom = lien retour accueil, flip lettre par lettre -->
-      <a :href="`/${lang}`" class="navbar__brand" aria-label="Vinciane Vinckenbosch">
+      <a :href="`/${lang}`" class="navbar__brand" aria-label="Vinciane Vinckenbosch" @click="onBrandClick">
         <span class="flip-word" aria-hidden="true">
           <span
             v-for="(char, ci) in 'Vinciane Vinckenbosch'"
@@ -186,6 +186,21 @@ function isActive(item: { href: string }): boolean {
   // Pour les pages, on compare le pathname sans query/hash
   const itemPath = item.href.split('?')[0].split('#')[0];
   return activePath.value === itemPath || activePath.value.startsWith(itemPath + '/');
+}
+
+/**
+ * Clic sur le logo : si on est déjà sur l'accueil, on annule la navigation
+ * et on smooth scroll vers le haut. Sinon, navigation normale vers l'accueil.
+ */
+function onBrandClick(e: MouseEvent) {
+  if (isHomePage(activePath.value)) {
+    e.preventDefault();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Nettoie un éventuel hash dans l'URL
+    if (window.location.hash) {
+      history.replaceState(null, '', window.location.pathname + window.location.search);
+    }
+  }
 }
 
 function toggleMenu() { menuOpen.value = !menuOpen.value; }

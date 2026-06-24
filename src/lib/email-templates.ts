@@ -18,7 +18,6 @@ const COLORS = {
   dark: "#232323",
   cream: "#F7F5F3",
   accent: "#DA7F52",
-  muted: "#BCB7A9",
   beige: "#E6E3DB",
 };
 
@@ -51,8 +50,6 @@ const i18n = {
     confirmSignature: "Bien musicalement,",
     confirmName: "Vinciane Vinckenbosch",
     confirmRole: "Altiste",
-    footerNote:
-      "Ceci est une confirmation automatique, merci de ne pas y répondre.",
     // Mail de notification (à Vinciane)
     notifySubject: (name: string) => `Nouveau message de ${name}`,
     notifyTitle: "Nouveau message reçu",
@@ -70,7 +67,6 @@ const i18n = {
     confirmSignature: "Warm regards,",
     confirmName: "Vinciane Vinckenbosch",
     confirmRole: "Violist",
-    footerNote: "This is an automated confirmation, please do not reply.",
     notifySubject: (name: string) => `New message from ${name}`,
     notifyTitle: "New message received",
     labelName: "Name",
@@ -87,8 +83,6 @@ const i18n = {
     confirmSignature: "Mit musikalischen Grüßen,",
     confirmName: "Vinciane Vinckenbosch",
     confirmRole: "Bratschistin",
-    footerNote:
-      "Dies ist eine automatische Bestätigung, bitte antworten Sie nicht darauf.",
     notifySubject: (name: string) => `Neue Nachricht von ${name}`,
     notifyTitle: "Neue Nachricht erhalten",
     labelName: "Name",
@@ -175,16 +169,9 @@ export function buildConfirmationEmail(payload: ContactPayload): {
           ${t.confirmRole}
         </p>
       </td>
-    </tr>
-    <tr>
-      <td style="padding:24px 0 0 0;text-align:center;">
-        <p style="margin:0;font-family:Georgia,serif;font-size:11px;color:${COLORS.muted};">
-          ${t.footerNote}
-        </p>
-      </td>
     </tr>`;
 
-  const text = `${t.confirmGreeting(payload.name)}\n\n${t.confirmIntro}\n\n${t.confirmRecap}\n${payload.message}\n\n${t.confirmSignature}\n${t.confirmName} — ${t.confirmRole}\n\n${t.footerNote}`;
+  const text = `${t.confirmGreeting(payload.name)}\n\n${t.confirmIntro}\n\n${t.confirmRecap}\n${payload.message}\n\n${t.confirmSignature}\n${t.confirmName} — ${t.confirmRole}`;
 
   return { subject: t.confirmSubject, html: emailShell(inner), text };
 }
