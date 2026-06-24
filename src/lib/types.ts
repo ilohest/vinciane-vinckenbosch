@@ -62,7 +62,7 @@ export interface Homepage {
   heroQuoteAttribution?: string;
   heroEvents?: HeroEventTeaser[];
   quote2Text?: LocalizedText;
-  quote2Attribution?: string;
+  quote2Attribution?: LocalizedText | string;
   biographyPdfs?: { fr?: string; en?: string; de?: string };
 
   // Images biographie (dans l'ordre d'apparition sur la page)

@@ -41,7 +41,7 @@ const open = ref(false);
 const i18n = {
   fr: 'télécharger la biographie',
   en: 'download the biography',
-  de: 'biografie herunterladen',
+  de: 'download Biografie',
 } as const;
 
 const langLabels = { fr: 'Français', en: 'English', de: 'Deutsch' } as const;

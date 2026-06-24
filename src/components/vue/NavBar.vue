@@ -153,7 +153,7 @@ const isHidden = ref(isHomePage(props.currentPath));
 const labels: Record<string, Record<string, string>> = {
   fr: { agenda: 'agenda', contact: 'contact', media: 'media', presse: 'presse', archives: 'archives' },
   en: { agenda: 'agenda', contact: 'contact', media: 'media', presse: 'press',  archives: 'archives' },
-  de: { agenda: 'agenda', contact: 'kontakt',  media: 'media', presse: 'presse', archives: 'archiv'  },
+  de: { agenda: 'Termine', contact: 'Kontakt',  media: 'media', presse: 'Presse', archives: 'Archiv'  },
 };
 
 const navItems = computed(() => {

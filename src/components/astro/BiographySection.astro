@@ -58,6 +58,24 @@ const TRIO_HIGHLIGHT = 'Trio Linaris';
 const trioFallback = "Chambriste passionnée, Vinciane Vinckenbosch est membre fondatrice du Trio Linaris, qu'elle forme aux côtés du flûtiste Pierre Cornu-Deyme et de la harpiste Alexandra Bidi (harpe solo de l'Orchestre de Paris).";
 const fullTrioText = (homepage?.bioTrioText?.[lang] || homepage?.bioTrioText?.fr) || trioFallback;
 
+const bacriParagraph = {
+  fr: {
+    before: "Dans ce contexte, elle assurera en septembre 2026",
+    accent: "la création mondiale d'une œuvre pour alto",
+    after: "de Nicolas Bacri, aux côtés du pianiste Jean-Baptiste Fonlupt.",
+  },
+  en: {
+    before: "In this context, in September 2026 she will give",
+    accent: "the world premiere of a work for viola",
+    after: "by Nicolas Bacri, alongside pianist Jean-Baptiste Fonlupt.",
+  },
+  de: {
+    before: "In diesem Zusammenhang wird sie im September 2026",
+    accent: "die Uraufführung eines Werks für Bratsche",
+    after: "von Nicolas Bacri an der Seite des Pianisten Jean-Baptiste Fonlupt übernehmen.",
+  },
+}[lang];
+
 // Noms « spéciaux » dans la phrase : « Trio Linaris » (toujours en orange) +
 // les liens éditables depuis Sanity (nom → URL). Chaque nom trouvé devient un
 // segment statique (non animé), éventuellement cliquable.
@@ -302,9 +320,9 @@ pushTrioText(fullTrioText.slice(trioCursor));
         <p class="bio__p">{bio('bioParaSoliste', `Elle se produit également en soliste avec orchestre, notamment avec le Concertino Ensemble d'Augsbourg, l'Orchestre des étudiants de l'IMEP et l'Orchestre symphonique de Namur.`)}</p>
         <p class="bio__p">{bio('bioParaTonkuenstler', `En 2026, Vinciane Vinckenbosch bénéficie, pour la deuxième année consécutive, du soutien du ministère bavarois de la Culture dans le cadre du programme « Tonkünstler Live Special », qui distingue son engagement en faveur de la musique de chambre et de la scène musicale indépendante.`)}</p>
         <p class="bio__p">
-          Dans ce contexte, elle assurera en septembre 2026
-          <span class="text-accent">la création mondiale d'une œuvre pour alto</span>
-          de Nicolas Bacri, aux côtés du pianiste Jean-Baptiste Fonlupt.
+          {bacriParagraph.before}{' '}
+          <span class="text-accent">{bacriParagraph.accent}</span>
+          {' '}{bacriParagraph.after}
         </p>
       </div>
     </div>

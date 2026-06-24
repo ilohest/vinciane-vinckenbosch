@@ -86,7 +86,7 @@ const i18n = {
     notifySubject: (name: string) => `Neue Nachricht von ${name}`,
     notifyTitle: "Neue Nachricht erhalten",
     labelName: "Name",
-    labelEmail: "E-Mail",
+    labelEmail: "Email",
     labelMessage: "Nachricht",
     notifyReply: "Antworten Sie dieser Person direkt →",
   },

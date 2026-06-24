@@ -36,27 +36,28 @@ const helpNote = (
   });
 
 const heroVideoValidation = (label: string) => (R: any) =>
-  R.custom(async (value: { asset?: { _ref?: string } } | undefined, context: any) => {
-    const assetId = value?.asset?._ref;
-    if (!assetId) return true;
+  R.custom(
+    async (value: { asset?: { _ref?: string } } | undefined, context: any) => {
+      const assetId = value?.asset?._ref;
+      if (!assetId) return true;
 
-    const client = context.getClient({ apiVersion: "2024-01-01" }) as {
-      fetch: (
-        query: string,
-        params?: Record<string, unknown>,
-      ) => Promise<{ size?: number } | null>;
-    };
-    const asset = await client.fetch(
-      `*[_id == $assetId][0]{size}`,
-      { assetId },
-    );
+      const client = context.getClient({ apiVersion: "2024-01-01" }) as {
+        fetch: (
+          query: string,
+          params?: Record<string, unknown>,
+        ) => Promise<{ size?: number } | null>;
+      };
+      const asset = await client.fetch(`*[_id == $assetId][0]{size}`, {
+        assetId,
+      });
 
-    if (asset?.size && asset.size > MAX_HERO_VIDEO_SIZE_BYTES) {
-      return `La vidéo ${label} est trop lourde. Maximum: ${MAX_HERO_VIDEO_SIZE_MB} Mo.`;
-    }
+      if (asset?.size && asset.size > MAX_HERO_VIDEO_SIZE_BYTES) {
+        return `La vidéo ${label} est trop lourde. Maximum: ${MAX_HERO_VIDEO_SIZE_MB} Mo.`;
+      }
 
-    return true;
-  });
+      return true;
+    },
+  );
 
 export const homepage = defineType({
   name: "homepage",
@@ -163,7 +164,6 @@ export const homepage = defineType({
       title: "Source de la citation d'ouverture",
       group: "hero",
       type: "string",
-      description: "Ex : (Passauer Neue Presse)",
     }),
 
     // ════════════════════════════════════════════════════════════
@@ -196,12 +196,8 @@ export const homepage = defineType({
         "Portrait vertical, affiché à gauche des paragraphes 1 et 2.",
     }),
 
-    loc(
-      "bioParaOrchestre",
-      "Paragraphe 1 — Orchestres & collaborations",
-      "bio",
-    ),
-    loc("bioParaPrix", "Paragraphe 2 — Prix & soutiens", "bio"),
+    loc("bioParaOrchestre", "Paragraphe 1", "bio"),
+    loc("bioParaPrix", "Paragraphe 2", "bio"),
 
     loc(
       "bioTrioText",
@@ -233,7 +229,8 @@ export const homepage = defineType({
               name: "url",
               title: "Lien vers un site web",
               type: "url",
-              description: "Remplir le lien OU le PDF ci-dessous (pas les deux).",
+              description:
+                "Remplir le lien OU le PDF ci-dessous (pas les deux).",
               validation: (R) => R.uri({ scheme: ["http", "https"] }),
             },
             {
@@ -253,7 +250,13 @@ export const homepage = defineType({
             ),
           preview: {
             select: { title: "label", subtitle: "url", media: "pdf" },
-            prepare: ({ title, subtitle }: { title?: string; subtitle?: string }) => ({
+            prepare: ({
+              title,
+              subtitle,
+            }: {
+              title?: string;
+              subtitle?: string;
+            }) => ({
               title: title ?? "(sans nom)",
               subtitle: subtitle || "PDF téléchargeable",
             }),
@@ -291,12 +294,12 @@ export const homepage = defineType({
       description: "Portrait vertical, affiché à gauche des paragraphes 3 à 6.",
     }),
 
-    loc("bioParaFestivals", "Paragraphe 3 — Festivals & partenaires", "bio"),
-    loc("bioParaSoliste", "Paragraphe 4 — Soliste avec orchestre", "bio"),
-    loc("bioParaTonkuenstler", "Paragraphe 5 — Tonkünstler Live", "bio"),
-    loc("bioParaBacri", "Paragraphe 6 — Création Bacri", "bio"),
+    loc("bioParaFestivals", "Paragraphe 3", "bio"),
+    loc("bioParaSoliste", "Paragraphe 4", "bio"),
+    loc("bioParaTonkuenstler", "Paragraphe 5", "bio"),
+    loc("bioParaBacri", "Paragraphe 6", "bio"),
 
-    loc("bioParaFormationViolon", "Paragraphe 7 — Formation violon", "bio"),
+    loc("bioParaFormationViolon", "Paragraphe 7", "bio"),
 
     defineField({
       name: "bioFormationImage",
@@ -309,9 +312,9 @@ export const homepage = defineType({
         "Photo paysage affichée au-dessus des paragraphes 8-10 (colonne droite).",
     }),
 
-    loc("bioParaFormationAlto", "Paragraphe 8 — Formation alto", "bio"),
-    loc("bioParaMaitres", "Paragraphe 9 — Maîtres & conseils", "bio"),
-    loc("bioParaPedagogie", "Paragraphe 10 — Pédagogie & alto", "bio"),
+    loc("bioParaFormationAlto", "Paragraphe 8", "bio"),
+    loc("bioParaMaitres", "Paragraphe 9", "bio"),
+    loc("bioParaPedagogie", "Paragraphe 10", "bio"),
 
     loc(
       "quote2Text",
@@ -320,14 +323,7 @@ export const homepage = defineType({
       "Grande citation affichée au bas de la section biographie, en couleur.",
     ),
 
-    defineField({
-      name: "quote2Attribution",
-      title: "Source de la citation biographie",
-      group: "bio",
-      type: "string",
-      description:
-        "Ex : (Wilfried Strehle, ancien alto solo du Berliner Philharmoniker)",
-    }),
+    loc("quote2Attribution", "Source de la citation biographie", "bio"),
 
     defineField({
       name: "biographyPdfs",

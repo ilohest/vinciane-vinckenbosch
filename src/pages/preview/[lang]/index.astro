@@ -50,8 +50,10 @@ const quote2 = {
   en: frenchTypo(homepage?.quote2Text?.en || quote2Fallback.en),
   de: frenchTypo(homepage?.quote2Text?.de || quote2Fallback.de),
 };
-const quote2Attribution = homepage?.quote2Attribution
-  || '(Wilfried Strehle, ancien alto solo du Berliner Philharmoniker)';
+const quote2AttributionValue = homepage?.quote2Attribution;
+const quote2Attribution = typeof quote2AttributionValue === 'string'
+  ? quote2AttributionValue
+  : quote2AttributionValue?.[lang] || quote2AttributionValue?.fr || '(Wilfried Strehle, ancien alto solo du Berliner Philharmoniker)';
 ---
 
 <BaseLayout
@@ -59,7 +61,7 @@ const quote2Attribution = homepage?.quote2Attribution
   title={`Aperçu brouillon — ${{
     fr: 'Vinciane Vinckenbosch — Altiste belge',
     en: 'Vinciane Vinckenbosch — Belgian Violist',
-    de: 'Vinciane Vinckenbosch — Belgische Bratschistin',
+    de: 'Vinciane Vinckenbosch — belgische Bratschistin',
   }[lang]}`}
   description="Aperçu brouillon non publié."
   noindex

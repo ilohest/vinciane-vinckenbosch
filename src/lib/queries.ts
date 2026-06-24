@@ -203,6 +203,8 @@ export interface MediaGalleryItem {
   downloadUrl?: string;
   caption?: string;
   href?: string;
+  width?: number;
+  height?: number;
 }
 
 function getYouTubeThumbnail(videoUrl?: string): string | undefined {
@@ -239,6 +241,8 @@ export async function getMediaGalleryItems(lang: 'fr' | 'en' | 'de' = 'fr'): Pro
       image?: string;
       credit?: string;
       videoUrl?: string;
+      width?: number;
+      height?: number;
     }> | null>(
       `*[
         _type == "mediaItem"
@@ -247,6 +251,8 @@ export async function getMediaGalleryItems(lang: 'fr' | 'en' | 'de' = 'fr'): Pro
       ] | order(coalesce(orderRank, "zzzzzz") asc, _createdAt asc){
         type,
         "image": image.asset->url,
+        "width": image.asset->metadata.dimensions.width,
+        "height": image.asset->metadata.dimensions.height,
         credit,
         videoUrl
       }`
@@ -270,6 +276,9 @@ export async function getMediaGalleryItems(lang: 'fr' | 'en' | 'de' = 'fr'): Pro
           downloadUrl: type === 'video' || !rawUrl ? undefined : sanityDownloadUrl(rawUrl),
           caption:     i.credit || undefined,
           href:        i.videoUrl || undefined,
+          // Dimensions intrinsèques → réserve l'espace (lazy-load fiable, pas de saut)
+          width:       i.width,
+          height:      i.height,
         };
       })
       .filter((item): item is MediaGalleryItem => Boolean(item));

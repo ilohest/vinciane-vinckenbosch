@@ -1,5 +1,20 @@
 <template>
   <div class="masonry-gallery" v-bind="$attrs">
+    <div v-if="showTypeTabs && hasVideos" class="masonry-tabs" role="tablist" aria-label="Type de média">
+      <button
+        v-for="tab in tabs"
+        :key="tab.value"
+        type="button"
+        class="masonry-tabs__button"
+        :class="{ 'masonry-tabs__button--active': activeType === tab.value }"
+        role="tab"
+        :aria-selected="activeType === tab.value"
+        @click="selectType(tab.value)"
+      >
+        {{ tab.label }}
+      </button>
+    </div>
+
     <!--
       Masonry en colonnes flex : les éléments sont répartis ligne par ligne
       (1·2·3 sur la 1re rangée, 4·5·6 sur la suivante…) pour respecter l'ordre
@@ -12,8 +27,8 @@
           :key="entry.index"
           class="masonry__item"
         >
-          <!-- Toujours un bouton : ouvre l'agrandissement (lightbox) -->
           <button
+            v-if="!isVideo(entry.item)"
             type="button"
             class="masonry__link"
             :aria-label="`${entry.item.caption || `Image ${entry.index + 1}`} — ${t.enlarge}`"
@@ -28,6 +43,8 @@
                 :src="entry.item.image"
                 :srcset="entry.item.srcset"
                 sizes="(max-width: 600px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                :width="entry.item.width"
+                :height="entry.item.height"
                 :alt="entry.item.caption || ''"
                 class="masonry__img"
                 :loading="entry.index < 6 ? 'eager' : 'lazy'"
@@ -50,6 +67,59 @@
               </div>
             </div>
           </button>
+          <div v-else class="masonry__link masonry__link--video">
+            <div class="masonry__img-wrap masonry__img-wrap--video">
+              <iframe
+                v-if="inlineVideoKey === videoKey(entry.item)"
+                :src="inlineVideoSrc(entry.item)"
+                class="masonry__inline-video"
+                title="Video"
+                allow="autoplay; encrypted-media; picture-in-picture"
+                allowfullscreen
+              />
+              <template v-else>
+                <img
+                  v-if="entry.item.image"
+                  :src="entry.item.image"
+                  :srcset="entry.item.srcset"
+                  sizes="(max-width: 600px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  :alt="entry.item.caption || ''"
+                  class="masonry__img"
+                  :loading="entry.index < 6 ? 'eager' : 'lazy'"
+                  :fetchpriority="entry.index < 3 ? 'high' : 'auto'"
+                  decoding="async"
+                />
+                <div v-else class="masonry__video-placeholder" aria-hidden="true">
+                  <span class="masonry__video-play"></span>
+                </div>
+              </template>
+              <div v-if="inlineVideoKey !== videoKey(entry.item)" class="masonry__video-controls">
+                <button
+                  type="button"
+                  class="masonry__video-control masonry__video-control--play"
+                  :aria-label="`${t.playSmall} — ${entry.item.caption || 'video'}`"
+                  @click="playInline(entry.item)"
+                >
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <path d="M8 5v14l11-7z"/>
+                  </svg>
+                </button>
+                <button
+                  type="button"
+                  class="masonry__video-control"
+                  :aria-label="`${t.enlarge} — ${entry.item.caption || 'video'}`"
+                  @click="openLightbox(entry.index)"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                    <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/>
+                  </svg>
+                </button>
+              </div>
+              <div v-if="inlineVideoKey !== videoKey(entry.item)" class="masonry__overlay masonry__overlay--video">
+                <span v-if="entry.item.caption" class="masonry__caption">{{ entry.item.caption }}</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -60,7 +130,7 @@
       @click.self="closeLightbox"
       role="dialog"
       aria-modal="true"
-      :aria-label="`Image ${lightboxIndex + 1} sur ${items.length}`"
+      :aria-label="`Image ${lightboxIndex + 1} sur ${displayedItems.length}`"
     >
       <button class="lightbox__close" @click="closeLightbox" aria-label="Fermer">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -84,29 +154,29 @@
           />
         </div>
         <img
-          v-else-if="items[lightboxIndex]?.image"
-          :src="items[lightboxIndex]?.image"
-          :srcset="items[lightboxIndex]?.srcset"
+          v-else-if="displayedItems[lightboxIndex]?.image"
+          :src="displayedItems[lightboxIndex]?.image"
+          :srcset="displayedItems[lightboxIndex]?.srcset"
           sizes="90vw"
-          :alt="items[lightboxIndex]?.caption || ''"
+          :alt="displayedItems[lightboxIndex]?.caption || ''"
           class="lightbox__img"
           decoding="async"
         />
         <!-- Légende + actions (téléchargement, lien source) -->
         <div class="lightbox__bar">
-          <span v-if="items[lightboxIndex]?.caption" class="lightbox__caption">
-            {{ items[lightboxIndex]?.caption }}
+          <span v-if="displayedItems[lightboxIndex]?.caption" class="lightbox__caption">
+            {{ displayedItems[lightboxIndex]?.caption }}
           </span>
           <div class="lightbox__actions">
             <button
-              v-if="items[lightboxIndex]?.downloadUrl"
+              v-if="displayedItems[lightboxIndex]?.downloadUrl"
               type="button"
               class="lightbox__download"
               :disabled="downloading"
-              :aria-label="`${t.download} — ${items[lightboxIndex]?.caption || 'photo'}`"
+              :aria-label="`${t.download} — ${displayedItems[lightboxIndex]?.caption || 'photo'}`"
               @click="triggerDownload(
-                items[lightboxIndex]!.downloadUrl!,
-                downloadFilename(items[lightboxIndex]!.downloadUrl!, lightboxIndex ?? 0)
+                displayedItems[lightboxIndex]!.downloadUrl!,
+                downloadFilename(displayedItems[lightboxIndex]!.downloadUrl!, lightboxIndex ?? 0)
               )"
             >
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
@@ -115,8 +185,8 @@
               {{ downloading ? t.downloading : t.download }}
             </button>
             <a
-              v-if="items[lightboxIndex]?.href && !activeVideoEmbed"
-              :href="items[lightboxIndex]?.href"
+              v-if="displayedItems[lightboxIndex]?.href && !activeVideoEmbed"
+              :href="displayedItems[lightboxIndex]?.href"
               target="_blank"
               rel="noopener noreferrer"
               class="lightbox__source"
@@ -127,7 +197,7 @@
         </div>
       </div>
 
-      <button v-if="lightboxIndex < items.length - 1" class="lightbox__next" @click="lightboxIndex++" aria-label="Suivant">
+      <button v-if="lightboxIndex < displayedItems.length - 1" class="lightbox__next" @click="lightboxIndex++" aria-label="Suivant">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
           <polyline points="9 18 15 12 9 6"/>
         </svg>
@@ -150,19 +220,25 @@ interface GalleryItem {
   downloadUrl?: string;
   caption?: string;
   href?: string;
+  width?: number;
+  height?: number;
 }
+
+type MediaType = 'photo' | 'video';
 
 const props = withDefaults(defineProps<{
   items: GalleryItem[];
   lang?: 'fr' | 'en' | 'de';
+  showTypeTabs?: boolean;
 }>(), {
   lang: 'fr',
+  showTypeTabs: false,
 });
 
 const i18n = {
-  fr: { enlarge: 'agrandir', readArticle: "Lire l'article", download: 'Télécharger', downloading: '...' },
-  en: { enlarge: 'enlarge',  readArticle: 'Read the article', download: 'Download', downloading: '...' },
-  de: { enlarge: 'vergrößern', readArticle: 'Artikel lesen', download: 'Herunterladen', downloading: '...' },
+  fr: { enlarge: 'agrandir', playSmall: 'lire ici', readArticle: "Lire l'article", download: 'Télécharger', downloading: '...', photos: 'photos', videos: 'vidéos' },
+  en: { enlarge: 'enlarge', playSmall: 'play here', readArticle: 'Read the article', download: 'Download', downloading: '...', photos: 'photos', videos: 'videos' },
+  de: { enlarge: 'vergrößern', playSmall: 'hier abspielen', readArticle: 'Artikel lesen', download: 'Herunterladen', downloading: '...', photos: 'Fotos', videos: 'Videos' },
 } as const;
 
 const t = computed(() => i18n[props.lang] ?? i18n.fr);
@@ -170,9 +246,25 @@ const t = computed(() => i18n[props.lang] ?? i18n.fr);
 const lightboxIndex = ref<number | null>(null);
 const windowWidth = ref(1200);
 const downloading = ref(false);
+const activeType = ref<MediaType>('photo');
+const inlineVideoKey = ref<string | null>(null);
+
+const photoItems = computed(() => props.items.filter((item) => !isVideo(item)));
+const videoItems = computed(() => props.items.filter((item) => isVideo(item)));
+const hasVideos = computed(() => videoItems.value.length > 0);
+
+const tabs = computed(() => [
+  { value: 'photo' as const, label: `${t.value.photos} (${photoItems.value.length})` },
+  { value: 'video' as const, label: `${t.value.videos} (${videoItems.value.length})` },
+]);
+
+const displayedItems = computed(() => {
+  if (!props.showTypeTabs || !hasVideos.value) return props.items;
+  return activeType.value === 'video' ? videoItems.value : photoItems.value;
+});
 
 const activeItem = computed(() => (
-  lightboxIndex.value === null ? undefined : props.items[lightboxIndex.value]
+  lightboxIndex.value === null ? undefined : displayedItems.value[lightboxIndex.value]
 ));
 
 const activeVideoEmbed = computed(() => (
@@ -209,6 +301,21 @@ function getVideoEmbedUrl(item: GalleryItem) {
   }
 
   return null;
+}
+
+function videoKey(item: GalleryItem) {
+  return item.href ?? '';
+}
+
+function inlineVideoSrc(item: GalleryItem) {
+  const embedUrl = getVideoEmbedUrl(item);
+  if (!embedUrl) return '';
+  const separator = embedUrl.includes('?') ? '&' : '?';
+  return `${embedUrl}${separator}autoplay=1`;
+}
+
+function playInline(item: GalleryItem) {
+  inlineVideoKey.value = videoKey(item);
 }
 
 function downloadFilename(url: string, index: number) {
@@ -259,11 +366,17 @@ const columnedItems = computed(() => {
     { length: columns.value },
     () => [],
   );
-  props.items.forEach((item, index) => {
+  displayedItems.value.forEach((item, index) => {
     cols[index % columns.value].push({ item, index });
   });
   return cols;
 });
+
+function selectType(type: MediaType) {
+  activeType.value = type;
+  inlineVideoKey.value = null;
+  closeLightbox();
+}
 
 function openLightbox(i: number) {
   lightboxIndex.value = i;
@@ -278,7 +391,7 @@ function closeLightbox() {
 function onKeydown(e: KeyboardEvent) {
   if (lightboxIndex.value === null) return;
   if (e.key === 'Escape') closeLightbox();
-  if (e.key === 'ArrowRight' && lightboxIndex.value < props.items.length - 1) lightboxIndex.value++;
+  if (e.key === 'ArrowRight' && lightboxIndex.value < displayedItems.value.length - 1) lightboxIndex.value++;
   if (e.key === 'ArrowLeft' && lightboxIndex.value > 0) lightboxIndex.value--;
 }
 
@@ -302,6 +415,37 @@ onUnmounted(() => {
 <style scoped>
 .masonry-gallery {
   display: block;
+}
+
+.masonry-tabs {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: clamp(1.5rem, 3vw, 2.5rem);
+}
+
+.masonry-tabs__button {
+  border: 1px solid currentColor;
+  border-radius: 9999px;
+  padding: 0.55rem 1.15rem;
+  background: transparent;
+  color: #F7F5F3;
+  font-family: "Ortica Linear", Georgia, serif;
+  font-weight: 300;
+  font-size: clamp(0.875rem, 1.3vw, 1rem);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: background-color 0.2s ease, color 0.2s ease, opacity 0.2s ease;
+}
+
+.masonry-tabs__button--active,
+.masonry-tabs__button:hover,
+.masonry-tabs__button:focus-visible {
+  background: #F7F5F3;
+  color: #232323;
+  opacity: 1;
 }
 
 .masonry {
@@ -336,6 +480,10 @@ onUnmounted(() => {
   text-align: left;
 }
 
+.masonry__link--video {
+  cursor: default;
+}
+
 .masonry__img-wrap {
   position: relative;
   overflow: hidden;
@@ -356,6 +504,14 @@ onUnmounted(() => {
   height: 100%;
   object-fit: cover;
   object-position: center;
+}
+
+.masonry__inline-video {
+  width: 100%;
+  height: 100%;
+  display: block;
+  border: 0;
+  background: #000;
 }
 
 .masonry__video-placeholder {
@@ -393,6 +549,48 @@ onUnmounted(() => {
   transform: scale(1.03);
 }
 
+.masonry__video-controls {
+  position: absolute;
+  inset: auto 0 0;
+  z-index: 2;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  background: linear-gradient(transparent, rgba(17, 17, 17, 0.68));
+}
+
+.masonry__video-control {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 1px solid rgba(247, 245, 243, 0.72);
+  border-radius: 50%;
+  background: rgba(35, 35, 35, 0.42);
+  color: #F7F5F3;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+  transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.masonry__video-control:hover,
+.masonry__video-control:focus-visible {
+  background: #F7F5F3;
+  color: #232323;
+  transform: translateY(-1px);
+}
+
+.masonry__video-control svg {
+  display: block;
+}
+
+.masonry__video-control--play {
+  width: 3rem;
+  height: 3rem;
+}
+
 /* Overlay : légende (bas gauche) + icône agrandir (bas droite) */
 .masonry__overlay {
   position: absolute;
@@ -410,6 +608,10 @@ onUnmounted(() => {
 .masonry__link:hover .masonry__overlay,
 .masonry__link:focus-visible .masonry__overlay {
   opacity: 1;
+}
+
+.masonry__overlay--video {
+  padding-right: 7.25rem;
 }
 
 .masonry__caption {

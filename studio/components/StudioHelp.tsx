@@ -80,12 +80,11 @@ const sections = [
   {
     title: "Ajouter une photo ou une vidéo dans la page Media",
     items: [
-      "Ouvrir « Médias », puis cliquer sur « Créer un nouveau document » (bouton « + »).",
-      "Choisir le type: photo ou vidéo.",
-      "Pour une photo, ajouter l'image et le crédit photo.",
-      "Pour une vidéo, coller le lien YouTube/Vimeo; une miniature peut être ajoutée si besoin.",
+      "Ouvrir « Médias », puis choisir « Photos » ou « Vidéos ».",
+      "Dans « Photos », cliquer sur « Créer une photo », puis ajouter l'image et le crédit photo.",
+      "Dans « Vidéos », cliquer sur « Créer une vidéo », puis coller le lien YouTube/Vimeo; une miniature peut être ajoutée si besoin.",
       "Une miniature est l'image d'aperçu affichée avant que la vidéo soit lancée.",
-      "Glisser-déposer les médias dans la liste pour changer leur ordre sur le site.",
+      "Glisser-déposer les photos ou les vidéos dans leur liste pour changer leur ordre sur le site.",
     ],
   },
   {

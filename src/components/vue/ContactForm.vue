@@ -114,9 +114,9 @@ const i18n = {
   },
   de: {
     name: "Name",
-    email: "E-Mail",
+    email: "Email",
     message: "Nachricht",
-    submit: "Senden",
+    submit: "senden",
     sending: "Wird gesendet…",
     success: "Vielen Dank, Ihre Nachricht wurde gesendet.",
     error:

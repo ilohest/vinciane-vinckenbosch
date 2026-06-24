@@ -44,15 +44,60 @@ export default defineConfig({
               .icon(() => "🎵")
               .child(S.documentTypeList("event").title("Agenda")),
 
-            // Médias — réordonnable par glisser-déposer
-            orderableDocumentListDeskItem({
-              id: "medias",
-              type: "mediaItem",
-              title: "Médias",
-              icon: () => "🎬",
-              S,
-              context,
-            }),
+            S.listItem()
+              .id("medias")
+              .title("Médias")
+              .icon(() => "🎬")
+              .child(
+                S.list()
+                  .title("Médias")
+                  .items([
+                    orderableDocumentListDeskItem({
+                      id: "medias-photos",
+                      type: "mediaItem",
+                      title: "Photos",
+                      icon: () => "📷",
+                      filter: 'type == "photo"',
+                      createIntent: false,
+                      menuItems: [
+                        S.menuItem()
+                          .title("Créer une photo")
+                          .intent({
+                            type: "create",
+                            params: {
+                              type: "mediaItem",
+                              template: "mediaItem-photo",
+                            },
+                          })
+                          .serialize(),
+                      ],
+                      S,
+                      context,
+                    }),
+                    orderableDocumentListDeskItem({
+                      id: "medias-videos",
+                      type: "mediaItem",
+                      title: "Vidéos",
+                      icon: () => "🎬",
+                      filter: 'type == "video"',
+                      createIntent: false,
+                      menuItems: [
+                        S.menuItem()
+                          .title("Créer une vidéo")
+                          .intent({
+                            type: "create",
+                            params: {
+                              type: "mediaItem",
+                              template: "mediaItem-video",
+                            },
+                          })
+                          .serialize(),
+                      ],
+                      S,
+                      context,
+                    }),
+                  ]),
+              ),
 
             // Presse — réordonnable par glisser-déposer
             orderableDocumentListDeskItem({
@@ -109,7 +154,24 @@ export default defineConfig({
     }),
   ],
 
-  schema: { types: schemaTypes },
+  schema: {
+    types: schemaTypes,
+    templates: (prev) => [
+      ...prev,
+      {
+        id: "mediaItem-photo",
+        title: "Photo",
+        schemaType: "mediaItem",
+        value: { type: "photo" },
+      },
+      {
+        id: "mediaItem-video",
+        title: "Vidéo",
+        schemaType: "mediaItem",
+        value: { type: "video" },
+      },
+    ],
+  },
 
   // Logo personnalisé en haut à gauche (remplace le titre par défaut)
   studio: {
