@@ -159,13 +159,13 @@ const desktopHeroMediaClass = hasMobileHeroMedia
 
   </div>
 
-  <!-- Scroll indicator (desktop uniquement) -->
-  <div class="hero__scroll" aria-hidden="true">
+  <!-- Scroll indicator (desktop uniquement) — bouton : smooth scroll vers le bas -->
+  <button class="hero__scroll" type="button" aria-label="Faire défiler vers le bas">
     <svg width="24" height="52" viewBox="0 0 24 52" fill="none">
       <line x1="12" y1="0" x2="12" y2="44" stroke="white" stroke-width="1" opacity="0.55"/>
       <polyline points="5,37 12,44 19,37" stroke="white" stroke-width="1" fill="none" opacity="0.55"/>
     </svg>
-  </div>
+  </button>
 
 </section>
 
@@ -332,10 +332,30 @@ const desktopHeroMediaClass = hasMobileHeroMedia
 .hero__scroll {
   position: absolute;
   bottom: calc(clamp(20px, 4.1vh, 48px) + 0.5rem);
-  left: 50%;
+  /* Décalée à droite du nom, dans la bande libre avant le bloc agenda */
+  left: calc(50% + clamp(2rem, 6vw, 6rem));
   transform: translateX(-50%);
   z-index: 1;
+  /* Bouton : reset + interactif */
+  appearance: none;
+  background: none;
+  border: 0;
+  padding: 6px;
+  cursor: pointer;
+  color: inherit;
+  line-height: 0;
   /* L'animation est définie dans le bloc hero entrance ci-dessous */
+}
+
+.hero__scroll:hover svg line,
+.hero__scroll:hover svg polyline {
+  opacity: 0.9;
+}
+
+.hero__scroll:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.65);
+  outline-offset: 4px;
+  border-radius: 4px;
 }
 
 @keyframes scrollBounce {
@@ -482,3 +502,19 @@ const desktopHeroMediaClass = hasMobileHeroMedia
   .hero__scroll { display: none; }
 }
 </style>
+
+<script>
+  // Flèche du hero : défilement doux jusqu'au bas du hero (section suivante)
+  const scrollBtn = document.querySelector<HTMLButtonElement>('.hero__scroll');
+  const hero = scrollBtn?.closest('section');
+  scrollBtn?.addEventListener('click', () => {
+    // Bas du hero, moins la hauteur du header fixe → la section suivante
+    // arrive juste sous le header (pas cachée dessous)
+    const navH = parseInt(
+      getComputedStyle(document.documentElement).getPropertyValue('--navbar-height'),
+      10,
+    ) || 57;
+    const bottom = hero ? hero.offsetTop + hero.offsetHeight : window.innerHeight;
+    window.scrollTo({ top: bottom - navH, behavior: 'smooth' });
+  });
+</script>
