@@ -1,4 +1,6 @@
 ---
+import { pagePath } from '../../lib/routes';
+
 interface Props {
   lang: 'fr' | 'en' | 'de';
 }
@@ -36,9 +38,9 @@ const footerLabels = {
     <div class="footer__bottom">
       <div class="footer__meta">
         <nav class="footer__links" aria-label="Legal">
-          <a href={`/${lang}/credits`} class="footer__link">{footerLabels.credits}</a>
-          <a href={`/${lang}/legal`} class="footer__link">{footerLabels.legal}</a>
-          <a href={`/${lang}/privacy`} class="footer__link">{footerLabels.privacy}</a>
+          <a href={pagePath(lang, 'credits')} class="footer__link">{footerLabels.credits}</a>
+          <a href={pagePath(lang, 'legal')} class="footer__link">{footerLabels.legal}</a>
+          <a href={pagePath(lang, 'privacy')} class="footer__link">{footerLabels.privacy}</a>
         </nav>
       </div>
       <span class="footer__made-by">

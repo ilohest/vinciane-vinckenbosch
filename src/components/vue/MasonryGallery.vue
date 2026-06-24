@@ -47,9 +47,10 @@
                 :height="entry.item.height"
                 :alt="entry.item.caption || ''"
                 class="masonry__img"
-                :loading="entry.index < 6 ? 'eager' : 'lazy'"
-                :fetchpriority="entry.index < 3 ? 'high' : 'auto'"
+                :loading="eagerImages || entry.index < 6 ? 'eager' : 'lazy'"
+                :fetchpriority="eagerImages || entry.index < 3 ? 'high' : 'auto'"
                 decoding="async"
+                @error="onImageError"
               />
               <div v-else-if="isVideo(entry.item)" class="masonry__video-placeholder" aria-hidden="true">
                 <span class="masonry__video-play"></span>
@@ -85,9 +86,10 @@
                   sizes="(max-width: 600px) 100vw, (max-width: 1024px) 50vw, 33vw"
                   :alt="entry.item.caption || ''"
                   class="masonry__img"
-                  :loading="entry.index < 6 ? 'eager' : 'lazy'"
-                  :fetchpriority="entry.index < 3 ? 'high' : 'auto'"
+                  :loading="eagerImages || entry.index < 6 ? 'eager' : 'lazy'"
+                  :fetchpriority="eagerImages || entry.index < 3 ? 'high' : 'auto'"
                   decoding="async"
+                  @error="onImageError"
                 />
                 <div v-else class="masonry__video-placeholder" aria-hidden="true">
                   <span class="masonry__video-play"></span>
@@ -230,9 +232,11 @@ const props = withDefaults(defineProps<{
   items: GalleryItem[];
   lang?: 'fr' | 'en' | 'de';
   showTypeTabs?: boolean;
+  eagerImages?: boolean;
 }>(), {
   lang: 'fr',
   showTypeTabs: false,
+  eagerImages: false,
 });
 
 const i18n = {
@@ -316,6 +320,16 @@ function inlineVideoSrc(item: GalleryItem) {
 
 function playInline(item: GalleryItem) {
   inlineVideoKey.value = videoKey(item);
+}
+
+function onImageError(event: Event) {
+  const img = event.currentTarget as HTMLImageElement | null;
+  if (!img || img.dataset.fallbackApplied === 'true') return;
+  if (!img.src.includes('cdn.sanity.io')) return;
+
+  img.dataset.fallbackApplied = 'true';
+  img.removeAttribute('srcset');
+  img.src = img.src.split('?')[0];
 }
 
 function downloadFilename(url: string, index: number) {
@@ -558,6 +572,8 @@ onUnmounted(() => {
   gap: 0.5rem;
   padding: 0.75rem;
   background: linear-gradient(transparent, rgba(17, 17, 17, 0.68));
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
 .masonry__video-control {
@@ -586,9 +602,9 @@ onUnmounted(() => {
   display: block;
 }
 
-.masonry__video-control--play {
-  width: 3rem;
-  height: 3rem;
+.masonry__link--video:hover .masonry__video-controls,
+.masonry__link--video:focus-within .masonry__video-controls {
+  opacity: 1;
 }
 
 /* Overlay : légende (bas gauche) + icône agrandir (bas droite) */
@@ -641,6 +657,7 @@ onUnmounted(() => {
 /* Mobile / tactile : overlay toujours visible (pas de hover) */
 @media (hover: none), (max-width: 768px) {
   .masonry__overlay { opacity: 1; }
+  .masonry__video-controls { opacity: 1; }
 }
 
 /* Lightbox */

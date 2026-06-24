@@ -130,6 +130,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
+import { localizedPathFromPath, pagePath } from '../../lib/routes';
 
 const props = defineProps<{
   lang: 'fr' | 'en' | 'de';
@@ -153,7 +154,7 @@ const isHidden = ref(isHomePage(props.currentPath));
 const labels: Record<string, Record<string, string>> = {
   fr: { agenda: 'agenda', contact: 'contact', media: 'media', presse: 'presse', archives: 'archives' },
   en: { agenda: 'agenda', contact: 'contact', media: 'media', presse: 'press',  archives: 'archives' },
-  de: { agenda: 'Termine', contact: 'Kontakt',  media: 'media', presse: 'Presse', archives: 'Archiv'  },
+  de: { agenda: 'Termine', contact: 'Kontakt',  media: 'Medien', presse: 'Presse', archives: 'Archiv'  },
 };
 
 const navItems = computed(() => {
@@ -161,16 +162,14 @@ const navItems = computed(() => {
   return [
     { key: 'agenda',   label: l.agenda,   href: `/${props.lang}/#agenda`  },
     { key: 'contact',  label: l.contact,  href: `/${props.lang}/#contact` },
-    { key: 'media',    label: l.media,    href: `/${props.lang}/media`    },
-    { key: 'presse',   label: l.presse,   href: `/${props.lang}/presse`   },
-    { key: 'archives', label: l.archives, href: `/${props.lang}/archives` },
+    { key: 'media',    label: l.media,    href: pagePath(props.lang, 'media') },
+    { key: 'presse',   label: l.presse,   href: pagePath(props.lang, 'presse') },
+    { key: 'archives', label: l.archives, href: pagePath(props.lang, 'archives') },
   ];
 });
 
-function localeLangPath(l: string): string {
-  const segments = activePath.value.split('/').filter(Boolean);
-  const withoutLang = segments.slice(1).join('/');
-  return `/${l}${withoutLang ? '/' + withoutLang : ''}`;
+function localeLangPath(l: 'fr' | 'en' | 'de'): string {
+  return localizedPathFromPath(activePath.value, l);
 }
 
 /**

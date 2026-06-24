@@ -85,7 +85,7 @@
           <Transition name="slide-left">
             <a
               v-if="showAll && !hideArchivesLink"
-              :href="`/${lang}/archives`"
+              :href="pagePath(lang, 'archives')"
               class="btn-pill"
             >{{ archivesLabel }}</a>
           </Transition>
@@ -112,6 +112,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
+import { pagePath } from '../../lib/routes';
 
 interface Event {
   date: string;

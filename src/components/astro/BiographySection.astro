@@ -560,7 +560,7 @@ pushTrioText(fullTrioText.slice(trioCursor));
 
 /* ── Texte Trio Linaris ───────────────────────────────────── */
 /*
-  Figma style_7U6T38 : Ortica 56px, lineHeight 64px, color #BCB7A9
+  Figma style_7U6T38 : Ortica 56px, lineHeight 64px
   Prend toute la largeur du conteneur
 */
 .bio__trio-text {
@@ -569,7 +569,7 @@ pushTrioText(fullTrioText.slice(trioCursor));
   /* Figma : 56px / 1728px = 3.24vw */
   font-size: clamp(1.5rem, 3.24vw, 3.5rem);
   line-height: 1.14;
-  color: #BCB7A9;
+  color: var(--color-accent);
   overflow-wrap: break-word;
   /*
     1ère ligne indentée pour s'aligner avec le bord gauche de la colonne
@@ -584,7 +584,7 @@ pushTrioText(fullTrioText.slice(trioCursor));
 }
 
 .bio__trio-letter {
-  color: #BCB7A9;
+  color: var(--color-accent);
   transition: color 0.12s linear;
 }
 
@@ -593,18 +593,23 @@ pushTrioText(fullTrioText.slice(trioCursor));
 }
 
 .bio__trio-static {
-  color: #BCB7A9;
+  color: var(--color-accent);
 }
 
 .bio__trio-accent {
-  color: #DA7F52;
+  color: var(--color-accent);
 }
 
 .bio__trio-link {
   text-decoration: underline;
   text-decoration-thickness: 1px;
   text-underline-offset: 0.18em;
-  transition: color 0.15s linear;
+  text-decoration-color: currentColor;
+  transition: color 0.15s linear, text-decoration-color 0.15s linear;
+}
+
+.bio__trio-link:not(.bio__trio-accent):has(.bio__trio-letter.is-active) {
+  color: #ffffff;
 }
 
 .bio__trio-link:not(.bio__trio-accent):hover,

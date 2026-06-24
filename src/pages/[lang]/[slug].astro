@@ -1,0 +1,484 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Footer from '../../components/astro/Footer.astro';
+import AgendaSectionVue from '../../components/vue/AgendaSection.vue';
+import MasonryGallery from '../../components/vue/MasonryGallery.vue';
+import type { Lang } from '../../lib/types';
+import { LANGS, useTranslations } from '../../lib/i18n';
+import { LEGACY_PAGE_SLUGS, PAGE_SLUGS, pageKeyFromSlug, pagePath, type PageKey } from '../../lib/routes';
+import {
+  getAgendaEvents,
+  getLegalNotice,
+  getMediaGalleryItems,
+  getPressGalleryItems,
+  getPrivacyPolicy,
+  getSiteSettings,
+} from '../../lib/queries';
+import { localizedSections } from '../../lib/portable-text';
+
+export function getStaticPaths() {
+  return LANGS.flatMap((lang) => {
+    const slugs = new Set([
+      ...Object.values(PAGE_SLUGS[lang]),
+      ...Object.values(LEGACY_PAGE_SLUGS),
+    ]);
+
+    return [...slugs].flatMap((slug) => {
+      const pageKey = pageKeyFromSlug(lang, slug);
+      return pageKey ? [{ params: { lang, slug }, props: { pageKey } }] : [];
+    });
+  });
+}
+
+const { lang } = Astro.params as { lang: Lang; slug: string };
+const { pageKey } = Astro.props as { pageKey: PageKey };
+const tr = useTranslations(lang);
+const canonicalPath = pagePath(lang, pageKey);
+
+function localMediaImage(name: string, caption = '© Andrej Grilc') {
+  return {
+    image: `/images/${name}-1600w.webp`,
+    srcset: [
+      `/images/${name}-828w.webp 828w`,
+      `/images/${name}-1600w.webp 1600w`,
+      `/images/${name}-2500w.webp 2500w`,
+    ].join(', '),
+    downloadUrl: `/images/${name}.jpg`,
+    caption,
+  };
+}
+
+const FALLBACK_MEDIA = [
+  localMediaImage('grilc-03101'),
+  localMediaImage('grilc-02541'),
+  localMediaImage('grilc-02660'),
+  localMediaImage('grilc-02173'),
+  localMediaImage('grilc-01839'),
+  localMediaImage('grilc-02056'),
+  localMediaImage('grilc-03039'),
+  localMediaImage('grilc-03046'),
+  localMediaImage('grilc-02256'),
+  localMediaImage('grilc-02439'),
+];
+
+const FALLBACK_PRESS = [
+  {
+    image: '/images/press/heilbronner-stimme-2017.jpg',
+    caption: 'Heilbronner Stimme — 19 août 2017',
+  },
+  {
+    image: '/images/press/pnp-grosse-kammermusik-2024.jpg',
+    caption: 'Passauer Neue Presse — 7 oct. 2024',
+    href: 'https://www.pnp.de/lokales/landkreis-passau/grosse-kammermusik-15534642',
+  },
+  {
+    image: '/images/press/reise-kammermusik-2024.jpg',
+    caption: 'Reise durch die Welt der Kammermusik',
+  },
+];
+
+const legalContent = {
+  fr: {
+    title: 'Mentions légales',
+    intro: 'Informations légales relatives au site officiel de Vinciane Vinckenbosch.',
+    updated: 'Dernière mise à jour : 31 mai 2026',
+    empty: 'Le contenu de cette page est en cours de mise à jour.',
+  },
+  en: {
+    title: 'Legal Notice',
+    intro: 'Legal information about the official website of Vinciane Vinckenbosch.',
+    updated: 'Last updated: May 31, 2026',
+    empty: 'The content of this page is being updated.',
+  },
+  de: {
+    title: 'Impressum',
+    intro: 'Rechtliche Informationen zur offiziellen Website von Vinciane Vinckenbosch.',
+    updated: 'Letzte Aktualisierung: 31. Mai 2026',
+    empty: 'Der Inhalt dieser Seite wird derzeit aktualisiert.',
+  },
+}[lang];
+
+const privacyContent = {
+  fr: {
+    title: 'Politique de confidentialité',
+    intro: 'Cette page explique quelles données peuvent être traitées lors de votre visite sur le site officiel de Vinciane Vinckenbosch.',
+    updated: 'Dernière mise à jour : 31 mai 2026',
+    empty: 'Le contenu de cette page est en cours de mise à jour.',
+  },
+  en: {
+    title: 'Privacy Policy',
+    intro: 'This page explains which data may be processed when you visit the official website of Vinciane Vinckenbosch.',
+    updated: 'Last updated: May 31, 2026',
+    empty: 'The content of this page is being updated.',
+  },
+  de: {
+    title: 'Datenschutzerklärung',
+    intro: 'Diese Seite erläutert, welche Daten bei Ihrem Besuch der offiziellen Website von Vinciane Vinckenbosch verarbeitet werden können.',
+    updated: 'Letzte Aktualisierung: 31. Mai 2026',
+    empty: 'Der Inhalt dieser Seite wird derzeit aktualisiert.',
+  },
+}[lang];
+
+const defaultCreditsIntro = {
+  fr: "Les photographies présentes sur ce site sont protégées par le droit d'auteur. Merci de créditer les photographes ci-dessous pour toute réutilisation.",
+  en: 'The photographs on this website are protected by copyright. Please credit the photographers listed below for any reuse.',
+  de: 'Die Fotografien auf dieser Website sind urheberrechtlich geschützt. Bitte nennen Sie bei jeder Weiterverwendung die unten aufgeführten Fotografen.',
+};
+
+let pageTitle = '';
+let pageDescription = '';
+let ogImage = '/images/grilc-03101.jpg';
+let mediaItems: Awaited<ReturnType<typeof getMediaGalleryItems>> = [];
+let pressItems: Awaited<ReturnType<typeof getPressGalleryItems>> = [];
+let archiveEvents: Awaited<ReturnType<typeof getAgendaEvents>> = [];
+let creditsContent: { title: string; intro: string; sectionTitle: string } | undefined;
+let photoCredits: string[] = [];
+let legalSections: NonNullable<ReturnType<typeof localizedSections>> = [];
+let privacySections: NonNullable<ReturnType<typeof localizedSections>> = [];
+
+if (pageKey === 'media') {
+  const sanityMedia = await getMediaGalleryItems(lang);
+  mediaItems = sanityMedia.length > 0 ? sanityMedia : FALLBACK_MEDIA;
+  pageTitle = { fr: 'Media — Vinciane Vinckenbosch', en: 'Media — Vinciane Vinckenbosch', de: 'Medien — Vinciane Vinckenbosch' }[lang];
+  pageDescription = {
+    fr: 'Galerie photos et vidéos de Vinciane Vinckenbosch, altiste belge : portraits, concerts, répétitions et performances avec le Trio Linaris et la Niederbayerische Philharmonie.',
+    en: 'Photo gallery and videos of Vinciane Vinckenbosch, Belgian violist: portraits, concerts, rehearsals and performances with Trio Linaris and the Niederbayerische Philharmonie.',
+    de: 'Fotogalerie und Videos von Vinciane Vinckenbosch, belgische Bratschistin: Porträts, Konzerte, Proben und Auftritte mit dem Trio Linaris und der Niederbayerischen Philharmonie.',
+  }[lang];
+  ogImage = '/images/grilc-02541.jpg';
+}
+
+if (pageKey === 'presse') {
+  const sanityPress = await getPressGalleryItems();
+  pressItems = sanityPress.length > 0 ? sanityPress : FALLBACK_PRESS;
+  pageTitle = { fr: 'Presse — Vinciane Vinckenbosch', en: 'Press — Vinciane Vinckenbosch', de: 'Presse — Vinciane Vinckenbosch' }[lang];
+  pageDescription = {
+    fr: "Revue de presse de Vinciane Vinckenbosch : articles et critiques parus dans Passauer Neue Presse, Klassik Heute, La Libre Belgique, Bachtrack et d'autres médias spécialisés.",
+    en: 'Press reviews of Vinciane Vinckenbosch: articles and reviews published in Passauer Neue Presse, Klassik Heute, La Libre Belgique, Bachtrack and other specialist media.',
+    de: 'Pressestimmen zu Vinciane Vinckenbosch: Artikel und Kritiken in der Passauer Neuen Presse, Klassik Heute, La Libre Belgique, Bachtrack und anderen Fachmedien.',
+  }[lang];
+  ogImage = '/images/grilc-02173.jpg';
+}
+
+if (pageKey === 'archives') {
+  archiveEvents = await getAgendaEvents(lang);
+  pageTitle = { fr: 'Archives — Vinciane Vinckenbosch', en: 'Archives — Vinciane Vinckenbosch', de: 'Archiv — Vinciane Vinckenbosch' }[lang];
+}
+
+if (pageKey === 'credits') {
+  const settings = await getSiteSettings();
+  photoCredits = settings.photoCredits ?? [];
+  creditsContent = {
+    fr: {
+      title: 'Crédits photo',
+      intro: settings.creditsIntro?.fr || defaultCreditsIntro.fr,
+      sectionTitle: 'Photographies du site',
+    },
+    en: {
+      title: 'Photo Credits',
+      intro: settings.creditsIntro?.en || defaultCreditsIntro.en,
+      sectionTitle: 'Website photographs',
+    },
+    de: {
+      title: 'Bildnachweise',
+      intro: settings.creditsIntro?.de || defaultCreditsIntro.de,
+      sectionTitle: 'Fotografien der Website',
+    },
+  }[lang];
+  pageTitle = `${creditsContent.title} — Vinciane Vinckenbosch`;
+  pageDescription = creditsContent.intro;
+}
+
+if (pageKey === 'legal') {
+  const sanityLegal = await getLegalNotice();
+  legalSections = localizedSections(sanityLegal?.content, lang) ?? [];
+  pageTitle = `${legalContent.title} — Vinciane Vinckenbosch`;
+  pageDescription = legalContent.intro;
+}
+
+if (pageKey === 'privacy') {
+  const sanityPrivacy = await getPrivacyPolicy();
+  privacySections = localizedSections(sanityPrivacy?.content, lang) ?? [];
+  pageTitle = `${privacyContent.title} — Vinciane Vinckenbosch`;
+  pageDescription = privacyContent.intro;
+}
+
+const videoSchema = pageKey === 'media' ? {
+  '@context': 'https://schema.org',
+  '@type': 'VideoObject',
+  name: 'Vinciane Vinckenbosch — Vocalise Op. 3',
+  description: 'Performance de Vinciane Vinckenbosch, altiste belge, jouant la Vocalise Op. 3.',
+  thumbnailUrl: 'https://i.ytimg.com/vi/zZCX7xCGYc8/hqdefault.jpg',
+  uploadDate: '2024-01-01',
+  contentUrl: 'https://www.youtube.com/watch?v=zZCX7xCGYc8',
+  embedUrl: 'https://www.youtube-nocookie.com/embed/zZCX7xCGYc8',
+  publisher: {
+    '@type': 'Person',
+    name: 'Vinciane Vinckenbosch',
+    url: 'https://vincianevinckenbosch.com',
+  },
+} : null;
+
+const gallerySchema = pageKey === 'media' ? {
+  '@context': 'https://schema.org',
+  '@type': 'ImageGallery',
+  name: pageTitle,
+  description: pageDescription,
+  url: `https://vincianevinckenbosch.com${canonicalPath}`,
+  author: {
+    '@type': 'Person',
+    name: 'Vinciane Vinckenbosch',
+  },
+} : null;
+---
+
+<BaseLayout
+  lang={lang}
+  title={pageTitle}
+  description={pageDescription}
+  ogImage={ogImage}
+  pageKey={pageKey}
+  canonicalPath={canonicalPath}
+>
+  {videoSchema && <script type="application/ld+json" slot="head" set:html={JSON.stringify(videoSchema)} />}
+  {gallerySchema && <script type="application/ld+json" slot="head" set:html={JSON.stringify(gallerySchema)} />}
+
+  {pageKey === 'media' && (
+    <main class="gallery-page">
+      <div class="gallery-page__container">
+        <h1 class="section-title gallery-page__title" data-reveal>{tr('nav.media')}</h1>
+        <MasonryGallery client:load items={mediaItems} lang={lang} showTypeTabs={true} eagerImages={true} />
+      </div>
+    </main>
+  )}
+
+  {pageKey === 'presse' && (
+    <main class="gallery-page">
+      <div class="gallery-page__container">
+        <h1 class="section-title gallery-page__title" data-reveal>{tr('nav.presse')}</h1>
+        <MasonryGallery client:only="vue" items={pressItems} lang={lang} />
+      </div>
+    </main>
+  )}
+
+  {pageKey === 'archives' && (
+    <main class="archives-page">
+      <AgendaSectionVue
+        client:load
+        events={archiveEvents}
+        lang={lang}
+        showPastOnly={true}
+        showAllByDefault={true}
+        hideArchivesLink={true}
+        hideLinks={true}
+        backHref={`/${lang}/#agenda`}
+      />
+    </main>
+  )}
+
+  {pageKey === 'credits' && creditsContent && (
+    <main class="credits-page">
+      <div class="credits-page__container">
+        <header class="credits-page__header" data-reveal>
+          <h1 class="section-title credits-page__title">{creditsContent.title}</h1>
+          <p class="credits-page__intro">{creditsContent.intro}</p>
+        </header>
+
+        <section class="credits-page__section" data-reveal>
+          <h2>{creditsContent.sectionTitle}</h2>
+          <ul class="credits-page__list">
+            {photoCredits.map((name) => (
+              <li class="credits-page__item">
+                <span class="credits-page__photographer">© {name}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      </div>
+    </main>
+  )}
+
+  {pageKey === 'legal' && (
+    <main class="legal-page">
+      <div class="legal-page__container">
+        <header class="legal-page__header" data-reveal>
+          <h1 class="section-title legal-page__title">{legalContent.title}</h1>
+          <p class="legal-page__intro">{legalContent.intro}</p>
+          <p class="legal-page__updated">{legalContent.updated}</p>
+        </header>
+
+        <div class="legal-page__content">
+          {legalSections.length > 0
+            ? legalSections.map((section) => (
+                <section class="legal-page__section" data-reveal>
+                  {section.title && <h2>{section.title}</h2>}
+                  {section.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
+                </section>
+              ))
+            : <p class="legal-page__empty" data-reveal>{legalContent.empty}</p>}
+        </div>
+      </div>
+    </main>
+  )}
+
+  {pageKey === 'privacy' && (
+    <main class="legal-page">
+      <div class="legal-page__container">
+        <header class="legal-page__header" data-reveal>
+          <h1 class="section-title legal-page__title">{privacyContent.title}</h1>
+          <p class="legal-page__intro">{privacyContent.intro}</p>
+          <p class="legal-page__updated">{privacyContent.updated}</p>
+        </header>
+
+        <div class="legal-page__content">
+          {privacySections.length > 0
+            ? privacySections.map((section) => (
+                <section class="legal-page__section" data-reveal>
+                  {section.title && <h2>{section.title}</h2>}
+                  {section.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
+                </section>
+              ))
+            : <p class="legal-page__empty" data-reveal>{privacyContent.empty}</p>}
+        </div>
+      </div>
+    </main>
+  )}
+
+  <Footer lang={lang} />
+</BaseLayout>
+
+<style>
+.gallery-page {
+  --page-padding: clamp(1.5rem, 4vw, 4rem);
+  min-height: 100vh;
+  padding-top: calc(var(--navbar-height, 57px) + var(--page-padding));
+  padding-bottom: var(--page-padding);
+}
+
+.gallery-page__container {
+  max-width: 1728px;
+  margin: 0 auto;
+  padding: 0 var(--page-padding);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(2rem, 3vw, 3rem);
+}
+
+.gallery-page__title {
+  font-size: clamp(2.5rem, 5.5vw, 5.375rem);
+  color: #ffffff;
+}
+
+.archives-page {
+  padding-bottom: 0;
+}
+
+.credits-page,
+.legal-page {
+  --page-padding: clamp(1.5rem, 4vw, 4rem);
+  min-height: 100vh;
+  padding: clamp(4rem, 8vw, 7rem) var(--page-padding);
+}
+
+.credits-page__container,
+.legal-page__container {
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+.credits-page__header,
+.legal-page__header {
+  margin-bottom: clamp(3rem, 6vw, 5rem);
+}
+
+.credits-page__title,
+.legal-page__title {
+  margin-bottom: 1.5rem;
+  font-size: clamp(2.5rem, 5.5vw, 5.375rem);
+  line-height: 1;
+  color: #ffffff;
+}
+
+.credits-page__intro,
+.legal-page__intro,
+.legal-page__updated,
+.legal-page__section p,
+.legal-page__empty {
+  font-family: "Ortica Linear", Georgia, serif;
+  font-weight: 300;
+  color: #E6E3DB;
+}
+
+.credits-page__intro,
+.legal-page__intro {
+  max-width: 42rem;
+  font-size: clamp(1.125rem, 1.8vw, 1.45rem);
+  line-height: 1.45;
+}
+
+.legal-page__updated {
+  margin-top: 1.25rem;
+  font-size: 0.95rem;
+  color: #BCB7A9;
+}
+
+.legal-page__content {
+  display: grid;
+  gap: clamp(2rem, 4vw, 3.5rem);
+}
+
+.credits-page__section,
+.legal-page__section,
+.legal-page__empty {
+  padding-top: clamp(1.5rem, 3vw, 2rem);
+  border-top: 1px solid rgba(230, 227, 219, 0.18);
+}
+
+.credits-page__section h2,
+.legal-page__section h2 {
+  margin: 0 0 1rem;
+  font-family: "Andale Mono", "Courier New", monospace;
+  font-size: clamp(0.875rem, 1vw, 1rem);
+  line-height: 1.4;
+  color: #DA7F52;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.credits-page__section h2 {
+  margin-bottom: 1.5rem;
+}
+
+.credits-page__list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(0.75rem, 1.5vw, 1.1rem);
+}
+
+.credits-page__item {
+  display: flex;
+  align-items: baseline;
+  gap: 1.25rem;
+  font-family: "Ortica Linear", Georgia, serif;
+  font-weight: 300;
+  font-size: clamp(1rem, 1.35vw, 1.125rem);
+  line-height: 1.5;
+  color: #E6E3DB;
+}
+
+.credits-page__photographer {
+  color: #E6E3DB;
+}
+
+.legal-page__section p,
+.legal-page__empty {
+  margin: 0;
+  font-size: clamp(1rem, 1.35vw, 1.125rem);
+  line-height: 1.65;
+}
+
+.legal-page__section p + p {
+  margin-top: var(--para-gap);
+}
+</style>

@@ -53,7 +53,7 @@ export const ui = {
   de: {
     'nav.agenda': 'Termine',
     'nav.contact': 'Kontakt',
-    'nav.media': 'media',
+    'nav.media': 'Medien',
     'nav.presse': 'Presse',
     'nav.archives': 'Archiv',
     'bio.title': 'Vita',
@@ -61,8 +61,8 @@ export const ui = {
     'agenda.title': 'Termine',
     'agenda.more': 'mehr Termine',
     'contact.title': 'Kontakt',
-    'media.cta': 'media',
-    'media.video': 'video',
+    'media.cta': 'Medien',
+    'media.video': 'Video',
     'meta.description': 'Vinciane Vinckenbosch, belgische Bratschistin. Solistin, Kammermusikerin, Co-Solobratschistin der Niederbayerischen Philharmonie.',
   },
 } as const;

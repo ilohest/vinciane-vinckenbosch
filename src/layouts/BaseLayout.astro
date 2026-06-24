@@ -3,6 +3,8 @@ import '../styles/global.css';
 import NavBar from '../components/vue/NavBar.vue';
 import { LANGS, localePath } from '../lib/i18n';
 import type { Lang } from '../lib/types';
+import type { PageKey } from '../lib/routes';
+import { pagePath } from '../lib/routes';
 
 interface Props {
   lang: Lang;
@@ -10,6 +12,8 @@ interface Props {
   description?: string;
   ogImage?: string;
   noindex?: boolean;
+  pageKey?: PageKey;
+  canonicalPath?: string;
 }
 
 const {
@@ -18,9 +22,12 @@ const {
   description = 'Vinciane Vinckenbosch, altiste belge. Soliste, chambriste, co-solo de la Niederbayerische Philharmonie.',
   ogImage = '/images/grilc-03101.jpg',
   noindex = false,
+  pageKey,
+  canonicalPath,
 } = Astro.props;
 
-const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const canonicalURL = new URL(canonicalPath ?? Astro.url.pathname, Astro.site);
+const alternatePath = (l: Lang) => pageKey ? pagePath(l, pageKey) : localePath(l);
 ---
 
 <!doctype html>
@@ -40,10 +47,10 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
       <link
         rel="alternate"
         hreflang={l}
-        href={new URL(localePath(l), Astro.site)}
+        href={new URL(alternatePath(l), Astro.site)}
       />
     ))}
-    <link rel="alternate" hreflang="x-default" href={new URL(localePath('fr'), Astro.site)} />
+    <link rel="alternate" hreflang="x-default" href={new URL(alternatePath('fr'), Astro.site)} />
 
     <!-- Open Graph -->
     <meta property="og:title" content={title} />

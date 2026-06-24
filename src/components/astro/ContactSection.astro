@@ -2,6 +2,7 @@
 import type { Lang, SanityImageAsset } from '../../lib/types';
 import { useTranslations } from '../../lib/i18n';
 import { sanityImageCropSrcset, sanityImageCropUrl, sanityImageObjectPosition } from '../../lib/sanity-image';
+import { pagePath } from '../../lib/routes';
 import ContactForm from '../vue/ContactForm.vue';
 
 interface Props {
@@ -141,7 +142,7 @@ const contactVideoThumbnailPosition = sanityImageObjectPosition(contactVideoThum
             <span class="contact__play-icon" aria-hidden="true"></span>
           </button>
         </div>
-        <a href={`/${lang}/media`} class="btn-pill contact__media-link">
+        <a href={pagePath(lang, 'media')} class="btn-pill contact__media-link">
           {tr('media.cta')}
         </a>
       </div>
