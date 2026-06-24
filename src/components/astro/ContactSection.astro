@@ -1,7 +1,7 @@
 ---
-import type { Lang } from '../../lib/types';
+import type { Lang, SanityImageAsset } from '../../lib/types';
 import { useTranslations } from '../../lib/i18n';
-import { sanityImageSrcset, sanityImageUrl } from '../../lib/sanity-image';
+import { sanityImageCropSrcset, sanityImageCropUrl, sanityImageObjectPosition } from '../../lib/sanity-image';
 import ContactForm from '../vue/ContactForm.vue';
 
 interface Props {
@@ -9,8 +9,8 @@ interface Props {
   email?: string;
   socialLinks?: { youtube?: string; facebook?: string; instagram?: string };
   videoUrl?: string;
-  videoThumbnail?: { url?: string };
-  galleryImages?: { url?: string }[];
+  videoThumbnail?: SanityImageAsset;
+  galleryImages?: SanityImageAsset[];
 }
 
 const {
@@ -46,7 +46,7 @@ const getYouTubeId = (url: string): string | null => {
 
 const contactVideoId = getYouTubeId(videoUrl) ?? 'zZCX7xCGYc8';
 const contactVideoUrl = `https://www.youtube-nocookie.com/embed/${contactVideoId}`;
-const contactVideoThumbnail = videoThumbnail?.url ?? `https://i.ytimg.com/vi/${contactVideoId}/hqdefault.jpg`;
+const contactVideoThumbnail = videoThumbnail ?? `https://i.ytimg.com/vi/${contactVideoId}/hqdefault.jpg`;
 
 const FALLBACK_GALLERY = [
   '/images/grilc-02256.jpg',
@@ -55,19 +55,22 @@ const FALLBACK_GALLERY = [
   '/images/grilc-02439.jpg',
 ];
 
-const resolvedGallery = (
-  galleryImages && galleryImages.length > 0
-    ? galleryImages.map(img => img.url).filter(Boolean) as string[]
-    : FALLBACK_GALLERY
-).slice(0, 4);
+const resolvedGallery = galleryImages && galleryImages.length > 0
+  ? galleryImages.filter((img) => img?.asset?._ref || img?.url)
+  : FALLBACK_GALLERY;
 
-const contactGalleryItems = resolvedGallery.map((src) => ({
-  src: sanityImageUrl(src, 1200),
-  srcset: sanityImageSrcset(src),
+const CONTACT_THUMB_RATIO = 4 / 3;
+const CONTACT_VIDEO_RATIO = 16 / 9;
+
+const contactGalleryItems = resolvedGallery.slice(0, 4).map((src) => ({
+  src: sanityImageCropUrl(src, 1200, CONTACT_THUMB_RATIO),
+  srcset: sanityImageCropSrcset(src, CONTACT_THUMB_RATIO),
+  position: sanityImageObjectPosition(src),
 }));
 
-const resolvedContactVideoThumbnail = sanityImageUrl(contactVideoThumbnail, 1600);
-const contactVideoThumbnailSrcset = sanityImageSrcset(contactVideoThumbnail);
+const resolvedContactVideoThumbnail = sanityImageCropUrl(contactVideoThumbnail, 1800, CONTACT_VIDEO_RATIO);
+const contactVideoThumbnailSrcset = sanityImageCropSrcset(contactVideoThumbnail, CONTACT_VIDEO_RATIO);
+const contactVideoThumbnailPosition = sanityImageObjectPosition(contactVideoThumbnail);
 ---
 
 <section class="contact" id="contact" aria-labelledby="contact-title">
@@ -109,6 +112,7 @@ const contactVideoThumbnailSrcset = sanityImageSrcset(contactVideoThumbnail);
               src={image.src}
               srcset={image.srcset || undefined}
               sizes="(max-width: 900px) 50vw, 25vw"
+              style={image.position ? `object-position: ${image.position}` : undefined}
               alt="Vinciane Vinckenbosch"
               loading="lazy"
               decoding="async"
@@ -129,6 +133,7 @@ const contactVideoThumbnailSrcset = sanityImageSrcset(contactVideoThumbnail);
               src={resolvedContactVideoThumbnail}
               srcset={contactVideoThumbnailSrcset || undefined}
               sizes="(max-width: 900px) 100vw, 50vw"
+              style={contactVideoThumbnailPosition ? `object-position: ${contactVideoThumbnailPosition}` : undefined}
               alt=""
               loading="lazy"
               decoding="async"

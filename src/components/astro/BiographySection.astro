@@ -2,7 +2,7 @@
 import type { Homepage, Lang } from '../../lib/types';
 import { useTranslations } from '../../lib/i18n';
 import { frenchTypo } from '../../lib/typography';
-import { sanityImageSrcset, sanityImageUrl } from '../../lib/sanity-image';
+import { sanityImageCropSrcset, sanityImageCropUrl, sanityImageObjectPosition } from '../../lib/sanity-image';
 
 interface Props {
   lang: Lang;
@@ -26,19 +26,33 @@ const heroQuote = frenchTypo(
 const heroQuoteAttr = homepage?.heroQuoteAttribution || '(Passauer Neue Presse)';
 
 // ── Images : Sanity en priorité, fallback sur les fichiers locaux ──
-const imgIntro      = homepage?.biographyIntroImage?.url || '/images/biographie-portrait-blue-viola.jpg';
-const imgPortrait1  = homepage?.bioImage2?.url           || '/images/grilc-02541.jpg';
-const imgTrioNarrow = homepage?.trioImageNarrow?.url     || '/images/trio-linaris-studio-portrait.jpg';
-const imgTrioWide   = homepage?.trioImageWide?.url       || '/images/trio-linaris-harp-room.jpeg';
-const imgPortrait2  = homepage?.bioImage3?.url           || '/images/grilc-02173.jpg';
-const imgFormation  = homepage?.bioFormationImage?.url   || '/images/grilc-02256.jpg';
+const imgIntro      = homepage?.biographyIntroImage || '/images/biographie-portrait-blue-viola.jpg';
+const imgPortrait1  = homepage?.bioImage2           || '/images/grilc-02541.jpg';
+const imgTrioNarrow = homepage?.trioImageNarrow     || '/images/trio-linaris-studio-portrait.jpg';
+const imgTrioWide   = homepage?.trioImageWide       || '/images/trio-linaris-harp-room.jpeg';
+const imgPortrait2  = homepage?.bioImage3           || '/images/grilc-02173.jpg';
+const imgFormation  = homepage?.bioFormationImage   || '/images/grilc-02256.jpg';
 
-const imgIntroSrcset      = sanityImageSrcset(imgIntro);
-const imgPortrait1Srcset  = sanityImageSrcset(imgPortrait1);
-const imgTrioNarrowSrcset = sanityImageSrcset(imgTrioNarrow);
-const imgTrioWideSrcset   = sanityImageSrcset(imgTrioWide);
-const imgPortrait2Srcset  = sanityImageSrcset(imgPortrait2);
-const imgFormationSrcset  = sanityImageSrcset(imgFormation);
+const INTRO_RATIO = 1099 / 628;
+const PORTRAIT_TALL_RATIO = 798 / 919;
+const TRIO_NARROW_RATIO = 532 / 726;
+const TRIO_WIDE_RATIO = 1060 / 726;
+const PORTRAIT_RATIO = 803 / 881;
+const LANDSCAPE_RATIO = 803 / 535;
+
+const imgIntroSrcset      = sanityImageCropSrcset(imgIntro, INTRO_RATIO);
+const imgPortrait1Srcset  = sanityImageCropSrcset(imgPortrait1, PORTRAIT_TALL_RATIO);
+const imgTrioNarrowSrcset = sanityImageCropSrcset(imgTrioNarrow, TRIO_NARROW_RATIO);
+const imgTrioWideSrcset   = sanityImageCropSrcset(imgTrioWide, TRIO_WIDE_RATIO);
+const imgPortrait2Srcset  = sanityImageCropSrcset(imgPortrait2, PORTRAIT_RATIO);
+const imgFormationSrcset  = sanityImageCropSrcset(imgFormation, LANDSCAPE_RATIO);
+
+const imgIntroPosition      = sanityImageObjectPosition(imgIntro);
+const imgPortrait1Position  = sanityImageObjectPosition(imgPortrait1);
+const imgTrioNarrowPosition = sanityImageObjectPosition(imgTrioNarrow);
+const imgTrioWidePosition   = sanityImageObjectPosition(imgTrioWide);
+const imgPortrait2Position  = sanityImageObjectPosition(imgPortrait2);
+const imgFormationPosition  = sanityImageObjectPosition(imgFormation);
 
 const TRIO_HIGHLIGHT = 'Trio Linaris';
 const trioFallback = "Chambriste passionnée, Vinciane Vinckenbosch est membre fondatrice du Trio Linaris, qu'elle forme aux côtés du flûtiste Pierre Cornu-Deyme et de la harpiste Alexandra Bidi (harpe solo de l'Orchestre de Paris).";
@@ -123,7 +137,7 @@ pushTrioText(fullTrioText.slice(trioCursor));
       <h2 class="bio__section-title">{tr('bio.title')}</h2>
       <div class="bio__intro-img-wrap">
         <picture>
-          {imgIntro === '/images/biographie-portrait-blue-viola.jpg' && (
+          {typeof imgIntro === 'string' && imgIntro === '/images/biographie-portrait-blue-viola.jpg' && (
             <source
               type="image/webp"
               srcset="/images/biographie-portrait-blue-viola-828w.webp 828w,
@@ -136,9 +150,10 @@ pushTrioText(fullTrioText.slice(trioCursor));
             <source srcset={imgIntroSrcset} sizes="(max-width: 768px) 100vw, 66vw" />
           )}
           <img
-            src={sanityImageUrl(imgIntro, 1200)}
+            src={sanityImageCropUrl(imgIntro, 2400, INTRO_RATIO)}
             alt="Vinciane Vinckenbosch — portrait officiel, altiste belge"
             class="bio__intro-img"
+            style={imgIntroPosition ? `object-position: ${imgIntroPosition}` : undefined}
             loading="lazy"
             decoding="async"
             width="2400"
@@ -156,7 +171,7 @@ pushTrioText(fullTrioText.slice(trioCursor));
     <div class="bio__row bio__row--img-left" data-reveal>
       <div class="bio__img-wrap bio__img-wrap--portrait-tall">
         <picture>
-          {imgPortrait1 === '/images/grilc-02541.jpg' && (
+          {typeof imgPortrait1 === 'string' && imgPortrait1 === '/images/grilc-02541.jpg' && (
             <source
               type="image/webp"
               srcset="/images/grilc-02541-828w.webp 828w,
@@ -169,8 +184,9 @@ pushTrioText(fullTrioText.slice(trioCursor));
             <source srcset={imgPortrait1Srcset} sizes="(max-width: 768px) 100vw, 48vw" />
           )}
           <img
-            src={sanityImageUrl(imgPortrait1, 1200)}
+            src={sanityImageCropUrl(imgPortrait1, 2400, PORTRAIT_TALL_RATIO)}
             alt="Vinciane Vinckenbosch jouant de l'alto, portrait artistique"
+            style={imgPortrait1Position ? `object-position: ${imgPortrait1Position}` : undefined}
             loading="lazy"
             decoding="async"
             width="9504"
@@ -232,8 +248,9 @@ pushTrioText(fullTrioText.slice(trioCursor));
             <source srcset={imgTrioNarrowSrcset} sizes="(max-width: 768px) 100vw, 33vw" />
           )}
           <img
-            src={sanityImageUrl(imgTrioNarrow, 800)}
+            src={sanityImageCropUrl(imgTrioNarrow, 1600, TRIO_NARROW_RATIO)}
             alt="Vinciane Vinckenbosch — Trio Linaris"
+            style={imgTrioNarrowPosition ? `object-position: ${imgTrioNarrowPosition}` : undefined}
             loading="lazy"
             decoding="async"
             width="532"
@@ -247,8 +264,9 @@ pushTrioText(fullTrioText.slice(trioCursor));
             <source srcset={imgTrioWideSrcset} sizes="(max-width: 768px) 100vw, 67vw" />
           )}
           <img
-            src={sanityImageUrl(imgTrioWide, 1200)}
+            src={sanityImageCropUrl(imgTrioWide, 2400, TRIO_WIDE_RATIO)}
             alt="Trio Linaris en salle de concert"
+            style={imgTrioWidePosition ? `object-position: ${imgTrioWidePosition}` : undefined}
             loading="lazy"
             decoding="async"
             width="1060"
@@ -269,8 +287,9 @@ pushTrioText(fullTrioText.slice(trioCursor));
             <source srcset={imgPortrait2Srcset} sizes="(max-width: 768px) 100vw, 48vw" />
           )}
           <img
-            src={sanityImageUrl(imgPortrait2, 1200)}
+            src={sanityImageCropUrl(imgPortrait2, 2400, PORTRAIT_RATIO)}
             alt="Vinciane Vinckenbosch en concert, altiste"
+            style={imgPortrait2Position ? `object-position: ${imgPortrait2Position}` : undefined}
             loading="lazy"
             decoding="async"
             width="803"
@@ -305,8 +324,9 @@ pushTrioText(fullTrioText.slice(trioCursor));
               <source srcset={imgFormationSrcset} sizes="(max-width: 768px) 100vw, 48vw" />
             )}
             <img
-              src={sanityImageUrl(imgFormation, 1200)}
+              src={sanityImageCropUrl(imgFormation, 2400, LANDSCAPE_RATIO)}
               alt="Vinciane Vinckenbosch — Formation"
+              style={imgFormationPosition ? `object-position: ${imgFormationPosition}` : undefined}
               loading="lazy"
               decoding="async"
               width="803"

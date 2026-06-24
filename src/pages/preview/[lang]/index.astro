@@ -13,7 +13,7 @@ import type { Lang } from '../../../lib/types';
 import { createSanityPreviewClient } from '../../../lib/sanity';
 import { getAgendaEvents, getHeroEvents, getHomepage } from '../../../lib/queries';
 import { frenchTypo } from '../../../lib/typography';
-import { sanityImageSrcset, sanityImageUrl } from '../../../lib/sanity-image';
+import { sanityImageCropSrcset, sanityImageCropUrl, sanityImageObjectPosition } from '../../../lib/sanity-image';
 
 const { lang } = Astro.params as { lang: Lang };
 const secret = Astro.url.searchParams.get('secret');
@@ -27,9 +27,11 @@ const previewClient = createSanityPreviewClient();
 const heroEvents = await getHeroEvents(3, previewClient);
 const homepage = await getHomepage(previewClient);
 const agendaEvents = await getAgendaEvents(lang, previewClient);
-const finalImage = homepage?.finalImage?.url || '/images/grilc-02660.jpg';
-const finalImageSrc = sanityImageUrl(finalImage, 2400);
-const finalImageSrcset = sanityImageSrcset(finalImage);
+const finalImage = homepage?.finalImage || '/images/grilc-02660.jpg';
+const finalImageRatio = 1672 / 900;
+const finalImageSrc = sanityImageCropUrl(finalImage, 3200, finalImageRatio);
+const finalImageSrcset = sanityImageCropSrcset(finalImage, finalImageRatio);
+const finalImagePosition = sanityImageObjectPosition(finalImage);
 
 const bioPdfs = {
   fr: homepage?.biographyPdfs?.fr ?? '/pdfs/biographie-fr.pdf',
@@ -101,6 +103,7 @@ const quote2Attribution = homepage?.quote2Attribution
         src={finalImageSrc}
         srcset={finalImageSrcset || undefined}
         sizes="(max-width: 768px) 100vw, 96vw"
+        style={finalImagePosition ? `object-position: ${finalImagePosition}` : undefined}
         alt=""
         loading="lazy"
         decoding="async"

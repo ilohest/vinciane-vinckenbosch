@@ -11,7 +11,7 @@ import type { Lang } from '../../lib/types';
 import { LANGS } from '../../lib/i18n';
 import { getHeroEvents, getHomepage } from '../../lib/queries';
 import { frenchTypo } from '../../lib/typography';
-import { sanityImageSrcset, sanityImageUrl } from '../../lib/sanity-image';
+import { sanityImageCropSrcset, sanityImageCropUrl, sanityImageObjectPosition } from '../../lib/sanity-image';
 
 export function getStaticPaths() {
   return LANGS.map(lang => ({ params: { lang } }));
@@ -20,9 +20,11 @@ export function getStaticPaths() {
 const { lang } = Astro.params as { lang: Lang };
 const heroEvents = await getHeroEvents(3);
 const homepage = await getHomepage();
-const finalImage = homepage?.finalImage?.url || '/images/grilc-02660.jpg';
-const finalImageSrc = sanityImageUrl(finalImage, 2400);
-const finalImageSrcset = sanityImageSrcset(finalImage);
+const finalImage = homepage?.finalImage || '/images/grilc-02660.jpg';
+const finalImageRatio = 1672 / 900;
+const finalImageSrc = sanityImageCropUrl(finalImage, 3200, finalImageRatio);
+const finalImageSrcset = sanityImageCropSrcset(finalImage, finalImageRatio);
+const finalImagePosition = sanityImageObjectPosition(finalImage);
 // PDF de biographie par langue : Sanity en priorité, sinon fichiers locaux
 const bioPdfs = {
   fr: homepage?.biographyPdfs?.fr ?? '/pdfs/biographie-fr.pdf',
@@ -102,6 +104,7 @@ const quote2Attribution = homepage?.quote2Attribution
         src={finalImageSrc}
         srcset={finalImageSrcset || undefined}
         sizes="(max-width: 768px) 100vw, 96vw"
+        style={finalImagePosition ? `object-position: ${finalImagePosition}` : undefined}
         alt=""
         loading="lazy"
         decoding="async"

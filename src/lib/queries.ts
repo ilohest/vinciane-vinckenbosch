@@ -4,6 +4,8 @@ import { sanityImageUrl, sanityImageSrcset, sanityDownloadUrl } from './sanity-i
 
 type QueryClient = Pick<typeof sanityClient, 'fetch'>;
 
+const IMAGE_PROJECTION = `_type, crop, hotspot, "url": asset->url, "asset": asset->{ "_ref": _id, url }`;
+
 /** Crédits photo par défaut (utilisés tant que Sanity n'est pas rempli) */
 export const DEFAULT_PHOTO_CREDITS: string[] = ['Andrej Grilc'];
 
@@ -23,9 +25,9 @@ export async function getSiteSettings(): Promise<SiteSettings> {
 export async function getHomepage(client: QueryClient = sanityClient): Promise<Homepage | null> {
   try {
     return await client.fetch(`*[_type == "homepage"][0]{
-      "heroImage":           heroImage { "url": asset->url },
+      "heroImage":           heroImage { ${IMAGE_PROJECTION} },
       "heroVideo":           heroVideo { "url": asset->url },
-      "heroMobileImage":     heroMobileImage { "url": asset->url },
+      "heroMobileImage":     heroMobileImage { ${IMAGE_PROJECTION} },
       "heroMobileVideo":     heroMobileVideo { "url": asset->url },
       heroQuote,
       heroQuoteAttribution,
@@ -37,13 +39,13 @@ export async function getHomepage(client: QueryClient = sanityClient): Promise<H
         "en": biographyPdfs.en.asset->url,
         "de": biographyPdfs.de.asset->url
       },
-      "biographyIntroImage": biographyIntroImage { "url": asset->url },
-      "bioImage2":           bioImage2           { "url": asset->url },
-      "trioImageNarrow":     trioImageNarrow     { "url": asset->url },
-      "trioImageWide":       trioImageWide       { "url": asset->url },
-      "bioImage3":           bioImage3           { "url": asset->url },
-      "bioFormationImage":   bioFormationImage   { "url": asset->url },
-      "finalImage":          finalImage          { "url": asset->url },
+      "biographyIntroImage": biographyIntroImage { ${IMAGE_PROJECTION} },
+      "bioImage2":           bioImage2           { ${IMAGE_PROJECTION} },
+      "trioImageNarrow":     trioImageNarrow     { ${IMAGE_PROJECTION} },
+      "trioImageWide":       trioImageWide       { ${IMAGE_PROJECTION} },
+      "bioImage3":           bioImage3           { ${IMAGE_PROJECTION} },
+      "bioFormationImage":   bioFormationImage   { ${IMAGE_PROJECTION} },
+      "finalImage":          finalImage          { ${IMAGE_PROJECTION} },
       bioTrioText,
       trioLinks[]{ label, url, "pdf": pdf.asset->url, "pdfName": pdf.asset->originalFilename },
       bioParaOrchestre,
@@ -56,9 +58,9 @@ export async function getHomepage(client: QueryClient = sanityClient): Promise<H
       bioParaFormationAlto,
       bioParaMaitres,
       bioParaPedagogie,
-      "contactGalleryImages": contactGalleryImages[]{ "url": asset->url },
+      "contactGalleryImages": contactGalleryImages[]{ ${IMAGE_PROJECTION} },
       contactVideoUrl,
-      "contactVideoThumbnail": contactVideoThumbnail { "url": asset->url },
+      "contactVideoThumbnail": contactVideoThumbnail { ${IMAGE_PROJECTION} },
       socialLinks
     }`);
   } catch {
