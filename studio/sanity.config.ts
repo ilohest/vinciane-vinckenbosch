@@ -4,6 +4,7 @@ import { orderableDocumentListDeskItem } from "@sanity/orderable-document-list";
 import { frFRLocale } from "@sanity/locale-fr-fr";
 import { schemaTypes } from "./schemas";
 import { StudioDashboard } from "./components/StudioDashboard";
+import { StudioLogo } from "./components/StudioLogo";
 import { StudioHelp } from "./components/StudioHelp";
 import { PreviewDraftAction } from "./components/PreviewDraftAction";
 
@@ -110,6 +111,13 @@ export default defineConfig({
 
   schema: { types: schemaTypes },
 
+  // Logo personnalisé en haut à gauche (remplace le titre par défaut)
+  studio: {
+    components: {
+      logo: StudioLogo,
+    },
+  },
+
   tools: (prev) => [
     {
       name: "home",
@@ -121,6 +129,10 @@ export default defineConfig({
   ],
 
   document: {
+    // Masque le bouton « + » (création libre de documents) en haut à gauche :
+    // tout le contenu se gère via la liste « Mon site ».
+    newDocumentOptions: () => [],
+
     actions: (prev, context) => {
       // L'aperçu brouillon n'existe que pour la page d'accueil et l'agenda
       // (la route /preview rend l'accueil + la section agenda). On masque donc
