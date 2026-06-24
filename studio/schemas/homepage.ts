@@ -36,12 +36,17 @@ const helpNote = (
   });
 
 const heroVideoValidation = (label: string) => (R: any) =>
-  R.custom(async (value?: { asset?: { _ref?: string } }, context: any) => {
+  R.custom(async (value: { asset?: { _ref?: string } } | undefined, context: any) => {
     const assetId = value?.asset?._ref;
     if (!assetId) return true;
 
-    const client = context.getClient({ apiVersion: "2024-01-01" });
-    const asset = await client.fetch<{ size?: number } | null>(
+    const client = context.getClient({ apiVersion: "2024-01-01" }) as {
+      fetch: (
+        query: string,
+        params?: Record<string, unknown>,
+      ) => Promise<{ size?: number } | null>;
+    };
+    const asset = await client.fetch(
       `*[_id == $assetId][0]{size}`,
       { assetId },
     );

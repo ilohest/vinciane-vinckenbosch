@@ -1,6 +1,7 @@
 ---
 import type { Lang } from '../../lib/types';
 import { useTranslations } from '../../lib/i18n';
+import { sanityImageSrcset, sanityImageUrl } from '../../lib/sanity-image';
 import ContactForm from '../vue/ContactForm.vue';
 
 interface Props {
@@ -59,6 +60,14 @@ const resolvedGallery = (
     ? galleryImages.map(img => img.url).filter(Boolean) as string[]
     : FALLBACK_GALLERY
 ).slice(0, 4);
+
+const contactGalleryItems = resolvedGallery.map((src) => ({
+  src: sanityImageUrl(src, 1200),
+  srcset: sanityImageSrcset(src),
+}));
+
+const resolvedContactVideoThumbnail = sanityImageUrl(contactVideoThumbnail, 1600);
+const contactVideoThumbnailSrcset = sanityImageSrcset(contactVideoThumbnail);
 ---
 
 <section class="contact" id="contact" aria-labelledby="contact-title">
@@ -94,9 +103,16 @@ const resolvedGallery = (
     <!-- Gallery + media CTA -->
     <div class="contact__media-row" data-reveal>
       <div class="contact__gallery">
-        {resolvedGallery.map(src => (
+        {contactGalleryItems.map(image => (
           <div class="contact__thumb">
-            <img src={src} alt="Vinciane Vinckenbosch" loading="lazy" decoding="async" />
+            <img
+              src={image.src}
+              srcset={image.srcset || undefined}
+              sizes="(max-width: 900px) 50vw, 25vw"
+              alt="Vinciane Vinckenbosch"
+              loading="lazy"
+              decoding="async"
+            />
           </div>
         ))}
       </div>
@@ -110,7 +126,9 @@ const resolvedGallery = (
             aria-label="Lire la vidéo YouTube de Vinciane Vinckenbosch"
           >
             <img
-              src={contactVideoThumbnail}
+              src={resolvedContactVideoThumbnail}
+              srcset={contactVideoThumbnailSrcset || undefined}
+              sizes="(max-width: 900px) 100vw, 50vw"
               alt=""
               loading="lazy"
               decoding="async"
@@ -356,8 +374,7 @@ const resolvedGallery = (
 
 /* ════════════════════════════════════════════════════════
    MOBILE — Figma iPhone 17 : 402×936
-   Structure : CONTACT ↓ socials (gauche) ↓ email (gauche)
-   Galerie + vidéo cachées sur mobile
+   Structure : CONTACT ↓ socials (gauche) ↓ formulaire ↓ médias
 ════════════════════════════════════════════════════════ */
 @media (max-width: 768px) {
 
@@ -402,9 +419,34 @@ const resolvedGallery = (
     font-size: 1.25rem; /* Figma : 20px */
   }
 
-  /* Galerie + vidéo : cachées sur mobile (non présentes dans le Figma) */
   .contact__media-row {
-    display: none;
+    display: flex;
+    gap: clamp(1.25rem, 6vw, 2rem);
+    margin-top: clamp(0.75rem, 3vw, 1.25rem);
+  }
+
+  .contact__gallery {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.5rem;
+  }
+
+  .contact__thumb {
+    aspect-ratio: 4/3;
+  }
+
+  .contact__media-bottom {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .contact__video-preview {
+    width: 100%;
+  }
+
+  .contact__media-link {
+    justify-self: auto;
   }
 }
 </style>

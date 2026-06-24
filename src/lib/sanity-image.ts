@@ -7,7 +7,7 @@
  * Deux cas d'usage :
  *
  * 1. AFFICHAGE WEB → sanityImageUrl / sanityImageSrcset
- *    Paramètres : auto=format (WebP/AVIF), w=N (resize), q=85, fit=max
+ *    Paramètres : auto=format (WebP/AVIF), w=N (resize), q=92, fit=max
  *    Usage : attributs src/srcset des <img> dans la page
  *
  * 2. TÉLÉCHARGEMENT PROFESSIONNEL → sanityDownloadUrl
@@ -16,8 +16,8 @@
  *    Usage : attribut href des liens <a download> dans les dossiers de presse.
  */
 
-const DEFAULT_QUALITY = 78;
-const SRCSET_WIDTHS = [480, 800, 1200, 1600, 2000, 2400] as const;
+const DEFAULT_QUALITY = 92;
+const SRCSET_WIDTHS = [640, 960, 1400, 1800, 2400, 3200, 3840] as const;
 
 /**
  * Ajoute les paramètres d'optimisation à une URL Sanity CDN pour l'affichage.

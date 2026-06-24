@@ -13,6 +13,7 @@ import type { Lang } from '../../../lib/types';
 import { createSanityPreviewClient } from '../../../lib/sanity';
 import { getAgendaEvents, getHeroEvents, getHomepage } from '../../../lib/queries';
 import { frenchTypo } from '../../../lib/typography';
+import { sanityImageSrcset, sanityImageUrl } from '../../../lib/sanity-image';
 
 const { lang } = Astro.params as { lang: Lang };
 const secret = Astro.url.searchParams.get('secret');
@@ -26,6 +27,9 @@ const previewClient = createSanityPreviewClient();
 const heroEvents = await getHeroEvents(3, previewClient);
 const homepage = await getHomepage(previewClient);
 const agendaEvents = await getAgendaEvents(lang, previewClient);
+const finalImage = homepage?.finalImage?.url || '/images/grilc-02660.jpg';
+const finalImageSrc = sanityImageUrl(finalImage, 2400);
+const finalImageSrcset = sanityImageSrcset(finalImage);
 
 const bioPdfs = {
   fr: homepage?.biographyPdfs?.fr ?? '/pdfs/biographie-fr.pdf',
@@ -94,7 +98,9 @@ const quote2Attribution = homepage?.quote2Attribution
     />
     <section class="home-final-image" aria-hidden="true" data-reveal>
       <img
-        src={homepage?.finalImage?.url || '/images/grilc-02660.jpg'}
+        src={finalImageSrc}
+        srcset={finalImageSrcset || undefined}
+        sizes="(max-width: 768px) 100vw, 96vw"
         alt=""
         loading="lazy"
         decoding="async"

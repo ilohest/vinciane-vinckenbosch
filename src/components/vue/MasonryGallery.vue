@@ -24,6 +24,7 @@
               :class="{ 'masonry__img-wrap--video': isVideo(entry.item) }"
             >
               <img
+                v-if="entry.item.image"
                 :src="entry.item.image"
                 :srcset="entry.item.srcset"
                 sizes="(max-width: 600px) 100vw, (max-width: 1024px) 50vw, 33vw"
@@ -33,6 +34,9 @@
                 :fetchpriority="entry.index < 3 ? 'high' : 'auto'"
                 decoding="async"
               />
+              <div v-else-if="isVideo(entry.item)" class="masonry__video-placeholder" aria-hidden="true">
+                <span class="masonry__video-play"></span>
+              </div>
               <div class="masonry__overlay">
                 <span v-if="entry.item.caption" class="masonry__caption">{{ entry.item.caption }}</span>
                 <span class="masonry__hint">
@@ -80,7 +84,7 @@
           />
         </div>
         <img
-          v-else
+          v-else-if="items[lightboxIndex]?.image"
           :src="items[lightboxIndex]?.image"
           :srcset="items[lightboxIndex]?.srcset"
           sizes="90vw"
@@ -141,7 +145,7 @@ defineOptions({
 
 interface GalleryItem {
   type?: 'photo' | 'video';
-  image: string;
+  image?: string;
   srcset?: string;
   downloadUrl?: string;
   caption?: string;
@@ -352,6 +356,37 @@ onUnmounted(() => {
   height: 100%;
   object-fit: cover;
   object-position: center;
+}
+
+.masonry__video-placeholder {
+  width: 100%;
+  height: 100%;
+  min-height: 10rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #111111;
+}
+
+.masonry__video-play {
+  width: clamp(3rem, 8vw, 4.5rem);
+  aspect-ratio: 1;
+  border: 1px solid rgba(247, 245, 243, 0.68);
+  border-radius: 50%;
+  position: relative;
+}
+
+.masonry__video-play::before {
+  content: "";
+  position: absolute;
+  left: 53%;
+  top: 50%;
+  transform: translate(-42%, -50%);
+  width: 0;
+  height: 0;
+  border-top: 0.55rem solid transparent;
+  border-bottom: 0.55rem solid transparent;
+  border-left: 0.85rem solid #F7F5F3;
 }
 
 .masonry__link:hover .masonry__img {

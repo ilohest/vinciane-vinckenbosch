@@ -161,7 +161,7 @@ export function StudioHelp() {
             </li>
             <li>
               Pour une question ou une hésitation avant publication, vous pouvez
-              écrire à Isaure: isaure.lohest@gmail.com.
+              écrire à Isaure: vinciane.vinckenbosch@gmail.com.
             </li>
           </ul>
         </aside>

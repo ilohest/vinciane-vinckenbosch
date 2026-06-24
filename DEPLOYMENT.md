@@ -62,7 +62,7 @@
 ## 4. Contact / e-mail
 
 - [ ] Remplacer le mot de passe d'application Gmail de test par celui du compte **définitif**
-      (actuellement compte de test `isaure.lohest@gmail.com` dans `.env`)
+      (actuellement compte de test `vinciane.vinckenbosch@gmail.com` dans `.env`)
 - [ ] Tester l'envoi du formulaire depuis le site déployé
 
 ## 5. Vérifications finales

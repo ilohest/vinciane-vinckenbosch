@@ -23,7 +23,7 @@ export const mediaItem = defineType({
       title: "Image / miniature",
       type: "image",
       description:
-        "Pour une photo : obligatoire. Pour une vidéo YouTube : optionnel, le site peut utiliser automatiquement la miniature YouTube.",
+        "Pour une photo : obligatoire. Pour une vidéo : optionnel, le site utilise la miniature YouTube si aucune miniature n'est ajoutée.",
       options: { hotspot: true },
       validation: (R) =>
         R.custom((value, context) => {

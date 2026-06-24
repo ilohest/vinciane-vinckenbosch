@@ -143,6 +143,15 @@ function formatTime(time?: string): string | undefined {
   return min && min !== '00' ? `${Number(h)}h${min}` : `${Number(h)}h`;
 }
 
+function normalizeExternalUrl(url?: string): string | undefined {
+  const trimmed = url?.trim();
+  if (!trimmed) return undefined;
+
+  return /^[a-z][a-z\d+.-]*:\/\//i.test(trimmed)
+    ? trimmed
+    : `https://${trimmed}`;
+}
+
 interface RawSanityEvent {
   date?: string;
   time?: string;
@@ -187,7 +196,7 @@ export async function getAgendaEvents(
           return [piece, p.composer].filter(Boolean).join(' — ');
         })
         .filter(Boolean),
-      ticketUrl: e.ticketUrl || undefined,
+      ticketUrl: normalizeExternalUrl(e.ticketUrl),
     }));
   } catch {
     return [];
@@ -197,7 +206,7 @@ export async function getAgendaEvents(
 /** Élément prêt à afficher dans la galerie media */
 export interface MediaGalleryItem {
   type?: 'photo' | 'video';
-  image: string;
+  image?: string;
   srcset?: string;
   downloadUrl?: string;
   caption?: string;
@@ -213,12 +222,12 @@ function getYouTubeThumbnail(videoUrl?: string): string | undefined {
 
     if (hostname === 'youtu.be') {
       const id = url.pathname.split('/').filter(Boolean)[0];
-      return id ? `https://i.ytimg.com/vi/${id}/mqdefault.jpg` : undefined;
+      return id ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg` : undefined;
     }
 
     if (hostname.endsWith('youtube.com')) {
       const id = url.searchParams.get('v') || url.pathname.split('/').filter(Boolean).pop();
-      return id ? `https://i.ytimg.com/vi/${id}/mqdefault.jpg` : undefined;
+      return id ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg` : undefined;
     }
   } catch {
     return undefined;
@@ -260,7 +269,7 @@ export async function getMediaGalleryItems(lang: 'fr' | 'en' | 'de' = 'fr'): Pro
         const fallbackThumbnail = type === 'video' ? getYouTubeThumbnail(i.videoUrl) : undefined;
         const image = rawUrl ? sanityImageUrl(rawUrl, 1600) : fallbackThumbnail;
 
-        if (!image) return null;
+        if (!image && type !== 'video') return null;
 
         return {
           type,

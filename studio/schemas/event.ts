@@ -22,6 +22,22 @@ const localizedString = (
       : undefined,
   });
 
+function isValidTicketUrl(value?: string) {
+  if (!value?.trim()) return true;
+
+  const trimmed = value.trim();
+  const urlWithProtocol = /^[a-z][a-z\d+.-]*:\/\//i.test(trimmed)
+    ? trimmed
+    : `https://${trimmed}`;
+
+  try {
+    const url = new URL(urlWithProtocol);
+    return url.protocol === "http:" || url.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
 export const event = defineType({
   name: "event",
   title: "Concert / Événement",
@@ -122,7 +138,19 @@ export const event = defineType({
       type: "boolean",
       initialValue: false,
     }),
-    defineField({ name: "ticketUrl", title: "Lien billetterie", type: "url" }),
+    defineField({
+      name: "ticketUrl",
+      title: "Lien billetterie",
+      type: "string",
+      description:
+        "Exemples acceptés : https://exemple.com ou www.exemple.com.",
+      validation: (R) =>
+        R.custom((value?: string) =>
+          isValidTicketUrl(value)
+            ? true
+            : "Ajoutez une URL valide, par exemple www.exemple.com.",
+        ),
+    }),
   ],
   orderings: [
     {
