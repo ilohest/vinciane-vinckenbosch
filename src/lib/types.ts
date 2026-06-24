@@ -64,6 +64,9 @@ export interface Homepage {
 
   // Texte Trio Linaris
   bioTrioText?: LocalizedText;
+  // Liens posés sur des noms de la phrase Trio Linaris (éditable dans Sanity).
+  // Chaque entrée a un lien web (url) OU un PDF téléchargeable (pdf).
+  trioLinks?: { label?: string; url?: string; pdf?: string; pdfName?: string }[];
 
   // Paragraphes biographie
   bioParaOrchestre?: LocalizedText;

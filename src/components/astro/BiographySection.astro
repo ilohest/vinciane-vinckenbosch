@@ -44,12 +44,60 @@ const TRIO_HIGHLIGHT = 'Trio Linaris';
 const trioFallback = "Chambriste passionnée, Vinciane Vinckenbosch est membre fondatrice du Trio Linaris, qu'elle forme aux côtés du flûtiste Pierre Cornu-Deyme et de la harpiste Alexandra Bidi (harpe solo de l'Orchestre de Paris).";
 const fullTrioText = (homepage?.bioTrioText?.[lang] || homepage?.bioTrioText?.fr) || trioFallback;
 
-const splitIdx = fullTrioText.indexOf(TRIO_HIGHLIGHT);
-const trioTextBefore    = splitIdx >= 0 ? fullTrioText.slice(0, splitIdx) : fullTrioText;
-const trioTextHighlight = splitIdx >= 0 ? TRIO_HIGHLIGHT : '';
-const trioTextAfter     = splitIdx >= 0 ? fullTrioText.slice(splitIdx + TRIO_HIGHLIGHT.length) : '';
-const trioTextBeforeChars = Array.from(trioTextBefore);
-const trioTextAfterChars  = Array.from(trioTextAfter);
+// Noms « spéciaux » dans la phrase : « Trio Linaris » (toujours en orange) +
+// les liens éditables depuis Sanity (nom → URL). Chaque nom trouvé devient un
+// segment statique (non animé), éventuellement cliquable.
+const trioLinks = (homepage?.trioLinks ?? []).filter((l) => l?.label?.trim());
+const trioMarkers = new Map<string, { href?: string; accent: boolean }>();
+for (const l of trioLinks) {
+  const label = l.label!.trim();
+  // Un PDF (lien de téléchargement via ?dl=) a la priorité ; sinon le lien web
+  const pdfHref = l.pdf ? `${l.pdf}?dl=${encodeURIComponent(l.pdfName ?? 'document.pdf')}` : undefined;
+  trioMarkers.set(label, { href: pdfHref || l.url?.trim(), accent: label === TRIO_HIGHLIGHT });
+}
+if (!trioMarkers.has(TRIO_HIGHLIGHT)) trioMarkers.set(TRIO_HIGHLIGHT, { accent: true });
+
+// Repère les occurrences (libellés les plus longs d'abord pour éviter les chevauchements)
+type TrioHit = { start: number; end: number; label: string };
+const trioHits: TrioHit[] = [];
+for (const label of [...trioMarkers.keys()].sort((a, b) => b.length - a.length)) {
+  let idx = fullTrioText.indexOf(label);
+  while (idx !== -1) {
+    if (!trioHits.some((h) => idx < h.end && idx + label.length > h.start)) {
+      trioHits.push({ start: idx, end: idx + label.length, label });
+    }
+    idx = fullTrioText.indexOf(label, idx + label.length);
+  }
+}
+trioHits.sort((a, b) => a.start - b.start);
+
+// Construit les segments à rendre, avec un index de lettre continu (animation)
+type TrioChar = { char: string; index: number };
+type TrioPart =
+  | { kind: 'letters'; chars: TrioChar[] }
+  | { kind: 'link'; href?: string; chars: TrioChar[] }
+  | { kind: 'accent'; value: string; href?: string };
+const trioParts: TrioPart[] = [];
+let trioLetterIndex = 0;
+let trioCursor = 0;
+const trioChars = (text: string): TrioChar[] =>
+  Array.from(text).map((char) => ({ char, index: trioLetterIndex++ }));
+const pushTrioText = (text: string) => {
+  if (text) trioParts.push({ kind: 'letters', chars: trioChars(text) });
+};
+for (const h of trioHits) {
+  pushTrioText(fullTrioText.slice(trioCursor, h.start));
+  const m = trioMarkers.get(h.label)!;
+  if (m.accent) {
+    // Trio Linaris : reste orange et statique (pas d'animation au scroll)
+    trioParts.push({ kind: 'accent', value: h.label, href: m.href });
+  } else {
+    // Autres noms : lettres animées (passent au blanc au scroll), dans un lien
+    trioParts.push({ kind: 'link', href: m.href, chars: trioChars(h.label) });
+  }
+  trioCursor = h.end;
+}
+pushTrioText(fullTrioText.slice(trioCursor));
 ---
 
 <section class="bio" id="biographie">
@@ -142,13 +190,35 @@ const trioTextAfterChars  = Array.from(trioTextAfter);
          Figma : style_7U6T38, fontSize 56, lineHeight 64px
     ═════════════════════════════════════════════════════════ -->
     <p class="bio__trio-text" data-reveal data-scroll-text>
-      {trioTextBeforeChars.map((char, index) => (
-        <span class="bio__trio-letter" data-letter-index={index}>{char}</span>
-      ))}
-      <span class="text-accent bio__trio-static">{trioTextHighlight}</span>
-      {trioTextAfterChars.map((char, index) => (
-        <span class="bio__trio-letter" data-letter-index={trioTextBeforeChars.length + index}>{char}</span>
-      ))}
+      {trioParts.map((part) => {
+        if (part.kind === 'letters') {
+          return part.chars.map(({ char, index }) => (
+            <span class="bio__trio-letter" data-letter-index={index}>{char}</span>
+          ));
+        }
+        if (part.kind === 'link') {
+          return (
+            <a
+              href={part.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="bio__trio-static bio__trio-link"
+            >
+              {part.chars.map(({ char, index }) => (
+                <span class="bio__trio-letter" data-letter-index={index}>{char}</span>
+              ))}
+            </a>
+          );
+        }
+        return part.href
+          ? <a
+              href={part.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="bio__trio-static bio__trio-accent bio__trio-link"
+            >{part.value}</a>
+          : <span class="bio__trio-static bio__trio-accent">{part.value}</span>;
+      })}
     </p>
 
     <!-- ════════════════════════════════════════════════════════
@@ -483,7 +553,23 @@ const trioTextAfterChars  = Array.from(trioTextAfter);
 }
 
 .bio__trio-static {
+  color: #BCB7A9;
+}
+
+.bio__trio-accent {
   color: #DA7F52;
+}
+
+.bio__trio-link {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+  transition: color 0.15s linear;
+}
+
+.bio__trio-link:not(.bio__trio-accent):hover,
+.bio__trio-link:not(.bio__trio-accent):hover .bio__trio-letter {
+  color: #ffffff;
 }
 
 @media (prefers-reduced-motion: reduce) {

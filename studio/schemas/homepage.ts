@@ -206,6 +206,58 @@ export const homepage = defineType({
     ),
 
     defineField({
+      name: "trioLinks",
+      title: "Liens dans la phrase Trio Linaris",
+      group: "bio",
+      type: "array",
+      description:
+        "Ajoutez un lien sur un nom de la phrase ci-dessus (ex. « Alexandra Bidi », « Pierre Cornu-Deyme », « Trio Linaris »). Le « Nom » doit être écrit EXACTEMENT comme dans le texte. Le nom devient alors cliquable sur le site.",
+      of: [
+        {
+          type: "object",
+          fields: [
+            {
+              name: "label",
+              title: "Nom dans le texte",
+              type: "string",
+              description:
+                "Doit correspondre exactement au texte, accents compris (ex. Alexandra Bidi).",
+              validation: (R) => R.required(),
+            },
+            {
+              name: "url",
+              title: "Lien vers un site web",
+              type: "url",
+              description: "Remplir le lien OU le PDF ci-dessous (pas les deux).",
+              validation: (R) => R.uri({ scheme: ["http", "https"] }),
+            },
+            {
+              name: "pdf",
+              title: "Ou document PDF téléchargeable",
+              type: "file",
+              options: { accept: "application/pdf" },
+              description:
+                "Si un PDF est ajouté, le nom devient un lien de téléchargement (le lien web ci-dessus est ignoré).",
+            },
+          ],
+          validation: (R) =>
+            R.custom((value?: { url?: string; pdf?: unknown }) =>
+              value?.url || value?.pdf
+                ? true
+                : "Ajoutez un lien web OU un document PDF.",
+            ),
+          preview: {
+            select: { title: "label", subtitle: "url", media: "pdf" },
+            prepare: ({ title, subtitle }: { title?: string; subtitle?: string }) => ({
+              title: title ?? "(sans nom)",
+              subtitle: subtitle || "PDF téléchargeable",
+            }),
+          },
+        },
+      ],
+    }),
+
+    defineField({
       name: "trioImageNarrow",
       title: "④ Photo Trio Linaris — portrait étroit (gauche des deux photos)",
       group: "bio",

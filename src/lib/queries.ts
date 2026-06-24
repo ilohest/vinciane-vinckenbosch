@@ -45,6 +45,7 @@ export async function getHomepage(client: QueryClient = sanityClient): Promise<H
       "bioFormationImage":   bioFormationImage   { "url": asset->url },
       "finalImage":          finalImage          { "url": asset->url },
       bioTrioText,
+      trioLinks[]{ label, url, "pdf": pdf.asset->url, "pdfName": pdf.asset->originalFilename },
       bioParaOrchestre,
       bioParaPrix,
       bioParaFestivals,
