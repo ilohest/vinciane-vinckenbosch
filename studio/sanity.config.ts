@@ -121,7 +121,13 @@ export default defineConfig({
   ],
 
   document: {
-    actions: (prev) => {
+    actions: (prev, context) => {
+      // L'aperçu brouillon n'existe que pour la page d'accueil et l'agenda
+      // (la route /preview rend l'accueil + la section agenda). On masque donc
+      // le bouton sur les autres types (Média, Presse, Crédits, pages légales).
+      const PREVIEWABLE = ["homepage", "event"];
+      if (!PREVIEWABLE.includes(context.schemaType)) return prev;
+
       const publishIndex = prev.findIndex(
         (action) => action.action === "publish",
       );
