@@ -44,7 +44,6 @@ export interface Event {
   venue: LocalizedString;
   role: LocalizedString;
   program: Array<{ composer: string; piece: string }>;
-  isFeatured: boolean;
 }
 
 export interface HeroEventTeaser {

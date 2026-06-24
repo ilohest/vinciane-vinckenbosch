@@ -132,10 +132,15 @@ export const event = defineType({
         },
       ],
     }),
+    // Champ déprécié : la mise en avant dans le hero se gère désormais uniquement
+    // via la liste « Concerts affichés dans le hero » de la page d'accueil.
+    // Conservé masqué pour éviter un avertissement Sanity sur les concerts existants.
     defineField({
       name: "isFeatured",
-      title: "Mettre en avant (page d'accueil)",
+      title: "Mettre en avant (ancien champ)",
       type: "boolean",
+      hidden: true,
+      readOnly: true,
       initialValue: false,
     }),
     defineField({

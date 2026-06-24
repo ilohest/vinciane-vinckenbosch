@@ -90,17 +90,7 @@ export async function getHeroEvents(limit = 3, client: QueryClient = sanityClien
       return selectedEvents.slice(0, limit);
     }
 
-    // Sinon : concerts à venir cochés « Mettre en avant » (isFeatured)
-    const featured = await client.fetch<HeroEventTeaser[]>(
-      `*[_type == "event" && isFeatured == true && defined(date) && defined(city) && defined(country) && date >= $today]
-        | order(date asc) [0...$limit]{ _id, date, city, country }`,
-      { today: todayIsoDate(), limit }
-    );
-    if (featured.length > 0) {
-      return featured;
-    }
-
-    // Sinon : prochains concerts automatiquement
+    // Sinon (liste vide) : les prochains concerts automatiquement
     return await client.fetch<HeroEventTeaser[]>(
       `*[_type == "event" && defined(date) && defined(city) && defined(country) && date >= $today]
         | order(date asc) [0...$limit]{
