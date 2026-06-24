@@ -1,5 +1,5 @@
 import { sanityClient } from './sanity';
-import type { Homepage, Event, HeroEventTeaser, MediaItem, PressItem, SiteSettings } from './types';
+import type { Homepage, HeroEventTeaser, SiteSettings } from './types';
 import { sanityImageUrl, sanityImageSrcset, sanityDownloadUrl } from './sanity-image';
 
 type QueryClient = Pick<typeof sanityClient, 'fetch'>;
@@ -18,12 +18,6 @@ export async function getSiteSettings(): Promise<SiteSettings> {
     // silencieux → fallback
   }
   return { photoCredits: DEFAULT_PHOTO_CREDITS };
-}
-
-/** Récupère les crédits photo depuis Sanity, avec fallback sur les valeurs par défaut */
-export async function getPhotoCredits(): Promise<string[]> {
-  const settings = await getSiteSettings();
-  return settings.photoCredits?.length ? settings.photoCredits : DEFAULT_PHOTO_CREDITS;
 }
 
 export async function getHomepage(client: QueryClient = sanityClient): Promise<Homepage | null> {
@@ -93,6 +87,17 @@ export async function getHeroEvents(limit = 3, client: QueryClient = sanityClien
       return selectedEvents.slice(0, limit);
     }
 
+    // Sinon : concerts à venir cochés « Mettre en avant » (isFeatured)
+    const featured = await client.fetch<HeroEventTeaser[]>(
+      `*[_type == "event" && isFeatured == true && defined(date) && defined(city) && defined(country) && date >= $today]
+        | order(date asc) [0...$limit]{ _id, date, city, country }`,
+      { today: todayIsoDate(), limit }
+    );
+    if (featured.length > 0) {
+      return featured;
+    }
+
+    // Sinon : prochains concerts automatiquement
     return await client.fetch<HeroEventTeaser[]>(
       `*[_type == "event" && defined(date) && defined(city) && defined(country) && date >= $today]
         | order(date asc) [0...$limit]{
@@ -102,17 +107,6 @@ export async function getHeroEvents(limit = 3, client: QueryClient = sanityClien
           country
         }`,
       { today: todayIsoDate(), limit }
-    );
-  } catch {
-    return [];
-  }
-}
-
-export async function getFeaturedEvents(limit = 5): Promise<Event[]> {
-  try {
-    return await sanityClient.fetch(
-      `*[_type == "event"] | order(date asc) [0...$limit]`,
-      { limit }
     );
   } catch {
     return [];
@@ -199,16 +193,6 @@ export async function getAgendaEvents(
   }
 }
 
-export async function getMediaItems(): Promise<MediaItem[]> {
-  try {
-    return await sanityClient.fetch(
-      `*[_type == "mediaItem" && !(_id in path("drafts.**"))] | order(coalesce(orderRank, "zzzzzz") asc, _createdAt asc)`
-    );
-  } catch {
-    return [];
-  }
-}
-
 /** Élément prêt à afficher dans la galerie media */
 export interface MediaGalleryItem {
   type?: 'photo' | 'video';
@@ -287,16 +271,6 @@ export async function getMediaGalleryItems(lang: 'fr' | 'en' | 'de' = 'fr'): Pro
         };
       })
       .filter((item): item is MediaGalleryItem => Boolean(item));
-  } catch {
-    return [];
-  }
-}
-
-export async function getPressItems(): Promise<PressItem[]> {
-  try {
-    return await sanityClient.fetch(
-      `*[_type == "pressItem" && !(_id in path("drafts.**"))] | order(coalesce(orderRank, "zzzzzz") asc, _createdAt asc)`
-    );
   } catch {
     return [];
   }
