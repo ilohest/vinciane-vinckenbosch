@@ -73,6 +73,7 @@ const sections = [
       "Ouvrir « Agenda », puis cliquer sur « Créer un nouveau document » (bouton « + »).",
       "Remplir la date, l'heure, la ville, le pays, le lieu, le rôle et le programme.",
       "Le site classe les concerts automatiquement: à venir dans l'agenda, passés dans les archives.",
+      "Dans l'agenda, le site affiche jusqu'à 6 concerts à venir. Le bouton « plus de dates » apparaît seulement s'il y a plus de 6 concerts à venir: avec 6 ou moins, ils sont déjà tous affichés et le bouton n'apparaît pas (c'est normal). Les concerts passés restent consultables dans la page Archives.",
       "Pour afficher un concert en haut de la page d'accueil (hero), cocher « Mettre en avant » ou le sélectionner dans la page d'accueil.",
     ],
   },
