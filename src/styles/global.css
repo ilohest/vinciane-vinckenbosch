@@ -54,6 +54,7 @@
 
 html {
   scroll-behavior: smooth;
+  scroll-padding-top: calc(var(--navbar-height, 57px) + 1rem);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -86,15 +87,16 @@ main {
   width: 100%;
   margin: 0;
   padding: 0;
-  /* Compense la navbar fixe en haut sur toutes les pages secondaires.
-     Sur la homepage, la navbar est cachée au scroll 0 donc pas de décalage. */
-  scroll-padding-top: var(--navbar-height, 57px);
 }
 
 /* Hauteur de la navbar fixe en haut — utilisée pour le padding-top
    des pages où la navbar est toujours visible (hors homepage) */
 :root {
   --navbar-height: 57px;
+}
+
+[id] {
+  scroll-margin-top: calc(var(--navbar-height, 57px) + 1rem);
 }
 
 .btn-pill {

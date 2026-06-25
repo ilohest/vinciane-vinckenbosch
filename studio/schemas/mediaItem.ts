@@ -10,6 +10,7 @@ export const mediaItem = defineType({
       name: "type",
       title: "Type",
       type: "string",
+      hidden: true,
       options: {
         list: [
           { title: "Photo", value: "photo" },

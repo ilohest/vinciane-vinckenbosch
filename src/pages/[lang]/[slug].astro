@@ -370,6 +370,8 @@ const gallerySchema = pageKey === 'media' ? {
 }
 
 .archives-page {
+  --page-padding: clamp(1.5rem, 4vw, 4rem);
+  padding-top: calc(var(--navbar-height, 57px) + clamp(1.5rem, 4vw, 3rem));
   padding-bottom: 0;
 }
 
@@ -394,9 +396,16 @@ const gallerySchema = pageKey === 'media' ? {
 .credits-page__title,
 .legal-page__title {
   margin-bottom: 1.5rem;
-  font-size: clamp(2.5rem, 5.5vw, 5.375rem);
+  font-size: clamp(2.35rem, 5.2vw, 5.125rem);
   line-height: 1;
   color: #ffffff;
+  overflow-wrap: anywhere;
+  hyphens: auto;
+}
+
+:global(html:lang(de)) .legal-page__title {
+  font-size: clamp(1.9rem, 4.2vw, 4.125rem);
+  letter-spacing: 0.055em;
 }
 
 .credits-page__intro,

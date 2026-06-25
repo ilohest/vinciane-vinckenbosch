@@ -31,6 +31,7 @@
               :href="item.href"
               class="navbar__link"
               :class="{ 'navbar__link--active': isActive(item) }"
+              @click="onNavItemClick($event, item)"
             >
               <!-- Flip lettre par lettre avec stagger -->
               <span class="flip-word" aria-hidden="true">
@@ -101,7 +102,7 @@
               :href="item.href"
               class="mobile-menu__link"
               :class="{ 'mobile-menu__link--active': isActive(item) }"
-              @click="closeMenu"
+              @click="onNavItemClick($event, item)"
             >{{ item.label }}</a>
           </li>
         </ul>
@@ -203,7 +204,33 @@ function onBrandClick(e: MouseEvent) {
 }
 
 function toggleMenu() { menuOpen.value = !menuOpen.value; }
-function closeMenu()  { menuOpen.value = false; }
+function closeMenu()  {
+  menuOpen.value = false;
+  if (typeof document !== 'undefined') document.body.style.overflow = '';
+}
+
+function scrollToSection(id: string) {
+  const target = document.getElementById(id);
+  if (!target) return;
+
+  const navbarHeight = Number.parseFloat(
+    getComputedStyle(document.documentElement).getPropertyValue('--navbar-height'),
+  ) || 57;
+  const top = window.scrollY + target.getBoundingClientRect().top - navbarHeight - 16;
+
+  window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+  history.pushState(null, '', `${window.location.pathname}${window.location.search}#${id}`);
+}
+
+function onNavItemClick(event: MouseEvent, item: { href: string }) {
+  const wasMenuOpen = menuOpen.value;
+  closeMenu();
+  const hash = item.href.split('#')[1];
+  if (!hash || !isHomePage(activePath.value)) return;
+
+  event.preventDefault();
+  window.setTimeout(() => scrollToSection(hash), wasMenuOpen ? 120 : 0);
+}
 
 watch(menuOpen, (open) => {
   if (typeof document !== 'undefined') {

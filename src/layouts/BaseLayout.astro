@@ -213,6 +213,21 @@ const alternatePath = (l: Lang) => pageKey ? pagePath(l, pageKey) : localePath(l
         addHover('a, button, [role="button"], label[for]');
       }
 
+      function anchorOffset() {
+        const raw = getComputedStyle(document.documentElement).getPropertyValue('--navbar-height');
+        return (Number.parseFloat(raw) || 57) + 16;
+      }
+
+      function scrollToHashWithOffset() {
+        if (!window.location.hash) return;
+        const id = decodeURIComponent(window.location.hash.slice(1));
+        const target = document.getElementById(id);
+        if (!target) return;
+
+        const top = window.scrollY + target.getBoundingClientRect().top - anchorOffset();
+        window.scrollTo({ top: Math.max(0, top), behavior: 'auto' });
+      }
+
       /* ── Init & re-init après View Transitions ───────────── */
       function initAll() {
         initReveal();
@@ -221,6 +236,9 @@ const alternatePath = (l: Lang) => pageKey ? pagePath(l, pageKey) : localePath(l
       }
 
       initAll();
+      window.addEventListener('load', () => {
+        requestAnimationFrame(() => scrollToHashWithOffset());
+      }, { once: true });
     </script>
   </body>
 </html>

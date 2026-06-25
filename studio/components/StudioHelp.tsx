@@ -160,7 +160,7 @@ export function StudioHelp() {
             </li>
             <li>
               Pour une question ou une hésitation avant publication, vous pouvez
-              écrire à Isaure: vinciane.vinckenbosch@gmail.com.
+              écrire à Isaure: hello@isaure-lohest.com.
             </li>
           </ul>
         </aside>
@@ -170,9 +170,9 @@ export function StudioHelp() {
           <p style={{ margin: 0, lineHeight: 1.6 }}>
             Le bouton « Aperçu brouillon » se trouve dans les actions du
             document, près de « Publier », dans les trois petits points. Il
-            ouvre une version privée du site avec les changements sauvegardés en
-            brouillon. Le site public ne change pas tant que vous ne cliquez pas
-            sur « Publier ».
+            ouvre une version privée de la page d'accueil avec les changements
+            sauvegardés en brouillon. Le site public ne change pas tant que vous
+            ne cliquez pas sur « Publier ».
           </p>
         </section>
       </div>
