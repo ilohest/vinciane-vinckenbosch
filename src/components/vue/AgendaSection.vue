@@ -98,7 +98,22 @@
           </component>
 
           <!-- Animated divider line -->
-          <div class="event-line" aria-hidden="true">
+          <component
+            :is="event.ticketUrl && !hideLinks ? 'a' : 'div'"
+            :href="event.ticketUrl && !hideLinks ? event.ticketUrl : undefined"
+            :target="event.ticketUrl && !hideLinks ? '_blank' : undefined"
+            :rel="
+              event.ticketUrl && !hideLinks ? 'noopener noreferrer' : undefined
+            "
+            class="event-line"
+            :class="{ 'event-line--linked': !!event.ticketUrl && !hideLinks }"
+            :aria-label="
+              event.ticketUrl && !hideLinks
+                ? `Info — ${event.city}, ${event.venue}`
+                : undefined
+            "
+            :aria-hidden="event.ticketUrl && !hideLinks ? undefined : true"
+          >
             <div class="event-line__sweep"></div>
             <span v-if="event.ticketUrl && !hideLinks" class="event-line__label"
               >INFO</span
@@ -124,7 +139,7 @@
                 stroke-linejoin="round"
               />
             </svg>
-          </div>
+          </component>
         </div>
       </TransitionGroup>
 
@@ -586,9 +601,26 @@ a.event {
 
 .event-line {
   position: relative;
+  display: block;
   height: 1px;
   background: rgba(255, 255, 255, 0.15);
   overflow: visible;
+  color: inherit;
+  text-decoration: none;
+}
+
+.event-line--linked {
+  cursor: pointer;
+}
+
+.event-line--linked::after {
+  content: "";
+  position: absolute;
+  top: -18px;
+  right: -0.5rem;
+  bottom: -18px;
+  width: 7.5rem;
+  z-index: 1;
 }
 
 .event-line__sweep {
@@ -607,6 +639,7 @@ a.event {
 
 .event-line__label {
   position: absolute;
+  z-index: 2;
   right: 40px;
   top: 50%;
   transform: translateY(calc(-50% + 6px));
@@ -630,6 +663,7 @@ a.event {
 
 .event-line__arrow {
   position: absolute;
+  z-index: 2;
   right: 0;
   top: 50%;
   transform: translateY(calc(-50% + 6px));
