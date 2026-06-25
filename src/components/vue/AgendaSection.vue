@@ -88,7 +88,7 @@
         <div class="agenda__footer-left">
           <Transition name="slide-left">
             <a
-              v-if="showAll && !hideArchivesLink"
+              v-if="!hideArchivesLink"
               :href="pagePath(lang, 'archives')"
               class="btn-pill"
             >{{ archivesLabel }}</a>

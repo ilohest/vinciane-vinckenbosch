@@ -138,7 +138,7 @@ const props = defineProps<{
   currentPath: string;
 }>();
 
-const langs      = ['fr', 'en', 'de'] as const;
+const langs      = ['fr', 'de', 'en'] as const;
 const menuOpen      = ref(false);
 const activePath    = ref(props.currentPath);
 // Section hash active détectée par IntersectionObserver
@@ -165,7 +165,6 @@ const navItems = computed(() => {
     { key: 'contact',  label: l.contact,  href: `/${props.lang}/#contact` },
     { key: 'media',    label: l.media,    href: pagePath(props.lang, 'media') },
     { key: 'presse',   label: l.presse,   href: pagePath(props.lang, 'presse') },
-    { key: 'archives', label: l.archives, href: pagePath(props.lang, 'archives') },
   ];
 });
 
