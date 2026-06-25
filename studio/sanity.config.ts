@@ -191,9 +191,11 @@ export default defineConfig({
   ],
 
   document: {
-    // Masque le bouton « + » (création libre de documents) en haut à gauche :
-    // tout le contenu se gère via la liste « Mon site ».
-    newDocumentOptions: () => [],
+    // Masque UNIQUEMENT le bouton « + » global de la barre du haut.
+    // Les boutons de création dans les listes (Agenda, Presse, Médias…) restent
+    // disponibles (contexte 'structure').
+    newDocumentOptions: (prev, { creationContext }) =>
+      creationContext.type === "global" ? [] : prev,
 
     actions: (prev, context) => {
       // L'aperçu brouillon n'existe que pour la page d'accueil et l'agenda

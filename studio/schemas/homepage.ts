@@ -199,20 +199,15 @@ export const homepage = defineType({
     loc("bioParaOrchestre", "Paragraphe 1", "bio"),
     loc("bioParaPrix", "Paragraphe 2", "bio"),
 
-    loc(
-      "bioTrioText",
-      "Texte Trio Linaris (grande phrase animée)",
-      "bio",
-      "Grande phrase au défilement animé. Écrivez le texte complet en incluant « Trio Linaris » : ce nom sera automatiquement mis en valeur en orange.",
-    ),
+    loc("bioTrioText", "Grand texte blanc", "bio"),
 
     defineField({
       name: "trioLinks",
-      title: "Liens dans la phrase Trio Linaris",
+      title: "Liens dans le grand texte blanc",
       group: "bio",
       type: "array",
       description:
-        "Ajoutez un lien sur un nom de la phrase ci-dessus (ex. « Alexandra Bidi », « Pierre Cornu-Deyme », « Trio Linaris »). Le « Nom » doit être écrit EXACTEMENT comme dans le texte. Le nom devient alors cliquable sur le site.",
+        "Ajoutez un lien sur un nom de la phrase ci-dessus (ex. « Alexandra Bidi », « Trio Linaris »). Le nom qui contiendra le lien doit être écrit EXACTEMENT comme dans le texte ci-dessus. Le nom devient alors cliquable sur le site.",
       of: [
         {
           type: "object",
@@ -235,7 +230,7 @@ export const homepage = defineType({
             },
             {
               name: "pdf",
-              title: "Ou document PDF téléchargeable",
+              title: "Document PDF téléchargeable",
               type: "file",
               options: { accept: "application/pdf" },
               description:
