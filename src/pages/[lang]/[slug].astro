@@ -246,7 +246,7 @@ const gallerySchema = pageKey === 'media' ? {
   {pageKey === 'media' && (
     <main class="gallery-page">
       <div class="gallery-page__container">
-        <h1 class="section-title gallery-page__title" data-reveal data-title-reveal>{tr('nav.media')}</h1>
+        <h1 class="section-title gallery-page__title gallery-page__title--intro">{tr('nav.media')}</h1>
         <MasonryGallery client:load items={mediaItems} lang={lang} showTypeTabs={true} eagerImages={true} />
       </div>
     </main>
@@ -255,7 +255,7 @@ const gallerySchema = pageKey === 'media' ? {
   {pageKey === 'presse' && (
     <main class="gallery-page">
       <div class="gallery-page__container">
-        <h1 class="section-title gallery-page__title" data-reveal data-title-reveal>{tr('nav.presse')}</h1>
+        <h1 class="section-title gallery-page__title gallery-page__title--intro">{tr('nav.presse')}</h1>
         <MasonryGallery client:only="vue" items={pressItems} lang={lang} />
       </div>
     </main>
@@ -374,6 +374,29 @@ const gallerySchema = pageKey === 'media' ? {
 .gallery-page__title {
   font-size: clamp(2.5rem, 5.5vw, 5.375rem);
   color: #ffffff;
+}
+
+@keyframes gallery-title-rise {
+  from {
+    opacity: 0;
+    transform: translateY(0.55em);
+    clip-path: inset(0 0 100% 0);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+.gallery-page__title--intro {
+  animation: gallery-title-rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.08s both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gallery-page__title--intro {
+    animation: none;
+  }
 }
 
 .archives-page {
