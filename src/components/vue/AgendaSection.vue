@@ -184,7 +184,7 @@ const props = defineProps<{
   hideArchivesLink?: boolean;
   /** true → aucun lien ni effet hover (page archives) */
   hideLinks?: boolean;
-  /** Lien retour vers l'agenda (affiché à droite du footer, page archives) */
+  /** Lien retour vers l'agenda (affiché à droite du footer, page archives)   */
   backHref?: string;
 }>();
 
