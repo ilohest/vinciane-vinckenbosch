@@ -25,6 +25,10 @@ const finalImageRatio = 1672 / 900;
 const finalImageSrc = sanityImageCropUrl(finalImage, 3200, finalImageRatio);
 const finalImageSrcset = sanityImageCropSrcset(finalImage, finalImageRatio);
 const finalImagePosition = sanityImageObjectPosition(finalImage);
+// Image de partage social (Open Graph) = photo hero, recadrée en 1200×630
+const ogImage = homepage?.heroImage?.url
+  ? sanityImageCropUrl(homepage.heroImage.url, 1200, 1200 / 630)
+  : undefined;
 // PDF de biographie par langue : Sanity en priorité, sinon fichiers locaux
 const bioPdfs = {
   fr: homepage?.biographyPdfs?.fr ?? '/pdfs/biographie-fr.pdf',
@@ -68,6 +72,7 @@ const quote2Attribution = typeof quote2AttributionValue === 'string'
   lang={lang}
   title={{ fr: 'Vinciane Vinckenbosch — Altiste belge', en: 'Vinciane Vinckenbosch — Belgian Violist', de: 'Vinciane Vinckenbosch — belgische Bratschistin' }[lang]}
   description={{ fr: 'Vinciane Vinckenbosch, altiste belge. Co-solo de la Niederbayerische Philharmonie, soliste, chambriste, membre fondatrice du Trio Linaris. Saluée par la critique internationale pour la grande classe de son jeu.', en: 'Vinciane Vinckenbosch, Belgian violist. Co-principal at the Niederbayerische Philharmonie, soloist, chamber musician, founding member of Trio Linaris. Acclaimed by international critics.', de: 'Vinciane Vinckenbosch, belgische Bratschistin. Co-Solo der Niederbayerischen Philharmonie, Solistin, Kammermusikerin, Gründungsmitglied des Trio Linaris.' }[lang]}
+  ogImage={ogImage}
 >
   <!-- Hero OUTSIDE main → enfant direct de body, zéro contrainte de conteneur -->
   <HeroSection
