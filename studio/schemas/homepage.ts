@@ -1,5 +1,6 @@
 import { defineField, defineType } from "sanity";
 import { InfoNote } from "../components/InfoNote";
+import { isLooseUrl } from "./urlValidation";
 
 const MAX_HERO_VIDEO_SIZE_MB = 25;
 const MAX_HERO_VIDEO_SIZE_BYTES = MAX_HERO_VIDEO_SIZE_MB * 1024 * 1024;
@@ -149,7 +150,12 @@ export const homepage = defineType({
       of: [{ type: "reference", to: [{ type: "event" }] }],
       description:
         "Sélectionnez jusqu'à 3 concerts. Si rien n'est sélectionné, les 3 prochains concerts sont affichés automatiquement.",
-      validation: (R) => R.max(3).unique(),
+      validation: (R) =>
+        R.max(3)
+          .error(
+            "Maximum 3 concerts. Supprimez-en un avant d'en ajouter un autre.",
+          )
+          .unique(),
     }),
 
     loc(
@@ -203,7 +209,7 @@ export const homepage = defineType({
 
     defineField({
       name: "trioLinks",
-      title: "Liens dans le grand texte blanc",
+      title: "Liens (grand texte blanc)",
       group: "bio",
       type: "array",
       description:
@@ -223,28 +229,52 @@ export const homepage = defineType({
             {
               name: "url",
               title: "Lien vers un site web",
-              type: "url",
+              type: "string",
               description:
-                "Remplir le lien OU le PDF ci-dessous (pas les deux).",
-              validation: (R) => R.uri({ scheme: ["http", "https"] }),
+                "Remplir le lien OU le PDF ci-dessous (pas les deux). Accepte https://exemple.com ou www.exemple.com.",
+              validation: (R) => R.custom(isLooseUrl),
             },
             {
               name: "pdf",
-              title: "Document PDF téléchargeable",
-              type: "file",
-              options: { accept: "application/pdf" },
+              title: "Document PDF téléchargeable (par langue)",
+              type: "object",
+              options: { columns: 3 },
               description:
-                "Si un PDF est ajouté, le nom devient un lien de téléchargement (le lien web ci-dessus est ignoré).",
+                "Si un PDF est ajouté, le nom devient un lien de téléchargement (le lien web ci-dessus est ignoré). Le site sert le PDF de la langue affichée, avec repli sur le français.",
+              fields: [
+                {
+                  name: "fr",
+                  title: "🇫🇷 Français",
+                  type: "file",
+                  options: { accept: "application/pdf" },
+                },
+                {
+                  name: "en",
+                  title: "🇬🇧 Anglais",
+                  type: "file",
+                  options: { accept: "application/pdf" },
+                },
+                {
+                  name: "de",
+                  title: "🇩🇪 Allemand",
+                  type: "file",
+                  options: { accept: "application/pdf" },
+                },
+              ],
             },
           ],
           validation: (R) =>
-            R.custom((value?: { url?: string; pdf?: unknown }) =>
-              value?.url || value?.pdf
-                ? true
-                : "Ajoutez un lien web OU un document PDF.",
+            R.custom(
+              (value?: {
+                url?: string;
+                pdf?: { fr?: unknown; en?: unknown; de?: unknown };
+              }) =>
+                value?.url || value?.pdf?.fr || value?.pdf?.en || value?.pdf?.de
+                  ? true
+                  : "Ajoutez un lien web OU un document PDF (au moins une langue).",
             ),
           preview: {
-            select: { title: "label", subtitle: "url", media: "pdf" },
+            select: { title: "label", subtitle: "url" },
             prepare: ({
               title,
               subtitle,
@@ -258,6 +288,16 @@ export const homepage = defineType({
           },
         },
       ],
+    }),
+
+    defineField({
+      name: "trioAccentWords",
+      title: "Mots en rouge (grand texte blanc)",
+      group: "bio",
+      type: "array",
+      of: [{ type: "string" }],
+      description:
+        "Mots ou expressions de la phrase à mettre en avant en rouge (ex. « Trio Linaris »). Écrivez-les exactement comme dans le texte. Laissez vide pour aucun.",
     }),
 
     defineField({
@@ -366,10 +406,26 @@ export const homepage = defineType({
       title: "Liens réseaux sociaux",
       group: "contact",
       type: "object",
+      description: "Accepte https://exemple.com ou www.exemple.com.",
       fields: [
-        { name: "youtube", title: "YouTube", type: "url" },
-        { name: "facebook", title: "Facebook", type: "url" },
-        { name: "instagram", title: "Instagram", type: "url" },
+        {
+          name: "youtube",
+          title: "YouTube",
+          type: "string",
+          validation: (R) => R.custom(isLooseUrl),
+        },
+        {
+          name: "facebook",
+          title: "Facebook",
+          type: "string",
+          validation: (R) => R.custom(isLooseUrl),
+        },
+        {
+          name: "instagram",
+          title: "Instagram",
+          type: "string",
+          validation: (R) => R.custom(isLooseUrl),
+        },
       ],
     }),
 
@@ -379,9 +435,12 @@ export const homepage = defineType({
       group: "contact",
       type: "array",
       of: [{ type: "image", options: { hotspot: true } }],
-      validation: (R) => R.max(4),
+      validation: (R) =>
+        R.max(4).error(
+          "Maximum 4 photos. Supprimez-en une avant d'en ajouter une autre.",
+        ),
       description:
-        "Jusqu'à 4 photos affichées en grille sous le formulaire de contact. Glissez-déposez pour réordonner.",
+        "Maximum 4 photos affichées en grille sous le formulaire de contact. Glissez-déposez pour réordonner.",
     }),
 
     defineField({

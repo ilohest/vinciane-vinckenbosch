@@ -24,7 +24,7 @@ export async function getSiteSettings(): Promise<SiteSettings> {
 
 export async function getHomepage(client: QueryClient = sanityClient): Promise<Homepage | null> {
   try {
-    return await client.fetch(`*[_type == "homepage"][0]{
+    const data = await client.fetch<Homepage | null>(`*[_type == "homepage"][0]{
       "heroImage":           heroImage { ${IMAGE_PROJECTION} },
       "heroVideo":           heroVideo { "url": asset->url },
       "heroMobileImage":     heroMobileImage { ${IMAGE_PROJECTION} },
@@ -47,7 +47,15 @@ export async function getHomepage(client: QueryClient = sanityClient): Promise<H
       "bioFormationImage":   bioFormationImage   { ${IMAGE_PROJECTION} },
       "finalImage":          finalImage          { ${IMAGE_PROJECTION} },
       bioTrioText,
-      trioLinks[]{ label, url, "pdf": pdf.asset->url, "pdfName": pdf.asset->originalFilename },
+      trioLinks[]{
+        label, url,
+        "pdf": {
+          "fr": pdf.fr.asset->url,
+          "en": pdf.en.asset->url,
+          "de": pdf.de.asset->url
+        }
+      },
+      trioAccentWords,
       bioParaOrchestre,
       bioParaPrix,
       bioParaFestivals,
@@ -63,6 +71,25 @@ export async function getHomepage(client: QueryClient = sanityClient): Promise<H
       "contactVideoThumbnail": contactVideoThumbnail { ${IMAGE_PROJECTION} },
       socialLinks
     }`);
+
+    if (!data) return null;
+
+    // Normalise les liens saisis sans protocole (www.exemple.com → https://…)
+    if (data.socialLinks) {
+      data.socialLinks = {
+        youtube: normalizeExternalUrl(data.socialLinks.youtube),
+        facebook: normalizeExternalUrl(data.socialLinks.facebook),
+        instagram: normalizeExternalUrl(data.socialLinks.instagram),
+      };
+    }
+    if (data.trioLinks) {
+      data.trioLinks = data.trioLinks.map((l) => ({
+        ...l,
+        url: normalizeExternalUrl(l.url),
+      }));
+    }
+
+    return data;
   } catch {
     return null;
   }

@@ -2,6 +2,7 @@ import { defineField, defineType } from "sanity";
 import { TimeInput } from "../components/TimeInput";
 import { CountryInput } from "../components/CountryInput";
 import { InfoNote } from "../components/InfoNote";
+import { isLooseUrl } from "./urlValidation";
 
 const localizedString = (
   name: string,
@@ -22,21 +23,6 @@ const localizedString = (
       : undefined,
   });
 
-function isValidTicketUrl(value?: string) {
-  if (!value?.trim()) return true;
-
-  const trimmed = value.trim();
-  const urlWithProtocol = /^[a-z][a-z\d+.-]*:\/\//i.test(trimmed)
-    ? trimmed
-    : `https://${trimmed}`;
-
-  try {
-    const url = new URL(urlWithProtocol);
-    return url.protocol === "http:" || url.protocol === "https:";
-  } catch {
-    return false;
-  }
-}
 
 export const event = defineType({
   name: "event",
@@ -149,12 +135,7 @@ export const event = defineType({
       type: "string",
       description:
         "Exemples acceptés : https://exemple.com ou www.exemple.com.",
-      validation: (R) =>
-        R.custom((value?: string) =>
-          isValidTicketUrl(value)
-            ? true
-            : "Ajoutez une URL valide, par exemple www.exemple.com.",
-        ),
+      validation: (R) => R.custom(isLooseUrl),
     }),
   ],
   orderings: [

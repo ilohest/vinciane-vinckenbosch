@@ -75,20 +75,27 @@ const bacriParagraph = {
   },
 }[lang];
 
+// Liens éditables : un nom → un lien web OU un PDF (par langue, repli FR)
 const trioLinks = (homepage?.trioLinks ?? []).filter((l) => l?.label?.trim());
-const trioLinkMap = new Map<string, string | undefined>();
+const trioLinkMap = new Map<string, string>();
 for (const l of trioLinks) {
   const label = l.label!.trim();
-  // PDF : URL brute → s'ouvre dans un nouvel onglet (via target="_blank"),
-  // même comportement que le bouton « Télécharger la biographie »
-  // (pas de ?dl= qui forcerait le téléchargement direct).
-  const pdfHref = l.pdf || undefined;
-  trioLinkMap.set(label, pdfHref || l.url?.trim());
+  const pdfHref = l.pdf?.[lang] || l.pdf?.fr || undefined;
+  const href = pdfHref || l.url?.trim();
+  if (href) trioLinkMap.set(label, href);
 }
+
+// Mots à souligner en rouge (accent), éditables depuis Sanity
+const trioAccentSet = new Set(
+  (homepage?.trioAccentWords ?? []).map((w) => w?.trim()).filter(Boolean) as string[],
+);
+
+// Tous les mots à repérer dans la phrase = liens + accents
+const trioInterest = [...new Set([...trioLinkMap.keys(), ...trioAccentSet])];
 
 type TrioHit = { start: number; end: number; label: string };
 const trioHits: TrioHit[] = [];
-for (const label of [...trioLinkMap.keys()].sort((a, b) => b.length - a.length)) {
+for (const label of trioInterest.sort((a, b) => b.length - a.length)) {
   let idx = fullTrioText.indexOf(label);
   while (idx !== -1) {
     if (!trioHits.some((h) => idx < h.end && idx + label.length > h.start)) {
@@ -101,7 +108,8 @@ trioHits.sort((a, b) => a.start - b.start);
 
 type TrioPart =
   | { kind: 'text'; value: string }
-  | { kind: 'link'; href: string; value: string };
+  | { kind: 'link'; href: string; value: string; accent: boolean }
+  | { kind: 'accent'; value: string };
 const trioParts: TrioPart[] = [];
 let trioCursor = 0;
 const pushTrioText = (text: string) => {
@@ -110,8 +118,10 @@ const pushTrioText = (text: string) => {
 for (const h of trioHits) {
   pushTrioText(fullTrioText.slice(trioCursor, h.start));
   const href = trioLinkMap.get(h.label);
-  if (href) trioParts.push({ kind: 'link', href, value: h.label });
-  else trioParts.push({ kind: 'text', value: h.label });
+  const accent = trioAccentSet.has(h.label);
+  if (href) trioParts.push({ kind: 'link', href, value: h.label, accent });
+  else if (accent) trioParts.push({ kind: 'accent', value: h.label });
+  else pushTrioText(h.label);
   trioCursor = h.end;
 }
 pushTrioText(fullTrioText.slice(trioCursor));
@@ -211,6 +221,9 @@ pushTrioText(fullTrioText.slice(trioCursor));
     <p class="bio__trio-text" data-reveal>
       {trioParts.map((part) => {
         if (part.kind === 'text') return part.value;
+        if (part.kind === 'accent') {
+          return <span class="bio__trio-accent">{part.value}</span>;
+        }
         if (part.kind === 'link') {
           return (
             <a
@@ -219,7 +232,7 @@ pushTrioText(fullTrioText.slice(trioCursor));
               rel="noopener noreferrer"
               class:list={[
                 'bio__trio-link',
-                part.value === 'Trio Linaris' && 'bio__trio-link--accent',
+                part.accent && 'bio__trio-link--accent',
               ]}
             >{part.value}</a>
           );
@@ -566,6 +579,14 @@ pushTrioText(fullTrioText.slice(trioCursor));
 
 .bio__trio-link--accent {
   color: var(--color-accent);
+}
+
+/* Mot souligné en rouge (accent) qui n'est pas un lien */
+.bio__trio-accent {
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
 }
 
 /* Survol : les noms passent en orange ; « Trio Linaris » passe en couleur de texte */

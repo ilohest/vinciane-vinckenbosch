@@ -106,6 +106,8 @@ const sections = [
       "Le site public change seulement après avoir cliqué sur « Publier ».",
       "Avant de publier, utilisez le bouton « Aperçu brouillon » dans les actions du document, près du bouton « Publier » ou dans les trois petits points selon la largeur de l'écran.",
       "Après publication, ouvrir le site dans un nouvel onglet et vérifier la page concernée.",
+      "Pour revenir en arrière: cliquez sur « Annuler les modifications » dans les trois petits points (⋯) à droite du bouton « Publier ». Cela efface les changements non publiés et recharge la dernière version publiée.",
+      "« Supprimer la publication » retire le contenu du site en ligne mais en garde une version en brouillon (vous pourrez le republier plus tard). « Supprimer » efface le document définitivement, sans retour possible.",
     ],
   },
 ];
