@@ -246,7 +246,7 @@ const gallerySchema = pageKey === 'media' ? {
   {pageKey === 'media' && (
     <main class="gallery-page">
       <div class="gallery-page__container">
-        <h1 class="section-title gallery-page__title" data-reveal>{tr('nav.media')}</h1>
+        <h1 class="section-title gallery-page__title" data-reveal data-title-reveal>{tr('nav.media')}</h1>
         <MasonryGallery client:load items={mediaItems} lang={lang} showTypeTabs={true} eagerImages={true} />
       </div>
     </main>
@@ -255,7 +255,7 @@ const gallerySchema = pageKey === 'media' ? {
   {pageKey === 'presse' && (
     <main class="gallery-page">
       <div class="gallery-page__container">
-        <h1 class="section-title gallery-page__title" data-reveal>{tr('nav.presse')}</h1>
+        <h1 class="section-title gallery-page__title" data-reveal data-title-reveal>{tr('nav.presse')}</h1>
         <MasonryGallery client:only="vue" items={pressItems} lang={lang} />
       </div>
     </main>
@@ -280,7 +280,7 @@ const gallerySchema = pageKey === 'media' ? {
     <main class="credits-page">
       <div class="credits-page__container">
         <header class="credits-page__header" data-reveal>
-          <h1 class="section-title credits-page__title">{creditsContent.title}</h1>
+          <h1 class="section-title credits-page__title" data-title-reveal>{creditsContent.title}</h1>
           <p class="credits-page__intro">{creditsContent.intro}</p>
         </header>
 
@@ -302,7 +302,7 @@ const gallerySchema = pageKey === 'media' ? {
     <main class="legal-page">
       <div class="legal-page__container">
         <header class="legal-page__header" data-reveal>
-          <h1 class="section-title legal-page__title">{legalContent.title}</h1>
+          <h1 class="section-title legal-page__title" data-title-reveal>{legalContent.title}</h1>
           <p class="legal-page__intro">{legalContent.intro}</p>
           <p class="legal-page__updated">{legalContent.updated}</p>
         </header>
@@ -325,7 +325,7 @@ const gallerySchema = pageKey === 'media' ? {
     <main class="legal-page">
       <div class="legal-page__container">
         <header class="legal-page__header" data-reveal>
-          <h1 class="section-title legal-page__title">{privacyContent.title}</h1>
+          <h1 class="section-title legal-page__title" data-title-reveal>{privacyContent.title}</h1>
           <p class="legal-page__intro">{privacyContent.intro}</p>
           <p class="legal-page__updated">{privacyContent.updated}</p>
         </header>
@@ -355,6 +355,13 @@ const gallerySchema = pageKey === 'media' ? {
   padding-bottom: var(--page-padding);
 }
 
+/* Page archives : on neutralise le padding-top propre de l'agenda ;
+   l'espace au-dessus du titre est géré par .archives-page (comme la galerie),
+   sinon les deux s'additionnent et le titre descend trop bas. */
+.archives-page :global(.agenda__container) {
+  padding-top: 0;
+}
+
 .gallery-page__container {
   max-width: 1728px;
   margin: 0 auto;
@@ -371,7 +378,7 @@ const gallerySchema = pageKey === 'media' ? {
 
 .archives-page {
   --page-padding: clamp(1.5rem, 4vw, 4rem);
-  padding-top: calc(var(--navbar-height, 57px) + clamp(1.5rem, 4vw, 3rem));
+  padding-top: calc(var(--navbar-height, 57px) + var(--page-padding));
   padding-bottom: 0;
 }
 

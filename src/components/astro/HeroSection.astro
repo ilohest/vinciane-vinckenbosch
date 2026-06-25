@@ -146,7 +146,7 @@ const desktopHeroMediaClass = hasMobileHeroMedia
     <!-- Nom + sous-titre -->
     <div class="hero__name-block">
       <p class="hero__subtitle">{subtitle}</p>
-      <h1 class="hero__name">
+      <h1 class="hero__name hero__name--intro">
         Vinciane<br />Vinckenbosch
       </h1>
     </div>
@@ -287,6 +287,23 @@ const desktopHeroMediaClass = hasMobileHeroMedia
   line-height: 0.92;
   color: #ffffff;
   letter-spacing: -0.01em;
+}
+
+@keyframes hero-title-rise {
+  from {
+    opacity: 0;
+    transform: translateY(0.45em);
+    clip-path: inset(0 0 100% 0);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+.hero__name--intro {
+  animation: hero-title-rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.12s both;
 }
 
 /* ────────────────────────────────────────────────────────

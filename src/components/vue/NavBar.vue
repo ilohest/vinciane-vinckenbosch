@@ -56,7 +56,20 @@
             :href="localeLangPath(l)"
             class="navbar__lang"
             :class="{ 'navbar__lang--active': l === lang }"
-          >{{ l.toUpperCase() }}</a>
+          >
+            <span class="flip-word" aria-hidden="true">
+              <span
+                v-for="(char, ci) in l.toUpperCase()"
+                :key="ci"
+                class="flip-char"
+                :style="{ '--i': ci }"
+              >
+                <span class="flip-char__a">{{ char }}</span>
+                <span class="flip-char__b">{{ char }}</span>
+              </span>
+            </span>
+            <span class="sr-only">{{ l.toUpperCase() }}</span>
+          </a>
         </div>
 
         <a
@@ -116,7 +129,20 @@
             class="mobile-menu__lang"
             :class="{ 'mobile-menu__lang--active': l === lang }"
             @click="closeMenu"
-          >{{ l.toUpperCase() }}</a>
+          >
+            <span class="flip-word" aria-hidden="true">
+              <span
+                v-for="(char, ci) in l.toUpperCase()"
+                :key="ci"
+                class="flip-char"
+                :style="{ '--i': ci }"
+              >
+                <span class="flip-char__a">{{ char }}</span>
+                <span class="flip-char__b">{{ char }}</span>
+              </span>
+            </span>
+            <span class="sr-only">{{ l.toUpperCase() }}</span>
+          </a>
         </div>
         <a href="https://www.youtube.com/@vincianevinckenbosch" target="_blank" rel="noopener noreferrer" class="mobile-menu__social" aria-label="YouTube">
           <svg width="22" height="16" viewBox="0 0 24 17" fill="none" aria-hidden="true">
@@ -554,13 +580,21 @@ onUnmounted(() => {
 /* Hover / actif : A monte, B entre — liens ET brand */
 .navbar__link:hover .flip-char__a,
 .navbar__link--active .flip-char__a,
-.navbar__brand:hover .flip-char__a {
+.navbar__brand:hover .flip-char__a,
+.navbar__lang:hover .flip-char__a,
+.navbar__lang--active .flip-char__a,
+.mobile-menu__lang:hover .flip-char__a,
+.mobile-menu__lang--active .flip-char__a {
   transform: translateY(-105%);
 }
 
 .navbar__link:hover .flip-char__b,
 .navbar__link--active .flip-char__b,
-.navbar__brand:hover .flip-char__b {
+.navbar__brand:hover .flip-char__b,
+.navbar__lang:hover .flip-char__b,
+.navbar__lang--active .flip-char__b,
+.mobile-menu__lang:hover .flip-char__b,
+.mobile-menu__lang--active .flip-char__b {
   transform: translateY(0);
 }
 

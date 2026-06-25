@@ -7,7 +7,7 @@
       :aria-expanded="open"
       @click.stop="open = !open"
     >
-      {{ label }} <span class="biodl__arrow">→</span>
+      {{ label }}
     </button>
 
     <!-- Choix de langue -->
@@ -107,12 +107,18 @@ onUnmounted(() => {
   color: #DA7F52;
 }
 
-.biodl__arrow {
+.biodl__toggle::after {
+  content: "→";
   display: inline-block;
-  transition: transform 0.25s ease;
+  letter-spacing: 0;
+  text-transform: none;
 }
 
-.biodl--open .biodl__arrow {
+.biodl__toggle:hover::after {
+  animation: btn-arrow-spin 0.55s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+.biodl--open .biodl__toggle::after {
   transform: rotate(90deg);
 }
 

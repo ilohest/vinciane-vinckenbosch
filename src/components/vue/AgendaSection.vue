@@ -1,14 +1,27 @@
 <template>
   <section class="agenda" id="agenda" aria-labelledby="agenda-title">
     <div class="agenda__container">
-
       <!-- Header -->
       <div class="agenda__header">
-        <h2 id="agenda-title" class="section-title agenda__title">{{ titleLabel }}</h2>
-        <label class="agenda__search-label" :class="{ 'agenda__search-label--active': query }">
-          <svg class="agenda__search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
-            <circle cx="11" cy="11" r="8"/>
-            <path d="M21 21l-4.35-4.35"/>
+        <h2 id="agenda-title" class="section-title agenda__title">
+          {{ titleLabel }}
+        </h2>
+        <label
+          class="agenda__search-label"
+          :class="{ 'agenda__search-label--active': query }"
+        >
+          <svg
+            class="agenda__search-icon"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="round"
+          >
+            <circle cx="11" cy="11" r="8" />
+            <path d="M21 21l-4.35-4.35" />
           </svg>
           <input
             v-model="query"
@@ -17,9 +30,22 @@
             :placeholder="searchPlaceholder"
             aria-label="Filtrer les concerts"
           />
-          <button v-if="query" class="agenda__search-clear" @click="query = ''" aria-label="Effacer">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-              <path d="M18 6L6 18M6 6l12 12"/>
+          <button
+            v-if="query"
+            class="agenda__search-clear"
+            @click="query = ''"
+            aria-label="Effacer"
+          >
+            <svg
+              width="12"
+              height="12"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+            >
+              <path d="M18 6L6 18M6 6l12 12" />
             </svg>
           </button>
         </label>
@@ -30,7 +56,12 @@
         {{ emptyLabel }}
       </p>
 
-      <TransitionGroup v-else tag="div" name="event-reveal" class="agenda__list">
+      <TransitionGroup
+        v-else
+        tag="div"
+        name="event-reveal"
+        class="agenda__list"
+      >
         <div
           v-for="(event, idx) in visibleEvents"
           :key="`${event.date}-${event.city}`"
@@ -42,13 +73,17 @@
             :is="event.ticketUrl && !hideLinks ? 'a' : 'div'"
             :href="event.ticketUrl && !hideLinks ? event.ticketUrl : undefined"
             :target="event.ticketUrl && !hideLinks ? '_blank' : undefined"
-            :rel="event.ticketUrl && !hideLinks ? 'noopener noreferrer' : undefined"
+            :rel="
+              event.ticketUrl && !hideLinks ? 'noopener noreferrer' : undefined
+            "
             class="event"
           >
             <div class="event__date-col">
               <!-- Figma : Coconat Regular, minuscules, pas d'uppercase -->
               <time class="event__date">{{ event.date }}</time>
-              <span v-if="event.time" class="event__time">{{ event.time }}</span>
+              <span v-if="event.time" class="event__time">{{
+                event.time
+              }}</span>
             </div>
             <div class="event__city">{{ event.city }}</div>
             <div class="event__venue">{{ event.venue }}</div>
@@ -65,10 +100,9 @@
           <!-- Animated divider line -->
           <div class="event-line" aria-hidden="true">
             <div class="event-line__sweep"></div>
-            <span
-              v-if="event.ticketUrl && !hideLinks"
-              class="event-line__label"
-            >INFO</span>
+            <span v-if="event.ticketUrl && !hideLinks" class="event-line__label"
+              >INFO</span
+            >
             <svg
               v-if="event.ticketUrl && !hideLinks"
               class="event-line__arrow"
@@ -76,8 +110,19 @@
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
             >
-              <path d="M7 17L17 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-              <path d="M9 7H17V15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path
+                d="M7 17L17 7"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+              />
+              <path
+                d="M9 7H17V15"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
             </svg>
           </div>
         </div>
@@ -91,7 +136,8 @@
               v-if="!hideArchivesLink"
               :href="pagePath(lang, 'archives')"
               class="btn-pill"
-            >{{ archivesLabel }}</a>
+              >{{ archivesLabel }}</a
+            >
           </Transition>
         </div>
         <div class="agenda__footer-right">
@@ -100,23 +146,22 @@
               v-if="!showAll && hasMore"
               class="btn-pill agenda__more-btn"
               @click="showAll = true"
-            >{{ moreLabel }}</button>
+            >
+              {{ moreLabel }}
+            </button>
           </Transition>
-          <a
-            v-if="backHref"
-            :href="backHref"
-            class="btn-pill"
-          >{{ backLabel }}</a>
+          <a v-if="backHref" :href="backHref" class="btn-pill">{{
+            backLabel
+          }}</a>
         </div>
       </div>
-
     </div>
   </section>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import { pagePath } from '../../lib/routes';
+import { ref, computed } from "vue";
+import { pagePath } from "../../lib/routes";
 
 interface Event {
   date: string;
@@ -130,7 +175,7 @@ interface Event {
 
 const props = defineProps<{
   events: Event[];
-  lang: 'fr' | 'en' | 'de';
+  lang: "fr" | "en" | "de";
   /** true → affiche uniquement les dates passées (page archives) */
   showPastOnly?: boolean;
   /** true → tout affiché d'emblée, sans pagination */
@@ -144,52 +189,54 @@ const props = defineProps<{
 }>();
 
 const MAX = 6;
-const query = ref('');
+const query = ref("");
 const showAll = ref(props.showAllByDefault ?? false);
 
 const i18n = {
   fr: {
-    titleAgenda:   'agenda',
-    titleArchives: 'archives',
-    more:      'plus de dates',
-    archives:  'archives',
+    titleAgenda: "agenda",
+    titleArchives: "archives",
+    more: "à venir",
+    archives: "archives",
     backLabel: "voir l'agenda",
-    search:    'rechercher…',
-    noResults: 'Aucun résultat pour',
-    noEvents:  'Aucun concert à venir.',
-    noArchive: 'Aucune archive disponible.',
+    search: "rechercher…",
+    noResults: "Aucun résultat pour",
+    noEvents: "Aucun concert à venir.",
+    noArchive: "Aucune archive disponible.",
   },
   en: {
-    titleAgenda:   'agenda',
-    titleArchives: 'archives',
-    more:      'more dates',
-    archives:  'archives',
-    backLabel: 'back to agenda',
-    search:    'search…',
-    noResults: 'No results for',
-    noEvents:  'No upcoming concerts.',
-    noArchive: 'No archived concerts yet.',
+    titleAgenda: "agenda",
+    titleArchives: "archives",
+    more: "more dates",
+    archives: "archives",
+    backLabel: "back to agenda",
+    search: "search…",
+    noResults: "No results for",
+    noEvents: "No upcoming concerts.",
+    noArchive: "No archived concerts yet.",
   },
   de: {
-    titleAgenda:   'Termine',
-    titleArchives: 'Archiv',
-    more:      'mehr Termine',
-    archives:  'Archiv',
-    backLabel: 'zu Termine',
-    search:    'suchen…',
-    noResults: 'Keine Ergebnisse für',
-    noEvents:  'Keine bevorstehenden Konzerte.',
-    noArchive: 'Noch keine archivierten Konzerte.',
+    titleAgenda: "Termine",
+    titleArchives: "Archiv",
+    more: "mehr Termine",
+    archives: "Archiv",
+    backLabel: "zu Termine",
+    search: "suchen…",
+    noResults: "Keine Ergebnisse für",
+    noEvents: "Keine bevorstehenden Konzerte.",
+    noArchive: "Noch keine archivierten Konzerte.",
   },
 } as const;
 
 const t = computed(() => i18n[props.lang] ?? i18n.fr);
-const titleLabel        = computed(() => props.showPastOnly ? t.value.titleArchives : t.value.titleAgenda);
-const moreLabel         = computed(() => t.value.more);
-const archivesLabel     = computed(() => t.value.archives);
-const backLabel         = computed(() => t.value.backLabel);
+const titleLabel = computed(() =>
+  props.showPastOnly ? t.value.titleArchives : t.value.titleAgenda,
+);
+const moreLabel = computed(() => t.value.more);
+const archivesLabel = computed(() => t.value.archives);
+const backLabel = computed(() => t.value.backLabel);
 const searchPlaceholder = computed(() => t.value.search);
-const emptyLabel        = computed(() => {
+const emptyLabel = computed(() => {
   const trimmedQuery = query.value.trim();
   if (trimmedQuery) return `${t.value.noResults} « ${trimmedQuery} »`;
   return props.showPastOnly ? t.value.noArchive : t.value.noEvents;
@@ -198,20 +245,38 @@ const emptyLabel        = computed(() => {
 // ── Helpers de date ──────────────────────────────────────────────────────────
 
 const MONTH_MAP: Record<string, number> = {
-  'jan': 0, 'fév': 1, 'février': 1, 'mar': 2, 'mars': 2,
-  'avr': 3, 'avril': 3, 'mai': 4, 'juin': 5,
-  'juil': 6, 'juillet': 6, 'août': 7, 'aoû': 7,
-  'sep': 8, 'sept': 8, 'septembre': 8,
-  'oct': 9, 'octobre': 9, 'nov': 10, 'novembre': 10,
-  'déc': 11, 'dec': 11, 'décembre': 11,
-  'fev': 1, 'aou': 7,
+  jan: 0,
+  fév: 1,
+  février: 1,
+  mar: 2,
+  mars: 2,
+  avr: 3,
+  avril: 3,
+  mai: 4,
+  juin: 5,
+  juil: 6,
+  juillet: 6,
+  août: 7,
+  aoû: 7,
+  sep: 8,
+  sept: 8,
+  septembre: 8,
+  oct: 9,
+  octobre: 9,
+  nov: 10,
+  novembre: 10,
+  déc: 11,
+  dec: 11,
+  décembre: 11,
+  fev: 1,
+  aou: 7,
 };
 
 function parseEventDate(dateStr: string): Date {
-  const parts = dateStr.toLowerCase().replace(/\./g, '').trim().split(/\s+/);
-  const day   = parseInt(parts[0] ?? '1');
-  const month = MONTH_MAP[parts[1] ?? ''] ?? 0;
-  const year  = parseInt(parts[2] ?? String(new Date().getFullYear()));
+  const parts = dateStr.toLowerCase().replace(/\./g, "").trim().split(/\s+/);
+  const day = parseInt(parts[0] ?? "1");
+  const month = MONTH_MAP[parts[1] ?? ""] ?? 0;
+  const year = parseInt(parts[2] ?? String(new Date().getFullYear()));
   return new Date(year, month, day);
 }
 
@@ -223,7 +288,7 @@ function startOfToday(): Date {
 // ── Filtrage ─────────────────────────────────────────────────────────────────
 
 function normalize(str: string): string {
-  return str.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+  return str.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
 }
 
 const dateFilteredEvents = computed(() => {
@@ -232,33 +297,41 @@ const dateFilteredEvents = computed(() => {
   if (props.showPastOnly) {
     // Archives : dates < aujourd'hui, du plus récent au plus ancien
     return sorted
-      .filter(e => parseEventDate(e.date) < today)
-      .sort((a, b) => parseEventDate(b.date).getTime() - parseEventDate(a.date).getTime());
+      .filter((e) => parseEventDate(e.date) < today)
+      .sort(
+        (a, b) =>
+          parseEventDate(b.date).getTime() - parseEventDate(a.date).getTime(),
+      );
   }
   // Agenda : dates >= aujourd'hui (y compris aujourd'hui), du plus proche au plus lointain
   return sorted
-    .filter(e => parseEventDate(e.date) >= today)
-    .sort((a, b) => parseEventDate(a.date).getTime() - parseEventDate(b.date).getTime());
+    .filter((e) => parseEventDate(e.date) >= today)
+    .sort(
+      (a, b) =>
+        parseEventDate(a.date).getTime() - parseEventDate(b.date).getTime(),
+    );
 });
 
 const filteredEvents = computed(() => {
   if (!query.value.trim()) return dateFilteredEvents.value;
   const q = normalize(query.value.trim());
-  return dateFilteredEvents.value.filter(event => {
-    const haystack = normalize([
-      event.date,
-      event.time ?? '',
-      event.city,
-      event.venue,
-      event.role,
-      ...(event.program ?? []),
-    ].join(' '));
+  return dateFilteredEvents.value.filter((event) => {
+    const haystack = normalize(
+      [
+        event.date,
+        event.time ?? "",
+        event.city,
+        event.venue,
+        event.role,
+        ...(event.program ?? []),
+      ].join(" "),
+    );
     return haystack.includes(q);
   });
 });
 
 const visibleEvents = computed(() =>
-  showAll.value ? filteredEvents.value : filteredEvents.value.slice(0, MAX)
+  showAll.value ? filteredEvents.value : filteredEvents.value.slice(0, MAX),
 );
 
 const hasMore = computed(() => filteredEvents.value.length > MAX);
@@ -281,7 +354,8 @@ const hasMore = computed(() => filteredEvents.value.length > MAX);
   --role-col: clamp(6rem, 7.9vw, 9rem);
   max-width: 1728px;
   margin: 0 auto;
-  padding: clamp(4rem, 8vw, 8rem) clamp(1.5rem, 4vw, 4rem) clamp(2rem, 3vw, 3rem);
+  padding: clamp(4rem, 8vw, 8rem) clamp(1.5rem, 4vw, 4rem)
+    clamp(2rem, 3vw, 3rem);
   display: flex;
   flex-direction: column;
   gap: clamp(2rem, 3vw, 3rem);
@@ -331,14 +405,16 @@ const hasMore = computed(() => filteredEvents.value.length > MAX);
   background: none;
   border: none;
   outline: none;
-  color: #F7F5F3;
+  color: #f7f5f3;
   font-family: "Ortica Linear", Georgia, serif;
   font-weight: 300;
   font-size: 0.875rem;
   width: 100%;
   /* remove browser default search cancel button */
 }
-.agenda__search::-webkit-search-cancel-button { display: none; }
+.agenda__search::-webkit-search-cancel-button {
+  display: none;
+}
 
 .agenda__search::placeholder {
   color: rgba(255, 255, 255, 0.35);
@@ -356,7 +432,9 @@ const hasMore = computed(() => filteredEvents.value.length > MAX);
   flex-shrink: 0;
   transition: color 0.15s;
 }
-.agenda__search-clear:hover { color: #F7F5F3; }
+.agenda__search-clear:hover {
+  color: #f7f5f3;
+}
 
 /* ─── List / table ───────────────────────────────────────── */
 
@@ -537,10 +615,12 @@ a.event {
   font-size: clamp(0.6875rem, 0.95vw, 0.8125rem);
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: #F7F5F3;
+  color: #f7f5f3;
   white-space: nowrap;
   opacity: 0;
-  transition: opacity 0.2s ease 0.3s, transform 0.25s ease 0.3s;
+  transition:
+    opacity 0.2s ease 0.3s,
+    transform 0.25s ease 0.3s;
 }
 
 .event-wrap--linked:hover .event-line__label {
@@ -555,9 +635,11 @@ a.event {
   transform: translateY(calc(-50% + 6px));
   width: 32px;
   height: 32px;
-  color: #F7F5F3;
+  color: #f7f5f3;
   opacity: 0;
-  transition: opacity 0.2s ease 0.3s, transform 0.25s ease 0.3s;
+  transition:
+    opacity 0.2s ease 0.3s,
+    transform 0.25s ease 0.3s;
 }
 
 .event-wrap--linked:hover .event-line__arrow {
@@ -586,11 +668,11 @@ a.event {
   background: none;
   border: 1px solid currentColor;
   font-family: inherit;
-  color: #F7F5F3;
+  color: #f7f5f3;
 }
 
 .agenda__more-btn:hover {
-  background-color: #F7F5F3;
+  background-color: #f7f5f3;
   color: #232323;
 }
 
@@ -613,14 +695,28 @@ a.event {
 .slide-left-leave-active,
 .slide-right-enter-active,
 .slide-right-leave-active {
-  transition: opacity 0.3s ease, transform 0.3s ease;
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
 }
 
-.slide-left-enter-from { opacity: 0; transform: translateX(-12px); }
-.slide-left-leave-to   { opacity: 0; transform: translateX(-12px); }
+.slide-left-enter-from {
+  opacity: 0;
+  transform: translateX(-12px);
+}
+.slide-left-leave-to {
+  opacity: 0;
+  transform: translateX(-12px);
+}
 
-.slide-right-enter-from { opacity: 0; transform: translateX(12px); }
-.slide-right-leave-to   { opacity: 0; transform: translateX(12px); }
+.slide-right-enter-from {
+  opacity: 0;
+  transform: translateX(12px);
+}
+.slide-right-leave-to {
+  opacity: 0;
+  transform: translateX(12px);
+}
 
 /* ─── Désactiver les effets hover sur écrans tactiles ──────── */
 @media (hover: none) {
@@ -660,12 +756,20 @@ a.event {
 
 @media (max-width: 1024px) {
   /* repeat(5, 1fr) déjà homogène, juste réduire le gap */
-  .event { column-gap: 1rem; }
+  .event {
+    column-gap: 1rem;
+  }
 }
 
 @media (max-width: 768px) {
-  .agenda__header { flex-direction: column; align-items: flex-start; gap: 1.25rem; }
-  .agenda__search-label { min-width: 100%; }
+  .agenda__header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.25rem;
+  }
+  .agenda__search-label {
+    min-width: 100%;
+  }
 
   /*
     Figma iPhone agenda (layout_SNSWT9) :
@@ -680,10 +784,10 @@ a.event {
   */
   .event {
     display: grid;
-    grid-template-columns: 1fr auto;   /* date/time à gauche, city/venue à droite */
+    grid-template-columns: 1fr auto; /* date/time à gauche, city/venue à droite */
     grid-template-rows: repeat(4, auto);
     column-gap: 1rem;
-    row-gap: 0.4375rem;               /* Figma : gap 7px */
+    row-gap: 0.4375rem; /* Figma : gap 7px */
     padding: 1rem 0 0.875rem;
     min-height: unset;
   }
@@ -696,14 +800,16 @@ a.event {
 
   /* Ligne 1 : date gauche */
   .event__date {
-    grid-column: 1; grid-row: 1;
+    grid-column: 1;
+    grid-row: 1;
     align-self: baseline;
     font-size: clamp(1rem, 6.2vw, 1.5625rem); /* Figma : 25px */
   }
 
   /* Ligne 1 : city droite */
   .event__city {
-    grid-column: 2; grid-row: 1;
+    grid-column: 2;
+    grid-row: 1;
     justify-self: end;
     text-align: right;
     align-self: baseline;
@@ -712,7 +818,8 @@ a.event {
 
   /* Ligne 2 : time gauche */
   .event__time {
-    grid-column: 1; grid-row: 2;
+    grid-column: 1;
+    grid-row: 2;
     align-self: baseline;
     margin-top: 0;
     font-size: 0.8125rem; /* Figma : 13px */
@@ -720,7 +827,8 @@ a.event {
 
   /* Ligne 2 : venue droite */
   .event__venue {
-    grid-column: 2; grid-row: 2;
+    grid-column: 2;
+    grid-row: 2;
     justify-self: end;
     text-align: right;
     align-self: baseline;
@@ -729,7 +837,8 @@ a.event {
 
   /* Ligne 3 : role pleine largeur */
   .event__role {
-    grid-column: 1 / -1; grid-row: 3;
+    grid-column: 1 / -1;
+    grid-row: 3;
     justify-self: start;
     text-align: left;
     font-size: 0.75rem; /* Figma : 12px */
@@ -737,7 +846,8 @@ a.event {
 
   /* Ligne 4 : programme pleine largeur */
   .event__program {
-    grid-column: 1 / -1; grid-row: 4;
+    grid-column: 1 / -1;
+    grid-row: 4;
     justify-self: start;
   }
 

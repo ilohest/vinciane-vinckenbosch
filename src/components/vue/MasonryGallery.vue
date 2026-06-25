@@ -68,7 +68,7 @@
               </div>
             </div>
           </button>
-          <div v-else class="masonry__link masonry__link--video">
+          <div v-else class="masonry__link masonry__link--video" data-cursor-pointer>
             <div class="masonry__img-wrap masonry__img-wrap--video">
               <iframe
                 v-if="inlineVideoKey === videoKey(entry.item)"
@@ -181,9 +181,6 @@
                 downloadFilename(displayedItems[lightboxIndex]!.downloadUrl!, lightboxIndex ?? 0)
               )"
             >
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
-                <path d="M12 3v13M5 14l7 7 7-7"/><line x1="3" y1="21" x2="21" y2="21"/>
-              </svg>
               {{ downloading ? t.downloading : t.download }}
             </button>
             <a
@@ -193,7 +190,7 @@
               rel="noopener noreferrer"
               class="lightbox__source"
             >
-              {{ t.readArticle }} →
+              {{ t.readArticle }}
             </a>
           </div>
         </div>
@@ -748,6 +745,28 @@ onUnmounted(() => {
   background-color: #F7F5F3;
   color: #232323;
   border-color: #F7F5F3;
+}
+
+.lightbox__source::after {
+  content: "→";
+  display: inline-block;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.lightbox__source:hover::after {
+  animation: btn-arrow-spin 0.55s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+.lightbox__download::after {
+  content: "↓";
+  display: inline-block;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.lightbox__download:hover::after {
+  animation: btn-arrow-spin 0.55s cubic-bezier(0.25, 1, 0.5, 1) forwards;
 }
 
 .lightbox__download:disabled {

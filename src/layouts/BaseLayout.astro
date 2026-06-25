@@ -198,6 +198,8 @@ const alternatePath = (l: Lang) => pageKey ? pagePath(l, pageKey) : localePath(l
       function initCursor() {
         const cursor = document.getElementById('custom-cursor');
         if (!cursor) return;
+        if (cursor.dataset.initialized === 'true') return;
+        cursor.dataset.initialized = 'true';
         // Masqué sur touch
         if (!window.matchMedia('(hover: hover)').matches) {
           cursor.style.display = 'none';
@@ -215,14 +217,18 @@ const alternatePath = (l: Lang) => pageKey ? pagePath(l, pageKey) : localePath(l
         document.addEventListener('mouseleave', () => cursor.classList.add('cursor--hidden'));
         document.addEventListener('mouseenter', () => cursor.classList.remove('cursor--hidden'));
 
-        // Agrandir sur éléments interactifs
-        function addHover(selector) {
-          document.querySelectorAll(selector).forEach(el => {
-            el.addEventListener('mouseenter', () => cursor.classList.add('cursor--hover'));
-            el.addEventListener('mouseleave', () => cursor.classList.remove('cursor--hover'));
-          });
-        }
-        addHover('a, button, [role="button"], label[for]');
+        // Délégation : couvre aussi les composants hydratés après le chargement.
+        const hoverSelector = 'a, button, [role="button"], label[for], [data-cursor-pointer]';
+        document.addEventListener('mouseover', (event) => {
+          if (event.target instanceof Element && event.target.closest(hoverSelector)) {
+            cursor.classList.add('cursor--hover');
+          }
+        });
+        document.addEventListener('mouseout', (event) => {
+          const nextTarget = event.relatedTarget;
+          if (nextTarget instanceof Element && nextTarget.closest(hoverSelector)) return;
+          cursor.classList.remove('cursor--hover');
+        });
       }
 
       function anchorOffset() {
