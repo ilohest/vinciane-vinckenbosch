@@ -119,7 +119,9 @@ onUnmounted(() => {
 }
 
 .biodl--open .biodl__toggle::after {
-  transform: rotate(90deg);
+  content: "↓";
+  animation: none;
+  transform: none;
 }
 
 /* Liste des langues */
