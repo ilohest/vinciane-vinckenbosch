@@ -65,6 +65,10 @@
           <!-- Animated divider line -->
           <div class="event-line" aria-hidden="true">
             <div class="event-line__sweep"></div>
+            <span
+              v-if="event.ticketUrl && !hideLinks"
+              class="event-line__label"
+            >INFO</span>
             <svg
               v-if="event.ticketUrl && !hideLinks"
               class="event-line__arrow"
@@ -520,7 +524,28 @@ a.event {
 }
 
 .event-wrap--linked:hover .event-line__sweep {
-  width: calc(100% - 38px);
+  width: calc(100% - 104px);
+}
+
+.event-line__label {
+  position: absolute;
+  right: 40px;
+  top: 50%;
+  transform: translateY(calc(-50% + 6px));
+  font-family: "Ortica Linear", Georgia, serif;
+  font-weight: 300;
+  font-size: clamp(0.6875rem, 0.95vw, 0.8125rem);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #F7F5F3;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.2s ease 0.3s, transform 0.25s ease 0.3s;
+}
+
+.event-wrap--linked:hover .event-line__label {
+  opacity: 1;
+  transform: translateY(-50%);
 }
 
 .event-line__arrow {
@@ -612,13 +637,14 @@ a.event {
     opacity: 1;
   }
 
-  /* Pas de sweep + flèche */
+  /* Pas de sweep animé, mais INFO + flèche toujours visibles (pas de hover) */
   .event-wrap--linked:hover .event-line__sweep {
     width: 0;
   }
-  .event-wrap--linked:hover .event-line__arrow {
-    opacity: 0;
-    transform: translateY(calc(-50% + 6px));
+  .event-line__arrow,
+  .event-line__label {
+    opacity: 1;
+    transform: translateY(-50%);
   }
 
   /* Supprimer les transitions qui resteraient actives */

@@ -79,7 +79,10 @@ const trioLinks = (homepage?.trioLinks ?? []).filter((l) => l?.label?.trim());
 const trioLinkMap = new Map<string, string | undefined>();
 for (const l of trioLinks) {
   const label = l.label!.trim();
-  const pdfHref = l.pdf ? `${l.pdf}?dl=${encodeURIComponent(l.pdfName ?? 'document.pdf')}` : undefined;
+  // PDF : URL brute → s'ouvre dans un nouvel onglet (via target="_blank"),
+  // même comportement que le bouton « Télécharger la biographie »
+  // (pas de ?dl= qui forcerait le téléchargement direct).
+  const pdfHref = l.pdf || undefined;
   trioLinkMap.set(label, pdfHref || l.url?.trim());
 }
 
@@ -558,10 +561,20 @@ pushTrioText(fullTrioText.slice(trioCursor));
   text-decoration-thickness: 1px;
   text-underline-offset: 0.18em;
   text-decoration-color: currentColor;
+  transition: color 0.18s ease;
 }
 
 .bio__trio-link--accent {
   color: var(--color-accent);
+}
+
+/* Survol : les noms passent en orange ; « Trio Linaris » passe en couleur de texte */
+.bio__trio-link:not(.bio__trio-link--accent):hover {
+  color: var(--color-accent);
+}
+
+.bio__trio-link--accent:hover {
+  color: var(--color-text);
 }
 
 /* ── Images Trio (deux côte à côte) ──────────────────────── */

@@ -148,8 +148,12 @@ const alternatePath = (l: Lang) => pageKey ? pagePath(l, pageKey) : localePath(l
     <slot />
     <NavBar client:idle lang={lang} currentPath={Astro.url.pathname} />
 
-    <!-- ── Curseur personnalisé — point orange (desktop only) ── -->
-    <div id="custom-cursor" aria-hidden="true"></div>
+    <!-- ── Curseur custom — note de musique sur liens/boutons (desktop only) ── -->
+    <div id="custom-cursor" aria-hidden="true">
+      <svg viewBox="0 0 24 24">
+        <path fill="currentColor" d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
+      </svg>
+    </div>
 
     <script is:inline>
       /* ── Scroll reveal ──────────────────────────────────── */

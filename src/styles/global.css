@@ -183,12 +183,17 @@ img[loading="lazy"].img-loaded {
 }
 
 /* ══════════════════════════════════════════════════════
-   CURSEUR PERSONNALISÉ — point orange #DA7F52
-   Desktop uniquement (hover: hover)
+   CURSEUR — note de musique sur les liens/boutons
+   Curseur natif normal partout ailleurs. Desktop uniquement.
 ══════════════════════════════════════════════════════ */
 @media (hover: hover) {
-  /* Cache le curseur natif */
-  html, body, a, button, [role="button"], label, input {
+  /* Sur les éléments interactifs (et leurs enfants) : curseur natif masqué,
+     remplacé par la note de musique. !important pour battre les règles
+     `cursor: pointer` des composants. (Le reste du site garde le curseur normal.) */
+  a, a *,
+  button, button *,
+  [role="button"], [role="button"] *,
+  label[for], label[for] * {
     cursor: none !important;
   }
 }
@@ -197,33 +202,34 @@ img[loading="lazy"].img-loaded {
   position: fixed;
   top: 0;
   left: 0;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background-color: #DA7F52;
+  width: 26px;
+  height: 26px;
+  margin-left: -13px;
+  margin-top:  -13px;
   pointer-events: none;
   z-index: 99999;
   transform: translate(-100px, -100px); /* hors écran par défaut */
-  /* Décalage centré sur le tip du curseur */
-  margin-left: -4px;
-  margin-top:  -4px;
-  transition: width  0.2s ease, height 0.2s ease,
-              background-color 0.2s ease, border 0.2s ease,
-              opacity 0.2s ease;
+  color: #ffffff;            /* la note utilise currentColor */
+  /* Effet négatif : la note s'inverse selon le fond → lisible partout */
+  mix-blend-mode: difference;
+  opacity: 0;                /* invisible par défaut */
+  transition: opacity 0.18s ease;
 }
 
+#custom-cursor svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Visible uniquement au survol d'un lien / bouton */
+#custom-cursor.cursor--hover {
+  opacity: 1;
+}
+
+/* Souris hors fenêtre → masquée (prioritaire sur --hover) */
 #custom-cursor.cursor--hidden {
   opacity: 0;
-}
-
-/* Hover sur liens/boutons : cercle creux légèrement agrandi */
-#custom-cursor.cursor--hover {
-  width: 20px;
-  height: 20px;
-  margin-left: -10px;
-  margin-top:  -10px;
-  background-color: transparent;
-  border: 1.5px solid #DA7F52;
 }
 
 /* Masqué sur touch */
