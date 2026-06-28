@@ -1,7 +1,8 @@
 import type { DocumentActionComponent } from "sanity";
 
 const previewBaseUrl =
-  process.env.SANITY_STUDIO_PREVIEW_BASE_URL ?? "http://localhost:4321";
+  process.env.SANITY_STUDIO_PREVIEW_BASE_URL ??
+  "https://www.vincianevinckenbosch.com";
 const previewSecret = process.env.SANITY_STUDIO_PREVIEW_SECRET ?? "";
 
 const editableTypes = new Set([

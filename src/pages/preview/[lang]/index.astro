@@ -28,6 +28,9 @@ const previewQueryOptions = { throwOnError: true };
 const heroEvents = await getHeroEvents(lang, 3, previewClient, previewQueryOptions);
 const homepage = await getHomepage(previewClient, previewQueryOptions);
 const agendaEvents = await getAgendaEvents(lang, previewClient, previewQueryOptions);
+const visibleDraftCount = await previewClient.fetch<number>(
+  `count(*[_id in path("drafts.**")])`,
+);
 const finalImage = homepage?.finalImage || '/images/grilc-02660.jpg';
 const finalImageRatio = 1672 / 900;
 const finalImageSrc = sanityImageCropUrl(finalImage, 3200, finalImageRatio);
@@ -68,7 +71,9 @@ const quote2Attribution = typeof quote2AttributionValue === 'string'
   noindex
 >
   <div class="preview-banner" role="status">
-    Aperçu brouillon — cette page montre les modifications non publiées.
+    {visibleDraftCount > 0
+      ? 'Aperçu brouillon — cette page montre les modifications non publiées.'
+      : 'Aperçu brouillon — aucun brouillon visible par le site.'}
   </div>
 
   <HeroSection
