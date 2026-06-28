@@ -240,7 +240,7 @@ const alternatePath = (l: Lang) => pageKey ? pagePath(l, pageKey) : localePath(l
       function scrollToHashWithOffset() {
         if (!window.location.hash) return;
         const id = decodeURIComponent(window.location.hash.slice(1));
-        const target = document.getElementById(id);
+        const target = document.getElementById(`${id}-title`) ?? document.getElementById(id);
         if (!target) return;
 
         const top = window.scrollY + target.getBoundingClientRect().top - anchorOffset();

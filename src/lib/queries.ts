@@ -3,6 +3,7 @@ import type { Homepage, HeroEventTeaser, SiteSettings } from './types';
 import { sanityImageUrl, sanityImageSrcset, sanityDownloadUrl } from './sanity-image';
 
 type QueryClient = Pick<typeof sanityClient, 'fetch'>;
+type QueryOptions = { throwOnError?: boolean };
 
 const IMAGE_PROJECTION = `_type, crop, hotspot, "url": asset->url, "asset": asset->{ "_ref": _id, url }`;
 
@@ -22,7 +23,10 @@ export async function getSiteSettings(): Promise<SiteSettings> {
   return { photoCredits: DEFAULT_PHOTO_CREDITS };
 }
 
-export async function getHomepage(client: QueryClient = sanityClient): Promise<Homepage | null> {
+export async function getHomepage(
+  client: QueryClient = sanityClient,
+  options: QueryOptions = {},
+): Promise<Homepage | null> {
   try {
     const data = await client.fetch<Homepage | null>(`*[_type == "homepage"][0]{
       "heroImage":           heroImage { ${IMAGE_PROJECTION} },
@@ -31,7 +35,7 @@ export async function getHomepage(client: QueryClient = sanityClient): Promise<H
       "heroMobileVideo":     heroMobileVideo { "url": asset->url },
       heroQuote,
       heroQuoteAttribution,
-      heroEvents[]->{ _id, date, city, country },
+      heroEvents[]->{ _id, date, city, cityLocalized, country },
       quote2Text,
       quote2Attribution,
       "biographyPdfs": {
@@ -90,7 +94,8 @@ export async function getHomepage(client: QueryClient = sanityClient): Promise<H
     }
 
     return data;
-  } catch {
+  } catch (error) {
+    if (options.throwOnError) throw error;
     return null;
   }
 }
@@ -99,7 +104,12 @@ function todayIsoDate(): string {
   return new Date().toISOString().slice(0, 10);
 }
 
-export async function getHeroEvents(limit = 3, client: QueryClient = sanityClient): Promise<HeroEventTeaser[]> {
+export async function getHeroEvents(
+  lang: 'fr' | 'en' | 'de' = 'fr',
+  limit = 3,
+  client: QueryClient = sanityClient,
+  options: QueryOptions = {},
+): Promise<HeroEventTeaser[]> {
   try {
     const homepage = await client.fetch<Pick<Homepage, 'heroEvents'> | null>(
       `*[_type == "homepage"][0]{
@@ -107,35 +117,44 @@ export async function getHeroEvents(limit = 3, client: QueryClient = sanityClien
           _id,
           date,
           city,
+          cityLocalized,
           country
         }
       }`
     );
 
-    const selectedEvents = homepage?.heroEvents?.filter((event) => event?.date && event?.city && event?.country) ?? [];
+    const selectedEvents = (homepage?.heroEvents ?? [])
+      .filter((event): event is HeroEventTeaser => Boolean(event))
+      .map((event) => localizeEventCity(event, lang))
+      .filter((event) => event?.date && event?.city && event?.country);
     if (selectedEvents.length > 0) {
       return selectedEvents.slice(0, limit);
     }
 
     // Sinon (liste vide) : les prochains concerts automatiquement
-    return await client.fetch<HeroEventTeaser[]>(
-      `*[_type == "event" && defined(date) && defined(city) && defined(country) && date >= $today]
+    const events = await client.fetch<HeroEventTeaser[]>(
+      `*[_type == "event" && defined(date) && (defined(cityLocalized.fr) || defined(city)) && defined(country) && date >= $today]
         | order(date asc) [0...$limit]{
           _id,
           date,
           city,
+          cityLocalized,
           country
         }`,
       { today: todayIsoDate(), limit }
     );
-  } catch {
+
+    return events.map((event) => localizeEventCity(event, lang));
+  } catch (error) {
+    if (options.throwOnError) throw error;
     return [];
   }
 }
 
 /** Événement formaté pour le composant Vue AgendaSection (champs plats) */
 export interface AgendaEvent {
-  date: string;        // "21 mai 2026" (français lisible)
+  date: string;        // "21 mai 2026" / "21 May 2026" / "21. Mai 2026" with localized month abbreviation
+  dateIso: string;     // "2026-05-21"
   time?: string;       // "20h" / "19h30"
   city: string;        // "Lyon, FR"
   venue: string;
@@ -144,15 +163,23 @@ export interface AgendaEvent {
   ticketUrl?: string;
 }
 
-/** Mois FR compatibles avec le parseur de dates du composant Vue */
-const FR_MONTHS = ['jan', 'fév', 'mars', 'avr', 'mai', 'juin', 'juil', 'août', 'sept', 'oct', 'nov', 'déc'];
+const DATE_LOCALES: Record<'fr' | 'en' | 'de', string> = {
+  fr: 'fr-FR',
+  en: 'en-GB',
+  de: 'de-DE',
+};
 
-/** "2026-05-21" → "21 mai 2026" */
-function isoToReadable(iso?: string): string {
+/** "2026-05-21" → date lisible dans la langue de la page */
+function isoToReadable(iso: string | undefined, lang: 'fr' | 'en' | 'de'): string {
   if (!iso) return '';
-  const [y, m, d] = iso.split('-').map(Number);
-  if (!y || !m || !d) return iso;
-  return `${d} ${FR_MONTHS[m - 1] ?? ''} ${y}`;
+  const parsedDate = new Date(`${iso}T00:00:00`);
+  if (Number.isNaN(parsedDate.getTime())) return iso;
+
+  return new Intl.DateTimeFormat(DATE_LOCALES[lang], {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  }).format(parsedDate);
 }
 
 /** "20:00" → "20h" · "19:30" → "19h30" */
@@ -175,11 +202,26 @@ interface RawSanityEvent {
   date?: string;
   time?: string;
   city?: string;
+  cityLocalized?: { fr?: string; en?: string; de?: string };
   country?: string;
   venue?: { fr?: string; en?: string; de?: string };
   role?: { fr?: string; en?: string; de?: string };
   program?: Array<{ composer?: string; piece?: { fr?: string; en?: string; de?: string } | string }>;
   ticketUrl?: string;
+}
+
+function localizedValue(
+  value: { fr?: string; en?: string; de?: string } | undefined,
+  lang: 'fr' | 'en' | 'de',
+): string {
+  return value?.[lang] || value?.fr || value?.en || value?.de || '';
+}
+
+function localizeEventCity<T extends HeroEventTeaser>(event: T, lang: 'fr' | 'en' | 'de'): T {
+  return {
+    ...event,
+    city: localizedValue(event.cityLocalized, lang) || event.city,
+  };
 }
 
 /**
@@ -189,11 +231,12 @@ interface RawSanityEvent {
 export async function getAgendaEvents(
   lang: 'fr' | 'en' | 'de' = 'fr',
   client: QueryClient = sanityClient,
+  options: QueryOptions = {},
 ): Promise<AgendaEvent[]> {
   try {
     const raw = await client.fetch<RawSanityEvent[] | null>(
       `*[_type == "event" && defined(date)] | order(date asc){
-        date, time, city, country, venue, role,
+        date, time, city, cityLocalized, country, venue, role,
         program[]{ composer, piece },
         ticketUrl
       }`
@@ -202,11 +245,14 @@ export async function getAgendaEvents(
     if (!raw || raw.length === 0) return [];
 
     return raw.map((e) => ({
-      date: isoToReadable(e.date),
+      date: isoToReadable(e.date, lang),
+      dateIso: e.date ?? '',
       time: formatTime(e.time),
-      city: e.country ? `${e.city}, ${e.country}` : (e.city ?? ''),
-      venue: e.venue?.[lang] || e.venue?.fr || '',
-      role: e.role?.[lang] || e.role?.fr || '',
+      city: e.country
+        ? `${localizedValue(e.cityLocalized, lang) || e.city || ''}, ${e.country}`
+        : (localizedValue(e.cityLocalized, lang) || e.city || ''),
+      venue: localizedValue(e.venue, lang),
+      role: localizedValue(e.role, lang),
       program: (e.program ?? [])
         .map((p) => {
           const piece = typeof p.piece === 'object' && p.piece !== null
@@ -217,7 +263,8 @@ export async function getAgendaEvents(
         .filter(Boolean),
       ticketUrl: normalizeExternalUrl(e.ticketUrl),
     }));
-  } catch {
+  } catch (error) {
+    if (options.throwOnError) throw error;
     return [];
   }
 }

@@ -23,7 +23,8 @@ function previewPathForType(schemaType: string) {
 export const PreviewDraftAction: DocumentActionComponent = (props) => {
   if (!editableTypes.has(props.type)) return null;
 
-  const disabled = !previewSecret;
+  const hasDraft = Boolean(props.draft);
+  const disabled = !previewSecret || !hasDraft;
   const target = previewPathForType(props.type);
   const url = `${previewBaseUrl.replace(/\/$/, "")}${target.path}?secret=${encodeURIComponent(
     previewSecret,
@@ -31,8 +32,10 @@ export const PreviewDraftAction: DocumentActionComponent = (props) => {
 
   return {
     label: "Aperçu brouillon",
-    title: disabled
+    title: !previewSecret
       ? "L'aperçu brouillon doit encore être configuré."
+      : !hasDraft
+        ? "Aucun brouillon enregistré pour ce document."
       : "Ouvrir l'aperçu brouillon dans un nouvel onglet.",
     disabled,
     group: ["default", "paneActions"],

@@ -24,9 +24,10 @@ if (!expectedSecret || secret !== expectedSecret) {
 }
 
 const previewClient = createSanityPreviewClient();
-const heroEvents = await getHeroEvents(3, previewClient);
-const homepage = await getHomepage(previewClient);
-const agendaEvents = await getAgendaEvents(lang, previewClient);
+const previewQueryOptions = { throwOnError: true };
+const heroEvents = await getHeroEvents(lang, 3, previewClient, previewQueryOptions);
+const homepage = await getHomepage(previewClient, previewQueryOptions);
+const agendaEvents = await getAgendaEvents(lang, previewClient, previewQueryOptions);
 const finalImage = homepage?.finalImage || '/images/grilc-02660.jpg';
 const finalImageRatio = 1672 / 900;
 const finalImageSrc = sanityImageCropUrl(finalImage, 3200, finalImageRatio);

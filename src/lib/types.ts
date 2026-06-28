@@ -40,6 +40,7 @@ export interface Event {
   date: string;
   time: string;
   city: string;
+  cityLocalized?: LocalizedString;
   country: string;
   venue: LocalizedString;
   role: LocalizedString;
@@ -50,6 +51,7 @@ export interface HeroEventTeaser {
   _id: string;
   date: string;
   city: string;
+  cityLocalized?: LocalizedString;
   country: string;
 }
 

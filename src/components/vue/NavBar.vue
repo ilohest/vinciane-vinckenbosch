@@ -235,7 +235,7 @@ function closeMenu()  {
 }
 
 function scrollToSection(id: string) {
-  const target = document.getElementById(id);
+  const target = document.getElementById(`${id}-title`) ?? document.getElementById(id);
   if (!target) return;
 
   const navbarHeight = Number.parseFloat(

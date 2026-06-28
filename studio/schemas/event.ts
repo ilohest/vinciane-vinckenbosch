@@ -64,10 +64,26 @@ export const event = defineType({
       components: { input: TimeInput },
     }),
     defineField({
-      name: "city",
+      name: "cityLocalized",
       title: "Ville",
+      description:
+        "Remplissez au minimum le français. Ajoutez l'anglais et l'allemand si le nom de la ville diffère.",
+      type: "localeString",
+      validation: (R) =>
+        R.custom((value?: { fr?: string }, context?: { parent?: { city?: string } }) =>
+          value?.fr?.trim() || context?.parent?.city?.trim()
+            ? true
+            : "Ajoutez la ville en français.",
+        ),
+    }),
+    // Ancien champ texte simple. Conservé pour les concerts déjà saisis et comme
+    // fallback côté site pendant la transition vers cityLocalized.
+    defineField({
+      name: "city",
+      title: "Ville (ancien champ)",
       type: "string",
-      validation: (R) => R.required().error("Ajoutez la ville du concert."),
+      hidden: true,
+      readOnly: true,
     }),
     defineField({
       name: "country",
@@ -151,9 +167,14 @@ export const event = defineType({
     },
   ],
   preview: {
-    select: { title: "city", subtitle: "date", description: "venue.fr" },
-    prepare: ({ title, subtitle, description }) => ({
-      title: `${subtitle ?? "—"} — ${title ?? "—"}`,
+    select: {
+      title: "cityLocalized.fr",
+      legacyTitle: "city",
+      subtitle: "date",
+      description: "venue.fr",
+    },
+    prepare: ({ title, legacyTitle, subtitle, description }) => ({
+      title: `${subtitle ?? "—"} — ${title ?? legacyTitle ?? "—"}`,
       subtitle: description ?? "",
     }),
   },

@@ -180,6 +180,7 @@ import { pagePath } from "../../lib/routes";
 
 interface Event {
   date: string;
+  dateIso: string;
   time?: string;
   city: string;
   venue: string;
@@ -257,42 +258,9 @@ const emptyLabel = computed(() => {
   return props.showPastOnly ? t.value.noArchive : t.value.noEvents;
 });
 
-// ── Helpers de date ──────────────────────────────────────────────────────────
-
-const MONTH_MAP: Record<string, number> = {
-  jan: 0,
-  fév: 1,
-  février: 1,
-  mar: 2,
-  mars: 2,
-  avr: 3,
-  avril: 3,
-  mai: 4,
-  juin: 5,
-  juil: 6,
-  juillet: 6,
-  août: 7,
-  aoû: 7,
-  sep: 8,
-  sept: 8,
-  septembre: 8,
-  oct: 9,
-  octobre: 9,
-  nov: 10,
-  novembre: 10,
-  déc: 11,
-  dec: 11,
-  décembre: 11,
-  fev: 1,
-  aou: 7,
-};
-
-function parseEventDate(dateStr: string): Date {
-  const parts = dateStr.toLowerCase().replace(/\./g, "").trim().split(/\s+/);
-  const day = parseInt(parts[0] ?? "1");
-  const month = MONTH_MAP[parts[1] ?? ""] ?? 0;
-  const year = parseInt(parts[2] ?? String(new Date().getFullYear()));
-  return new Date(year, month, day);
+function parseEventDate(event: Event): Date {
+  const parsed = new Date(`${event.dateIso}T00:00:00`);
+  return Number.isNaN(parsed.getTime()) ? new Date(0) : parsed;
 }
 
 function startOfToday(): Date {
@@ -312,18 +280,18 @@ const dateFilteredEvents = computed(() => {
   if (props.showPastOnly) {
     // Archives : dates < aujourd'hui, du plus récent au plus ancien
     return sorted
-      .filter((e) => parseEventDate(e.date) < today)
+      .filter((e) => parseEventDate(e) < today)
       .sort(
         (a, b) =>
-          parseEventDate(b.date).getTime() - parseEventDate(a.date).getTime(),
+          parseEventDate(b).getTime() - parseEventDate(a).getTime(),
       );
   }
   // Agenda : dates >= aujourd'hui (y compris aujourd'hui), du plus proche au plus lointain
   return sorted
-    .filter((e) => parseEventDate(e.date) >= today)
+    .filter((e) => parseEventDate(e) >= today)
     .sort(
       (a, b) =>
-        parseEventDate(a.date).getTime() - parseEventDate(b.date).getTime(),
+        parseEventDate(a).getTime() - parseEventDate(b).getTime(),
     );
 });
 
