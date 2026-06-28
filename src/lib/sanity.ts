@@ -27,7 +27,7 @@ export function createSanityPreviewClient() {
     apiVersion: import.meta.env.SANITY_API_VERSION ?? '2024-01-01',
     useCdn: false,
     token,
-    perspective: 'drafts',
+    perspective: 'raw',
   });
 }
 

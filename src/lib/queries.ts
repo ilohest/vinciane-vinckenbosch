@@ -6,6 +6,59 @@ type QueryClient = Pick<typeof sanityClient, 'fetch'>;
 type QueryOptions = { throwOnError?: boolean };
 
 const IMAGE_PROJECTION = `_type, crop, hotspot, "url": asset->url, "asset": asset->{ "_ref": _id, url }`;
+const HOMEPAGE_PROJECTION = `
+  "heroImage":           heroImage { ${IMAGE_PROJECTION} },
+  "heroVideo":           heroVideo { "url": asset->url },
+  "heroMobileImage":     heroMobileImage { ${IMAGE_PROJECTION} },
+  "heroMobileVideo":     heroMobileVideo { "url": asset->url },
+  heroQuote,
+  heroQuoteAttribution,
+  heroEvents[]->{
+    _id,
+    "date": coalesce(*[_id == "drafts." + ^._id][0].date, date),
+    "city": coalesce(*[_id == "drafts." + ^._id][0].city, city),
+    "cityLocalized": coalesce(*[_id == "drafts." + ^._id][0].cityLocalized, cityLocalized),
+    "country": coalesce(*[_id == "drafts." + ^._id][0].country, country)
+  },
+  quote2Text,
+  quote2Attribution,
+  "biographyPdfs": {
+    "fr": biographyPdfs.fr.asset->url,
+    "en": biographyPdfs.en.asset->url,
+    "de": biographyPdfs.de.asset->url
+  },
+  "biographyIntroImage": biographyIntroImage { ${IMAGE_PROJECTION} },
+  "bioImage2":           bioImage2           { ${IMAGE_PROJECTION} },
+  "trioImageNarrow":     trioImageNarrow     { ${IMAGE_PROJECTION} },
+  "trioImageWide":       trioImageWide       { ${IMAGE_PROJECTION} },
+  "bioImage3":           bioImage3           { ${IMAGE_PROJECTION} },
+  "bioFormationImage":   bioFormationImage   { ${IMAGE_PROJECTION} },
+  "finalImage":          finalImage          { ${IMAGE_PROJECTION} },
+  bioTrioText,
+  trioLinks[]{
+    label, url,
+    "pdf": {
+      "fr": pdf.fr.asset->url,
+      "en": pdf.en.asset->url,
+      "de": pdf.de.asset->url
+    }
+  },
+  trioAccentWords,
+  bioParaOrchestre,
+  bioParaPrix,
+  bioParaFestivals,
+  bioParaSoliste,
+  bioParaTonkuenstler,
+  bioParaBacri,
+  bioParaFormationViolon,
+  bioParaFormationAlto,
+  bioParaMaitres,
+  bioParaPedagogie,
+  "contactGalleryImages": contactGalleryImages[]{ ${IMAGE_PROJECTION} },
+  contactVideoUrl,
+  "contactVideoThumbnail": contactVideoThumbnail { ${IMAGE_PROJECTION} },
+  socialLinks
+`;
 
 /** Crédits photo par défaut (utilisés tant que Sanity n'est pas rempli) */
 export const DEFAULT_PHOTO_CREDITS: string[] = ['Andrej Grilc'];
@@ -28,57 +81,43 @@ export async function getHomepage(
   options: QueryOptions = {},
 ): Promise<Homepage | null> {
   try {
-    const data = await client.fetch<Homepage | null>(`*[_type == "homepage"][0]{
-      "heroImage":           heroImage { ${IMAGE_PROJECTION} },
-      "heroVideo":           heroVideo { "url": asset->url },
-      "heroMobileImage":     heroMobileImage { ${IMAGE_PROJECTION} },
-      "heroMobileVideo":     heroMobileVideo { "url": asset->url },
-      heroQuote,
-      heroQuoteAttribution,
-      heroEvents[]->{ _id, date, city, cityLocalized, country },
-      quote2Text,
-      quote2Attribution,
-      "biographyPdfs": {
-        "fr": biographyPdfs.fr.asset->url,
-        "en": biographyPdfs.en.asset->url,
-        "de": biographyPdfs.de.asset->url
-      },
-      "biographyIntroImage": biographyIntroImage { ${IMAGE_PROJECTION} },
-      "bioImage2":           bioImage2           { ${IMAGE_PROJECTION} },
-      "trioImageNarrow":     trioImageNarrow     { ${IMAGE_PROJECTION} },
-      "trioImageWide":       trioImageWide       { ${IMAGE_PROJECTION} },
-      "bioImage3":           bioImage3           { ${IMAGE_PROJECTION} },
-      "bioFormationImage":   bioFormationImage   { ${IMAGE_PROJECTION} },
-      "finalImage":          finalImage          { ${IMAGE_PROJECTION} },
-      bioTrioText,
-      trioLinks[]{
-        label, url,
-        "pdf": {
-          "fr": pdf.fr.asset->url,
-          "en": pdf.en.asset->url,
-          "de": pdf.de.asset->url
-        }
-      },
-      trioAccentWords,
-      bioParaOrchestre,
-      bioParaPrix,
-      bioParaFestivals,
-      bioParaSoliste,
-      bioParaTonkuenstler,
-      bioParaBacri,
-      bioParaFormationViolon,
-      bioParaFormationAlto,
-      bioParaMaitres,
-      bioParaPedagogie,
-      "contactGalleryImages": contactGalleryImages[]{ ${IMAGE_PROJECTION} },
-      contactVideoUrl,
-      "contactVideoThumbnail": contactVideoThumbnail { ${IMAGE_PROJECTION} },
-      socialLinks
-    }`);
+    const data = await client.fetch<Homepage | null>(`*[_type == "homepage"][0]{${HOMEPAGE_PROJECTION}}`);
 
     if (!data) return null;
 
     // Normalise les liens saisis sans protocole (www.exemple.com → https://…)
+    if (data.socialLinks) {
+      data.socialLinks = {
+        youtube: normalizeExternalUrl(data.socialLinks.youtube),
+        facebook: normalizeExternalUrl(data.socialLinks.facebook),
+        instagram: normalizeExternalUrl(data.socialLinks.instagram),
+      };
+    }
+    if (data.trioLinks) {
+      data.trioLinks = data.trioLinks.map((l) => ({
+        ...l,
+        url: normalizeExternalUrl(l.url),
+      }));
+    }
+
+    return data;
+  } catch (error) {
+    if (options.throwOnError) throw error;
+    return null;
+  }
+}
+
+export async function getHomepagePreview(
+  client: QueryClient,
+  options: QueryOptions = {},
+): Promise<Homepage | null> {
+  try {
+    const data = await client.fetch<Homepage | null>(
+      `coalesce(*[_id == "drafts.homepage"][0], *[_id == "homepage"][0]){${HOMEPAGE_PROJECTION}}`
+    );
+
+    if (!data) return null;
+
     if (data.socialLinks) {
       data.socialLinks = {
         youtube: normalizeExternalUrl(data.socialLinks.youtube),
@@ -141,6 +180,47 @@ export async function getHeroEvents(
           cityLocalized,
           country
         }`,
+      { today: todayIsoDate(), limit }
+    );
+
+    return events.map((event) => localizeEventCity(event, lang));
+  } catch (error) {
+    if (options.throwOnError) throw error;
+    return [];
+  }
+}
+
+export async function getHeroEventsPreview(
+  lang: 'fr' | 'en' | 'de' = 'fr',
+  limit = 3,
+  client: QueryClient,
+  options: QueryOptions = {},
+): Promise<HeroEventTeaser[]> {
+  try {
+    const homepage = await getHomepagePreview(client, options);
+    const selectedEvents = (homepage?.heroEvents ?? [])
+      .filter((event): event is HeroEventTeaser => Boolean(event))
+      .map((event) => localizeEventCity(event, lang))
+      .filter((event) => event?.date && event?.city && event?.country);
+    if (selectedEvents.length > 0) {
+      return selectedEvents.slice(0, limit);
+    }
+
+    const events = await client.fetch<HeroEventTeaser[]>(
+      `*[
+        _type == "event"
+        && defined(date)
+        && (defined(cityLocalized.fr) || defined(city))
+        && defined(country)
+        && date >= $today
+        && (_id in path("drafts.**") || !defined(*[_id == "drafts." + ^._id][0]._id))
+      ] | order(date asc) [0...$limit]{
+        _id,
+        date,
+        city,
+        cityLocalized,
+        country
+      }`,
       { today: todayIsoDate(), limit }
     );
 
@@ -236,6 +316,51 @@ export async function getAgendaEvents(
   try {
     const raw = await client.fetch<RawSanityEvent[] | null>(
       `*[_type == "event" && defined(date)] | order(date asc){
+        date, time, city, cityLocalized, country, venue, role,
+        program[]{ composer, piece },
+        ticketUrl
+      }`
+    );
+
+    if (!raw || raw.length === 0) return [];
+
+    return raw.map((e) => ({
+      date: isoToReadable(e.date, lang),
+      dateIso: e.date ?? '',
+      time: formatTime(e.time),
+      city: e.country
+        ? `${localizedValue(e.cityLocalized, lang) || e.city || ''}, ${e.country}`
+        : (localizedValue(e.cityLocalized, lang) || e.city || ''),
+      venue: localizedValue(e.venue, lang),
+      role: localizedValue(e.role, lang),
+      program: (e.program ?? [])
+        .map((p) => {
+          const piece = typeof p.piece === 'object' && p.piece !== null
+            ? (p.piece[lang] || p.piece.fr || p.piece.en || p.piece.de || '')
+            : (p.piece ?? '');
+          return [piece, p.composer].filter(Boolean).join(' — ');
+        })
+        .filter(Boolean),
+      ticketUrl: normalizeExternalUrl(e.ticketUrl),
+    }));
+  } catch (error) {
+    if (options.throwOnError) throw error;
+    return [];
+  }
+}
+
+export async function getAgendaEventsPreview(
+  lang: 'fr' | 'en' | 'de' = 'fr',
+  client: QueryClient,
+  options: QueryOptions = {},
+): Promise<AgendaEvent[]> {
+  try {
+    const raw = await client.fetch<RawSanityEvent[] | null>(
+      `*[
+        _type == "event"
+        && defined(date)
+        && (_id in path("drafts.**") || !defined(*[_id == "drafts." + ^._id][0]._id))
+      ] | order(date asc){
         date, time, city, cityLocalized, country, venue, role,
         program[]{ composer, piece },
         ticketUrl

@@ -11,12 +11,13 @@ import BioDownload from '../../../components/vue/BioDownload.vue';
 import Footer from '../../../components/astro/Footer.astro';
 import type { Lang } from '../../../lib/types';
 import { createSanityPreviewClient } from '../../../lib/sanity';
-import { getAgendaEvents, getHeroEvents, getHomepage } from '../../../lib/queries';
+import { getAgendaEventsPreview, getHeroEventsPreview, getHomepagePreview } from '../../../lib/queries';
 import { frenchTypo } from '../../../lib/typography';
 import { sanityImageCropSrcset, sanityImageCropUrl, sanityImageObjectPosition } from '../../../lib/sanity-image';
 
 const { lang } = Astro.params as { lang: Lang };
 const secret = Astro.url.searchParams.get('secret');
+const documentId = Astro.url.searchParams.get('documentId')?.replace(/^drafts\./, '');
 const expectedSecret = import.meta.env.SANITY_PREVIEW_SECRET;
 
 if (!expectedSecret || secret !== expectedSecret) {
@@ -25,12 +26,18 @@ if (!expectedSecret || secret !== expectedSecret) {
 
 const previewClient = createSanityPreviewClient();
 const previewQueryOptions = { throwOnError: true };
-const heroEvents = await getHeroEvents(lang, 3, previewClient, previewQueryOptions);
-const homepage = await getHomepage(previewClient, previewQueryOptions);
-const agendaEvents = await getAgendaEvents(lang, previewClient, previewQueryOptions);
+const heroEvents = await getHeroEventsPreview(lang, 3, previewClient, previewQueryOptions);
+const homepage = await getHomepagePreview(previewClient, previewQueryOptions);
+const agendaEvents = await getAgendaEventsPreview(lang, previewClient, previewQueryOptions);
 const visibleDraftCount = await previewClient.fetch<number>(
-  `count(*[_id in path("drafts.**")])`,
+  `count(*[_id in path("drafts.**") || _id in path("versions.**")])`,
 );
+const targetedDraftExists = documentId
+  ? await previewClient.fetch<boolean>(`defined(*[_id == $draftId][0]._id)`, {
+      draftId: `drafts.${documentId}`,
+    })
+  : false;
+const hasPreviewDraft = visibleDraftCount > 0 || targetedDraftExists;
 const finalImage = homepage?.finalImage || '/images/grilc-02660.jpg';
 const finalImageRatio = 1672 / 900;
 const finalImageSrc = sanityImageCropUrl(finalImage, 3200, finalImageRatio);
@@ -71,7 +78,7 @@ const quote2Attribution = typeof quote2AttributionValue === 'string'
   noindex
 >
   <div class="preview-banner" role="status">
-    {visibleDraftCount > 0
+    {hasPreviewDraft
       ? 'Aperçu brouillon — cette page montre les modifications non publiées.'
       : 'Aperçu brouillon — aucun brouillon visible par le site.'}
   </div>

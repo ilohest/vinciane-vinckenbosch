@@ -27,8 +27,11 @@ export const PreviewDraftAction: DocumentActionComponent = (props) => {
   const hasDraft = Boolean(props.draft);
   const disabled = !previewSecret || !hasDraft;
   const target = previewPathForType(props.type);
+  const documentId = props.id.replace(/^drafts\./, "");
   const url = `${previewBaseUrl.replace(/\/$/, "")}${target.path}?secret=${encodeURIComponent(
     previewSecret,
+  )}&type=${encodeURIComponent(props.type)}&documentId=${encodeURIComponent(
+    documentId,
   )}${target.hash}`;
 
   return {
