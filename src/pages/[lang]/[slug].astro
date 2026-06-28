@@ -215,7 +215,7 @@ const videoSchema = pageKey === 'media' ? {
   publisher: {
     '@type': 'Person',
     name: 'Vinciane Vinckenbosch',
-    url: 'https://vincianevinckenbosch.com',
+    url: Astro.site?.toString().replace(/\/$/, '') ?? 'https://www.vincianevinckenbosch.com',
   },
 } : null;
 
@@ -224,7 +224,7 @@ const gallerySchema = pageKey === 'media' ? {
   '@type': 'ImageGallery',
   name: pageTitle,
   description: pageDescription,
-  url: `https://vincianevinckenbosch.com${canonicalPath}`,
+  url: new URL(canonicalPath, Astro.site).toString(),
   author: {
     '@type': 'Person',
     name: 'Vinciane Vinckenbosch',

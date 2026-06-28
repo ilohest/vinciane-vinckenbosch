@@ -1,0 +1,14 @@
+---
+import NotFoundPage from '../../components/astro/NotFoundPage.astro';
+import { DEFAULT_LANG, LANGS } from '../../lib/i18n';
+import type { Lang } from '../../lib/types';
+
+export const prerender = false;
+
+const requestedLang = Astro.params.lang as Lang | undefined;
+const lang = requestedLang && LANGS.includes(requestedLang) ? requestedLang : DEFAULT_LANG;
+
+Astro.response.status = 404;
+---
+
+<NotFoundPage lang={lang} />

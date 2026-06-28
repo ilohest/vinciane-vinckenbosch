@@ -12,7 +12,7 @@ const CANONICAL_PAGE_SLUGS = {
 };
 
 export default defineConfig({
-  site: 'https://vincianevinckenbosch.com',
+  site: 'https://www.vincianevinckenbosch.com',
   // Site statique par défaut ; les routes serveur (ex: /api/contact)
   // déclarent `export const prerender = false` pour tourner en serverless.
   adapter: vercel(),

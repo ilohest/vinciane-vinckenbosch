@@ -28,6 +28,7 @@ const {
 
 const canonicalURL = new URL(canonicalPath ?? Astro.url.pathname, Astro.site);
 const alternatePath = (l: Lang) => pageKey ? pagePath(l, pageKey) : localePath(l);
+const siteURL = Astro.site?.toString().replace(/\/$/, '') ?? 'https://www.vincianevinckenbosch.com';
 ---
 
 <!doctype html>
@@ -80,8 +81,8 @@ const alternatePath = (l: Lang) => pageKey ? pagePath(l, pageKey) : localePath(l
       "alternateName": ["Vinciane Vinckenbosch altiste", "Vinciane Vinckenbosch viola"],
       "jobTitle": "Violiste / Altiste",
       "description": "Altiste belge saluée par la critique internationale pour la grande classe de son jeu. Co-solo de la Niederbayerische Philharmonie, membre fondatrice du Trio Linaris, soliste invitée dans de nombreux orchestres européens.",
-      "url": "https://vincianevinckenbosch.com",
-      "image": "https://vincianevinckenbosch.com/images/grilc-03101.jpg",
+      "url": siteURL,
+      "image": `${siteURL}/images/grilc-03101.jpg`,
       "nationality": { "@type": "Country", "name": "Belgium" },
       "birthPlace": { "@type": "Place", "address": { "@type": "PostalAddress", "addressCountry": "BE" } },
       "knowsAbout": ["Alto", "Viola", "Musique de chambre", "Chamber Music", "Kammermusik", "Musique d'orchestre", "Musique classique"],
@@ -128,7 +129,7 @@ const alternatePath = (l: Lang) => pageKey ? pagePath(l, pageKey) : localePath(l
       "@type": "WebSite",
       "name": "Vinciane Vinckenbosch",
       "description": "Site officiel de Vinciane Vinckenbosch, altiste belge.",
-      "url": "https://vincianevinckenbosch.com",
+      "url": siteURL,
       "inLanguage": ["fr", "en", "de"],
       "author": {
         "@type": "Person",
@@ -138,7 +139,7 @@ const alternatePath = (l: Lang) => pageKey ? pagePath(l, pageKey) : localePath(l
         "@type": "SearchAction",
         "target": {
           "@type": "EntryPoint",
-          "urlTemplate": "https://vincianevinckenbosch.com/fr/#agenda?q={search_term_string}"
+          "urlTemplate": `${siteURL}/fr/#agenda?q={search_term_string}`
         },
         "query-input": "required name=search_term_string"
       }
@@ -149,8 +150,9 @@ const alternatePath = (l: Lang) => pageKey ? pagePath(l, pageKey) : localePath(l
     <link rel="preload" href="/fonts/OrticaLinear-Light.woff2" as="font" type="font/woff2" crossorigin />
 
     <meta name="theme-color" content="#232323" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=6" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=6" />
+    <link rel="alternate icon" type="image/x-icon" href="/favicon.ico?v=6" />
 
   </head>
   <body>

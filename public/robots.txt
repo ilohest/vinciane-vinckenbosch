@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 
 # Sitemap
-Sitemap: https://vincianevinckenbosch.com/sitemap-index.xml
+Sitemap: https://www.vincianevinckenbosch.com/sitemap-index.xml

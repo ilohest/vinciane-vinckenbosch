@@ -1,0 +1,217 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import type { Lang } from '../../lib/types';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+
+const copy = {
+  fr: {
+    title: 'Page introuvable — Vinciane Vinckenbosch',
+    description: "Cette page n'existe pas ou a été déplacée.",
+    eyebrow: 'Page introuvable',
+    text: "La partition s'est peut-être glissée ailleurs.",
+    follow: "Vous pouvez reprendre depuis l’un des chemins ci-dessous.",
+    home: 'Accueil',
+    agenda: 'Agenda',
+    contact: 'Contact',
+  },
+  en: {
+    title: 'Page not found — Vinciane Vinckenbosch',
+    description: 'This page does not exist or has been moved.',
+    eyebrow: 'Page not found',
+    text: 'This score may have slipped out of place.',
+    follow: 'You can pick up again from one of the paths below.',
+    home: 'Home',
+    agenda: 'Agenda',
+    contact: 'Contact',
+  },
+  de: {
+    title: 'Seite nicht gefunden — Vinciane Vinckenbosch',
+    description: 'Diese Seite existiert nicht oder wurde verschoben.',
+    eyebrow: 'Seite nicht gefunden',
+    text: 'Diese Partitur ist vielleicht an eine andere Stelle gerutscht.',
+    follow: 'Sie können über einen der Wege unten wieder einsteigen.',
+    home: 'Startseite',
+    agenda: 'Termine',
+    contact: 'Kontakt',
+  },
+} as const;
+
+const c = copy[lang];
+---
+
+<BaseLayout
+  lang={lang}
+  title={c.title}
+  description={c.description}
+  noindex
+  canonicalPath={`/${lang}/404`}
+>
+  <main class="not-found" aria-labelledby="not-found-title">
+    <picture class="not-found__media" aria-hidden="true">
+      <source srcset="/images/grilc-03046-2500w.webp" media="(min-width: 1100px)" />
+      <source srcset="/images/grilc-03046-1600w.webp" media="(min-width: 700px)" />
+      <img
+        src="/images/grilc-03046-828w.webp"
+        alt=""
+        loading="eager"
+        decoding="async"
+        fetchpriority="high"
+        class="not-found__image"
+      />
+    </picture>
+
+    <div class="not-found__shade" aria-hidden="true"></div>
+
+    <section class="not-found__content">
+      <p class="not-found__eyebrow">{c.eyebrow}</p>
+      <h1 id="not-found-title" class="not-found__title">404</h1>
+      <p class="not-found__text">
+        {c.text}
+        <span>{c.follow}</span>
+      </p>
+
+      <div class="not-found__actions" aria-label="Navigation de secours">
+        <a class="btn-pill not-found__button" href={`/${lang}/`}>{c.home}</a>
+        <a class="btn-pill not-found__button" href={`/${lang}/#agenda`}>{c.agenda}</a>
+        <a class="btn-pill not-found__button" href={`/${lang}/#contact`}>{c.contact}</a>
+      </div>
+    </section>
+  </main>
+</BaseLayout>
+
+<style>
+  .not-found {
+    position: relative;
+    min-height: 100svh;
+    display: grid;
+    align-items: end;
+    overflow: hidden;
+    background: #232323;
+    color: #f7f5f3;
+  }
+
+  .not-found__media,
+  .not-found__shade {
+    position: absolute;
+    inset: 0;
+  }
+
+  .not-found__image {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    object-position: 42% center;
+  }
+
+  .not-found__shade {
+    background:
+      linear-gradient(90deg, rgba(35, 35, 35, 0.92) 0%, rgba(35, 35, 35, 0.66) 38%, rgba(35, 35, 35, 0.18) 72%),
+      linear-gradient(0deg, rgba(35, 35, 35, 0.9) 0%, rgba(35, 35, 35, 0.12) 44%, rgba(35, 35, 35, 0.5) 100%);
+  }
+
+  .not-found__content {
+    position: relative;
+    z-index: 1;
+    width: min(720px, calc(100% - 40px));
+    margin: 0 auto;
+    padding: 118px 0 56px;
+  }
+
+  .not-found__eyebrow {
+    font-family: "Andale Mono", "Courier New", monospace;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #da7f52;
+  }
+
+  .not-found__title {
+    margin-top: 18px;
+    font-family: "Coconat", Georgia, serif;
+    font-size: 9.5rem;
+    font-weight: 400;
+    line-height: 0.82;
+    color: #f7f5f3;
+  }
+
+  .not-found__text {
+    max-width: 530px;
+    margin-top: 30px;
+    font-family: "Ortica Linear", Georgia, serif;
+    font-size: 1.35rem;
+    font-weight: 300;
+    line-height: 1.35;
+    color: rgba(247, 245, 243, 0.9);
+  }
+
+  .not-found__text span {
+    display: block;
+    margin-top: 0.35em;
+  }
+
+  .not-found__actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 18px 24px;
+    margin-top: 34px;
+  }
+
+  .not-found__button {
+    text-decoration: none;
+  }
+
+  @media (max-width: 760px) {
+    .not-found {
+      min-height: 100svh;
+      align-items: end;
+    }
+
+    .not-found__image {
+      object-position: 46% center;
+    }
+
+    .not-found__shade {
+      background:
+        linear-gradient(0deg, rgba(35, 35, 35, 0.96) 0%, rgba(35, 35, 35, 0.72) 48%, rgba(35, 35, 35, 0.16) 100%),
+        linear-gradient(90deg, rgba(35, 35, 35, 0.52) 0%, rgba(35, 35, 35, 0.08) 100%);
+    }
+
+    .not-found__content {
+      width: min(100% - 32px, 560px);
+      padding: 96px 0 34px;
+    }
+
+    .not-found__title {
+      font-size: 6.25rem;
+    }
+
+    .not-found__text {
+      max-width: 430px;
+      font-size: 1.12rem;
+      line-height: 1.42;
+    }
+
+    .not-found__actions {
+      gap: 14px 18px;
+      margin-top: 28px;
+    }
+  }
+
+  @media (max-width: 420px) {
+    .not-found__title {
+      font-size: 5rem;
+    }
+
+    .not-found__actions {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+  }
+</style>

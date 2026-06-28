@@ -12,6 +12,7 @@ interface Props {
 const { lang, events } = Astro.props;
 
 const allEventsData = events ?? await getAgendaEvents(lang);
+const siteURL = Astro.site?.toString().replace(/\/$/, '') ?? 'https://www.vincianevinckenbosch.com';
 
 function startDateIso(dateIso: string, timeStr: string): string {
   const time = timeStr.replace('h', ':').padEnd(5, '00');
@@ -36,7 +37,7 @@ const eventSchemas = allEventsData.map(e => ({
   "performer": {
     "@type": "Person",
     "name": "Vinciane Vinckenbosch",
-    "url": "https://vincianevinckenbosch.com"
+    "url": siteURL
   },
   "organizer": { "@type": "Organization", "name": e.venue },
   "eventStatus": "https://schema.org/EventScheduled",
