@@ -12,7 +12,6 @@ interface Props {
 const { lang, homepage } = Astro.props;
 const tr = useTranslations(lang);
 
-/** Texte d'un champ bio localisé : Sanity (langue → fr) sinon fallback FR codé en dur */
 const bio = (field: keyof Homepage, fallback: string): string => {
   const v = homepage?.[field] as { fr?: string; en?: string; de?: string } | undefined;
   return (v && (v[lang] || v.fr)) || fallback;
@@ -130,23 +129,12 @@ pushTrioText(fullTrioText.slice(trioCursor));
 <section class="bio" id="biographie">
   <div class="bio__wrap">
 
-    <!-- ════════════════════════════════════════════════════════
-         RANGÉE 1 — Citation (gauche ~80%) + attribution (droite)
-         Figma : Frame 1000001808 — row, justify: space-between,
-                 align: flex-end, width: 1672
-    ═════════════════════════════════════════════════════════ -->
-    <div class="bio__quote-row" data-reveal>
+        <div class="bio__quote-row" data-reveal>
       <p class="bio__quote-text">{heroQuote}</p>
       <span class="bio__quote-attr">{heroQuoteAttr}</span>
     </div>
 
-    <!-- ════════════════════════════════════════════════════════
-         RANGÉE 2 — Titre "BIOGRAPHIE" (gauche) + photo (droite)
-         Figma : Frame 1000001830 — row, justify: space-between,
-                 align: flex-end, width: 1669
-                 Image : 1099×628 → ratio 1.75
-    ═════════════════════════════════════════════════════════ -->
-    <div class="bio__title-row" data-reveal>
+        <div class="bio__title-row" data-reveal>
       <h2 class="bio__section-title">{tr('bio.title')}</h2>
       <div class="bio__intro-img-wrap">
         <picture>
@@ -176,12 +164,7 @@ pushTrioText(fullTrioText.slice(trioCursor));
       </div>
     </div>
 
-    <!-- ════════════════════════════════════════════════════════
-         BLOC 1 — Image gauche (798×919, portrait ~47.7%)
-                 + texte droite (789px ~47.2%)
-         Figma : Frame 1000001825 — row, justify: space-between
-    ═════════════════════════════════════════════════════════ -->
-    <div class="bio__row bio__row--img-left" data-reveal>
+        <div class="bio__row bio__row--img-left" data-reveal>
       <div class="bio__img-wrap bio__img-wrap--portrait-tall">
         <picture>
           {typeof imgPortrait1 === 'string' && imgPortrait1 === '/images/grilc-02541.jpg' && (
@@ -213,12 +196,7 @@ pushTrioText(fullTrioText.slice(trioCursor));
       </div>
     </div>
 
-    <!-- ════════════════════════════════════════════════════════
-         TEXTE TRIO LINARIS — pleine largeur, 56px
-         Liens éditables depuis Sanity
-         Figma : style_7U6T38, fontSize 56, lineHeight 64px
-    ═════════════════════════════════════════════════════════ -->
-    <p class="bio__trio-text" data-reveal>
+        <p class="bio__trio-text" data-reveal>
       {trioParts.map((part) => {
         if (part.kind === 'text') return part.value;
         if (part.kind === 'accent') {
@@ -240,11 +218,7 @@ pushTrioText(fullTrioText.slice(trioCursor));
       })}
     </p>
 
-    <!-- ════════════════════════════════════════════════════════
-         IMAGES TRIO — deux photos côte à côte
-         Figma : 532×726 (33%) + 1060×726 (67%), gap: 80px
-    ═════════════════════════════════════════════════════════ -->
-    <div class="bio__trio-imgs" data-reveal>
+        <div class="bio__trio-imgs" data-reveal>
       <div class="bio__trio-img bio__trio-img--narrow">
         <picture>
           {imgTrioNarrowSrcset && (
@@ -279,11 +253,7 @@ pushTrioText(fullTrioText.slice(trioCursor));
       </div>
     </div>
 
-    <!-- ════════════════════════════════════════════════════════
-         BLOC 2 — Image gauche (803×881) + texte droite
-         Figma : Frame 1000001828 — row, justify: space-between
-    ═════════════════════════════════════════════════════════ -->
-    <div class="bio__row bio__row--img-left" data-reveal>
+        <div class="bio__row bio__row--img-left" data-reveal>
       <div class="bio__img-wrap bio__img-wrap--portrait">
         <picture>
           {imgPortrait2Srcset && (
@@ -312,11 +282,7 @@ pushTrioText(fullTrioText.slice(trioCursor));
       </div>
     </div>
 
-    <!-- ════════════════════════════════════════════════════════
-         BLOC 3 — Texte gauche + (image 803×535 + texte) droite
-         Figma : Frame 1000001829 — row, justify: space-between
-    ═════════════════════════════════════════════════════════ -->
-    <div class="bio__row bio__row--text-left" data-reveal>
+        <div class="bio__row bio__row--text-left" data-reveal>
       <div class="bio__text-col">
         <p class="bio__p">{bio('bioParaFormationViolon', `Après avoir débuté ses études à Bruxelles auprès de Shirly Laub, Vinciane Vinckenbosch obtient en 2011 un Master en violon avec la plus grande distinction dans la classe d'Igor Tkatchouk, à l'Institut royal de Musique et de Pédagogie de Namur. Parallèlement, elle découvre l'alto auprès de Daniel Rubenstein, avant de poursuivre son perfectionnement en violon en Allemagne dans la classe de Petru Munteanu, au Leopold Mozart College of Music de l'université d'Augsbourg.`)}</p>
       </div>
@@ -349,7 +315,6 @@ pushTrioText(fullTrioText.slice(trioCursor));
 </section>
 
 <style>
-/* ── Conteneur ────────────────────────────────────────────── */
 .bio {
   padding-top: clamp(2rem,8vw,3rem);
   padding-bottom: 0;
@@ -358,21 +323,12 @@ pushTrioText(fullTrioText.slice(trioCursor));
 .bio__wrap {
   max-width: 1728px;
   margin: 0 auto;
-  /* Figma : 28px left inset dans un 1728px frame */
-  padding: 0 clamp(1.5rem, 3.7vw, 4rem);
+    padding: 0 clamp(1.5rem, 3.7vw, 4rem);
   display: flex;
   flex-direction: column;
-  /* Figma Frame 24 : gap 80px */
-  gap: clamp(3rem, 5.5vw, 5rem);
+    gap: clamp(3rem, 5.5vw, 5rem);
 }
 
-/* ── RANGÉE 1 — Citation ──────────────────────────────────── */
-/*
-  Figma Frame 1000001808 :
-  row, justify-content: space-between, align-items: flex-end
-  Quote : width 1332 / 1672 = 79.7%
-  Attribution : width ~265 / 1672 = 15.9%, right side
-*/
 .bio__quote-row {
   display: flex;
   justify-content: space-between;
@@ -383,38 +339,26 @@ pushTrioText(fullTrioText.slice(trioCursor));
 .bio__quote-text {
   font-family: "Ortica Linear", Georgia, serif;
   font-weight: 300;
-  /* Figma : 85px / 1728px = 4.92vw */
-  font-size: clamp(2rem, 4.9vw, 5.3125rem);
+    font-size: clamp(2rem, 4.9vw, 5.3125rem);
   line-height: 1.06;
-  /* Indentation de la première ligne (suit la taille du texte) */
-  text-indent: 3em;
+    text-indent: 3em;
   color: #DA7F52;
-  /* Prend ~80% de la largeur */
-  flex: 0 0 calc(79.7% - 1rem);
+    flex: 0 0 calc(79.7% - 1rem);
   max-width: calc(79.7% - 1rem);
 }
 
 .bio__quote-attr {
   font-family: "Ortica Linear", Georgia, serif;
   font-weight: 300;
-  /* Figma : 23px */
-  font-size: clamp(0.8125rem, 1.33vw, 1.4375rem);
+    font-size: clamp(0.8125rem, 1.33vw, 1.4375rem);
   color: #F7F5F3;
   opacity: 0.75;
   flex-shrink: 1;
   max-width: 55%;
   text-align: right;
-  /* bottom-aligned : aligné en bas grâce au align-items: flex-end du parent */
-  padding-bottom: 0.25rem;
+    padding-bottom: 0.25rem;
 }
 
-/* ── RANGÉE 2 — Titre + photo intro ──────────────────────── */
-/*
-  Figma Frame 1000001830 :
-  row, justify-content: space-between, align-items: flex-end
-  Titre : hug (gauche)
-  Image : 1099×628 → ~65.8% de 1669px
-*/
 .bio__title-row {
   display: flex;
   justify-content: space-between;
@@ -427,18 +371,15 @@ pushTrioText(fullTrioText.slice(trioCursor));
   font-weight: 400;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  /* Figma : 73px / 1728px = 4.22vw */
-  font-size: clamp(2.25rem, 4.2vw, 4.5625rem);
+    font-size: clamp(2.25rem, 4.2vw, 4.5625rem);
   line-height: 0.84;
   color: #ffffff;
   flex-shrink: 0;
-  /* Aligne en bas de la photo */
-  padding-bottom: 0.5rem;
+    padding-bottom: 0.5rem;
 }
 
 .bio__intro-img-wrap {
-  /* Figma : 1099/1669 = 65.8% */
-  flex: 0 0 65.8%;
+    flex: 0 0 65.8%;
   max-width: 65.8%;
   aspect-ratio: 1099 / 628;
   overflow: hidden;
@@ -452,11 +393,6 @@ pushTrioText(fullTrioText.slice(trioCursor));
   display: block;
 }
 
-/* ── Blocs biographie alternés ───────────────────────────── */
-/*
-  Figma Frame ZWMDHS : row, justify-content: space-between
-  Gauche ~47.7% (798/1672) | Droite ~47.2% (789/1672)
-*/
 .bio__row {
   display: flex;
   justify-content: space-between;
@@ -464,20 +400,16 @@ pushTrioText(fullTrioText.slice(trioCursor));
   gap: clamp(1.5rem, 3vw, 3rem);
 }
 
-/* Image à gauche */
 .bio__row--img-left .bio__img-wrap {
-  /* Figma : 798/1672 = 47.7% */
-  flex: 0 0 47.7%;
+    flex: 0 0 47.7%;
   max-width: 47.7%;
 }
 
 .bio__row--img-left .bio__text-col {
-  /* Figma : 789/1672 = 47.2% */
-  flex: 0 0 47.2%;
+    flex: 0 0 47.2%;
   max-width: 47.2%;
 }
 
-/* Texte à gauche + colonne droite composée */
 .bio__row--text-left > .bio__text-col {
   flex: 0 0 47.7%;
   max-width: 47.7%;
@@ -496,24 +428,20 @@ pushTrioText(fullTrioText.slice(trioCursor));
   max-width: 100%;
 }
 
-/* ── Wrappers d'images avec aspect ratio Figma ───────────── */
 .bio__img-wrap {
   overflow: hidden;
 }
 
 .bio__img-wrap--portrait-tall {
-  /* Figma : 798×919 → ratio 0.868 */
-  aspect-ratio: 798 / 919;
+    aspect-ratio: 798 / 919;
 }
 
 .bio__img-wrap--portrait {
-  /* Figma : 803×881 → ratio 0.912 */
-  aspect-ratio: 803 / 881;
+    aspect-ratio: 803 / 881;
 }
 
 .bio__img-wrap--landscape {
-  /* Figma : 803×535 → ratio 1.501 */
-  aspect-ratio: 803 / 535;
+    aspect-ratio: 803 / 535;
 }
 
 .bio__img-wrap picture,
@@ -527,45 +455,27 @@ pushTrioText(fullTrioText.slice(trioCursor));
   object-fit: cover;
 }
 
-/* ── Colonne texte ────────────────────────────────────────── */
 .bio__text-col {
   display: flex;
   flex-direction: column;
-  gap: var(--para-gap); /* global --para-gap ≈ 10px */
-}
+  gap: var(--para-gap); }
 
 .bio__p {
   font-family: "Ortica Linear", Georgia, serif;
   font-weight: 300;
-  /* Figma : 26px / 1728px = 1.505vw */
-  font-size: clamp(0.9375rem, 1.5vw, 1.625rem);
+    font-size: clamp(0.9375rem, 1.5vw, 1.625rem);
   color: #F7F5F3;
   line-height: 1.55;
 }
 
-/* ── Texte Trio Linaris ───────────────────────────────────── */
-/*
-  Figma style_7U6T38 : Ortica 56px, lineHeight 64px
-  Prend toute la largeur du conteneur
-*/
 .bio__trio-text {
   font-family: "Ortica Linear", Georgia, serif;
   font-weight: 300;
-  /* Figma : 56px / 1728px = 3.24vw */
-  font-size: clamp(1.5rem, 3.24vw, 3.5rem);
+    font-size: clamp(1.5rem, 3.24vw, 3.5rem);
   line-height: 1.14;
   color: var(--color-text);
   overflow-wrap: break-word;
-  /*
-    1ère ligne indentée pour s'aligner avec le bord gauche de la colonne
-    de texte du bloc précédent (image 47.7% + gap entre colonnes).
-    Dans le Figma : espaces préfixes dans le texte créent cet effet.
-  */
-  /*
-    Avec justify-content:space-between, le gap = 100% - 47.7% (img) - 47.2% (texte) = 5.1%
-    → colonne texte commence à 47.7% + 5.1% = 52.8% du container
-  */
-  text-indent: 52.8%;
+      text-indent: 52.8%;
 }
 
 .bio__trio-link {
@@ -581,7 +491,6 @@ pushTrioText(fullTrioText.slice(trioCursor));
   color: var(--color-accent);
 }
 
-/* Mot souligné en rouge (accent) qui n'est pas un lien */
 .bio__trio-accent {
   color: var(--color-accent);
   text-decoration: underline;
@@ -589,7 +498,6 @@ pushTrioText(fullTrioText.slice(trioCursor));
   text-underline-offset: 0.18em;
 }
 
-/* Survol : les noms passent en orange ; « Trio Linaris » passe en couleur de texte */
 .bio__trio-link:not(.bio__trio-link--accent):hover {
   color: var(--color-accent);
 }
@@ -598,16 +506,9 @@ pushTrioText(fullTrioText.slice(trioCursor));
   color: var(--color-text);
 }
 
-/* ── Images Trio (deux côte à côte) ──────────────────────── */
-/*
-  Figma Frame 1000001849 : row, gap 80px
-  Image 1 : 532×726 → 532/(532+1060+80) = 33.4%
-  Image 2 : 1060×726 → 1060/1592 = 66.6%
-*/
 .bio__trio-imgs {
   display: flex;
-  /* Figma : gap 80px / 1728px = 4.63vw */
-  gap: clamp(1.5rem, 4.6vw, 5rem);
+    gap: clamp(1.5rem, 4.6vw, 5rem);
   align-items: stretch;
   height: clamp(28rem, 42vw, 45.375rem);
 }
@@ -629,18 +530,15 @@ pushTrioText(fullTrioText.slice(trioCursor));
 }
 
 .bio__trio-img--narrow {
-  /* 532×726 → aspect ratio portrait + width 33.4% */
-  flex: 0 0 33.4%;
+    flex: 0 0 33.4%;
   max-width: 33.4%;
 }
 
 .bio__trio-img--wide {
-  /* 1060×726 → aspect ratio paysage + width 66.6% */
-  flex: 0 0 calc(66.6% - clamp(1.5rem, 4.6vw, 5rem));
+    flex: 0 0 calc(66.6% - clamp(1.5rem, 4.6vw, 5rem));
   max-width: calc(66.6% - clamp(1.5rem, 4.6vw, 5rem));
 }
 
-/* ── Responsive ───────────────────────────────────────────── */
 @media (max-width: 1024px) {
   .bio__quote-text {
     flex: 1;
@@ -653,12 +551,7 @@ pushTrioText(fullTrioText.slice(trioCursor));
 }
 
 @media (max-width: 768px) {
-  /*
-    Rythme vertical uniforme sur mobile :
-    même espace au-dessus ET en-dessous du texte partout.
-    → une seule variable appliquée à TOUS les gaps (wrap, rows, colonnes)
-  */
-  .bio__wrap {
+    .bio__wrap {
     gap: clamp(2rem, 8vw, 3rem);
   }
 
@@ -667,16 +560,14 @@ pushTrioText(fullTrioText.slice(trioCursor));
     align-items: flex-start;
     gap: 0.75rem;
   }
-  /* Attribution/source alignée à droite sur mobile */
-  .bio__quote-attr {
+    .bio__quote-attr {
     text-align: right;
     align-self: flex-end;
   }
   .bio__title-row {
     flex-direction: column;
     align-items: flex-start;
-    /* même gap que bio__wrap pour cohérence */
-    gap: clamp(2rem, 8vw, 3rem);
+        gap: clamp(2rem, 8vw, 3rem);
   }
   .bio__intro-img-wrap {
     flex: none;
@@ -685,12 +576,10 @@ pushTrioText(fullTrioText.slice(trioCursor));
   }
   .bio__row {
     flex-direction: column;
-    /* même gap que bio__wrap → espace identique au-dessus et en-dessous du texte */
-    gap: clamp(2rem, 8vw, 3rem);
+        gap: clamp(2rem, 8vw, 3rem);
   }
 
-  /* Mobile : texte EN HAUT, image EN BAS pour les blocs image-gauche */
-  .bio__row--img-left .bio__text-col {
+    .bio__row--img-left .bio__text-col {
     order: -1;
   }
 
@@ -701,8 +590,7 @@ pushTrioText(fullTrioText.slice(trioCursor));
     flex: none;
     max-width: 100%;
     width: 100%;
-    /* même gap dans right-col */
-    gap: clamp(2rem, 8vw, 3rem);
+        gap: clamp(2rem, 8vw, 3rem);
   }
 
   .bio__row--img-left .bio__text-col,
@@ -714,8 +602,7 @@ pushTrioText(fullTrioText.slice(trioCursor));
   .bio__trio-imgs {
     flex-direction: column;
     height: auto;
-    /* même gap entre les deux images empilées */
-    gap: clamp(2rem, 8vw, 3rem);
+        gap: clamp(2rem, 8vw, 3rem);
   }
   .bio__trio-img--narrow,
   .bio__trio-img--wide {
@@ -726,5 +613,18 @@ pushTrioText(fullTrioText.slice(trioCursor));
   }
   .bio__trio-img--narrow { aspect-ratio: 532 / 726; }
   .bio__trio-img--wide { aspect-ratio: 1060 / 726; }
+}
+
+@media (max-width: 480px) {
+  .bio__quote-text {
+    font-size: 1.6rem;
+    line-height: 1.08;
+    text-align: end;
+    text-indent: 0;
+  }
+
+  .bio__quote-attr {
+    text-align: end;
+  }
 }
 </style>

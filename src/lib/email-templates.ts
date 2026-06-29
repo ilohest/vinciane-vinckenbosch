@@ -107,8 +107,7 @@ function emailShell(innerHtml: string): string {
     <tr>
       <td align="center">
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background-color:${COLORS.dark};">
-          <!-- Logo / Nom -->
-          <tr>
+                    <tr>
             <td style="padding:0 0 32px 0;text-align:center;">
               <span style="font-family:Georgia,'Times New Roman',serif;font-size:22px;letter-spacing:0.08em;color:${COLORS.cream};">
                 Vinciane Vinckenbosch
@@ -146,8 +145,7 @@ export function buildConfirmationEmail(payload: ContactPayload): {
           ${t.confirmIntro}
         </p>
 
-        <!-- Récap message -->
-        <p style="margin:0 0 10px 0;font-family:Georgia,serif;font-size:12px;text-transform:uppercase;letter-spacing:0.1em;color:${COLORS.accent};">
+                <p style="margin:0 0 10px 0;font-family:Georgia,serif;font-size:12px;text-transform:uppercase;letter-spacing:0.1em;color:${COLORS.accent};">
           ${t.confirmRecap}
         </p>
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-left:2px solid ${COLORS.accent};">
@@ -158,8 +156,7 @@ export function buildConfirmationEmail(payload: ContactPayload): {
           </tr>
         </table>
 
-        <!-- Signature -->
-        <p style="margin:32px 0 4px 0;font-family:Georgia,serif;font-size:14px;color:#3a3a3a;">
+                <p style="margin:32px 0 4px 0;font-family:Georgia,serif;font-size:14px;color:#3a3a3a;">
           ${t.confirmSignature}
         </p>
         <p style="margin:0;font-family:Georgia,serif;font-size:16px;color:${COLORS.dark};">
@@ -213,8 +210,7 @@ export function buildNotificationEmail(payload: ContactPayload): {
           ${row(t.labelMessage, nl2br(payload.message))}
         </table>
 
-        <!-- Bouton répondre -->
-        <table role="presentation" cellpadding="0" cellspacing="0" style="margin:28px 0 0 0;">
+                <table role="presentation" cellpadding="0" cellspacing="0" style="margin:28px 0 0 0;">
           <tr>
             <td style="border:1px solid ${COLORS.dark};border-radius:9999px;">
               <a href="mailto:${safeEmail}" style="display:inline-block;padding:10px 24px;font-family:Georgia,serif;font-size:13px;text-transform:uppercase;letter-spacing:0.06em;color:${COLORS.dark};text-decoration:none;">

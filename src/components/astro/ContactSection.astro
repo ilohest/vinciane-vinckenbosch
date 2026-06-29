@@ -77,8 +77,7 @@ const contactVideoThumbnailPosition = sanityImageObjectPosition(contactVideoThum
 <section class="contact" id="contact" aria-labelledby="contact-title">
   <div class="contact__container">
 
-    <!-- Header row: title + social links -->
-    <div class="contact__header" data-reveal>
+        <div class="contact__header" data-reveal>
       <h2 id="contact-title" class="section-title contact__title">{tr('contact.title')}</h2>
       <div class="contact__socials">
         {socialLinks.youtube && (
@@ -99,13 +98,11 @@ const contactVideoThumbnailPosition = sanityImageObjectPosition(contactVideoThum
       </div>
     </div>
 
-    <!-- Formulaire de contact -->
-    <div class="contact__form-wrap" data-reveal>
+        <div class="contact__form-wrap" data-reveal>
       <ContactForm client:visible lang={lang} />
     </div>
 
-    <!-- Gallery + media CTA -->
-    <div class="contact__media-row" data-reveal>
+        <div class="contact__media-row" data-reveal>
       <div class="contact__gallery">
         {contactGalleryItems.map(image => (
           <div class="contact__thumb">
@@ -165,7 +162,6 @@ const contactVideoThumbnailPosition = sanityImageObjectPosition(contactVideoThum
   gap: clamp(3rem, 5vw, 6rem);
 }
 
-/* Header */
 .contact__header {
   display: flex;
   align-items: flex-end;
@@ -200,7 +196,6 @@ const contactVideoThumbnailPosition = sanityImageObjectPosition(contactVideoThum
   color: #DA7F52;
 }
 
-/* Email */
 .contact__email-wrap {
   align-self: flex-end;
   text-align: right;
@@ -214,13 +209,11 @@ const contactVideoThumbnailPosition = sanityImageObjectPosition(contactVideoThum
   color: #F7F5F3;
   word-break: break-all;
   transition: color 0.2s ease;
-  /* Desktop : underline animé via ::after */
-  text-decoration: none;
+    text-decoration: none;
   position: relative;
   display: inline-block;
 }
 
-/* Underline qui se dessine de gauche à droite */
 .contact__email::after {
   content: '';
   position: absolute;
@@ -242,7 +235,6 @@ const contactVideoThumbnailPosition = sanityImageObjectPosition(contactVideoThum
   transform: scaleX(1);
 }
 
-/* Mobile (touch) : underline toujours visible pour signaler le lien */
 @media (hover: none) {
   .contact__email {
     text-decoration: underline;
@@ -252,13 +244,11 @@ const contactVideoThumbnailPosition = sanityImageObjectPosition(contactVideoThum
   .contact__email::after { display: none; }
 }
 
-/* Form */
 .contact__form-wrap {
   max-width: 720px;
   margin-top: clamp(1rem, 3vw, 2rem);
 }
 
-/* Media row */
 .contact__media-row {
   display: flex;
   flex-direction: column;
@@ -287,7 +277,6 @@ const contactVideoThumbnailPosition = sanityImageObjectPosition(contactVideoThum
   transform: scale(1.04);
 }
 
-/* Video preview */
 .contact__media-bottom {
   display: grid;
   grid-template-columns: minmax(18rem, 49.5%) 1fr;
@@ -357,8 +346,7 @@ const contactVideoThumbnailPosition = sanityImageObjectPosition(contactVideoThum
 }
 
 .contact__video-preview iframe {
-  /* Inset absolu → remplit exactement le conteneur aspect-ratio */
-  position: absolute;
+    position: absolute;
   inset: 0;
   border: 0;
   width: 100%;
@@ -378,10 +366,6 @@ const contactVideoThumbnailPosition = sanityImageObjectPosition(contactVideoThum
   }
 }
 
-/* ════════════════════════════════════════════════════════
-   MOBILE — Figma iPhone 17 : 402×936
-   Structure : CONTACT ↓ socials (gauche) ↓ formulaire ↓ médias
-════════════════════════════════════════════════════════ */
 @media (max-width: 768px) {
 
   .contact {
@@ -392,38 +376,30 @@ const contactVideoThumbnailPosition = sanityImageObjectPosition(contactVideoThum
     gap: clamp(1.5rem, 6vw, 2.5rem);
   }
 
-  /* Header : titre au-dessus, socials en dessous (colonne) */
-  .contact__header {
+    .contact__header {
     flex-direction: column;
     align-items: flex-start;
     gap: clamp(1.5rem, 6vw, 2rem);
   }
 
-  /* Titre : Figma 45px Coconat */
-  .contact__title {
+    .contact__title {
     font-size: clamp(2.5rem, 11.2vw, 2.8125rem);
   }
 
-  /* Socials : gauche, gap 9px, Ortica 15px */
-  .contact__socials {
+    .contact__socials {
     align-items: flex-start;
-    gap: 0.5625rem; /* Figma : 9px */
-  }
+    gap: 0.5625rem;   }
 
   .contact__social-link {
-    font-size: 0.9375rem; /* Figma : 15px */
-  }
+    font-size: 0.9375rem;   }
 
-  /* Email : gauche, Ortica 20px, souligné */
-  .contact__email-wrap {
+    .contact__email-wrap {
     align-self: flex-start;
     text-align: left;
-    margin-top: 0; /* le gap du container s'en charge */
-  }
+    margin-top: 0;   }
 
   .contact__email {
-    font-size: 1.25rem; /* Figma : 20px */
-  }
+    font-size: 1.25rem;   }
 
   .contact__media-row {
     display: flex;

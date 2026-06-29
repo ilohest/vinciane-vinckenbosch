@@ -111,6 +111,17 @@ export default defineConfig({
 
             S.divider(),
 
+            S.listItem()
+              .id("apercuPartage")
+              .title("Aperçu de partage")
+              .icon(() => "🔗")
+              .child(
+                S.document()
+                  .schemaType("socialPreview")
+                  .documentId("socialPreview")
+                  .title("Aperçu de partage"),
+              ),
+
             // ── Informations légales & crédits ─────────────────────
             S.listItem()
               .id("creditsPhoto")
@@ -198,10 +209,10 @@ export default defineConfig({
       creationContext.type === "global" ? [] : prev,
 
     actions: (prev, context) => {
-      // L'aperçu brouillon n'existe que pour la page d'accueil et l'agenda
+      // L'aperçu brouillon n'existe que pour la page d'accueil, l'agenda et l'aperçu de partage
       // (la route /preview rend l'accueil + la section agenda). On masque donc
       // le bouton sur les autres types (Média, Presse, Crédits, pages légales).
-      const PREVIEWABLE = ["homepage", "event"];
+      const PREVIEWABLE = ["homepage", "event", "socialPreview"];
       if (!PREVIEWABLE.includes(context.schemaType)) return prev;
 
       const publishIndex = prev.findIndex(

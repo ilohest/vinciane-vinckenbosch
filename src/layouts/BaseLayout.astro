@@ -10,7 +10,7 @@ interface Props {
   lang: Lang;
   title?: string;
   description?: string;
-  ogImage?: string;
+  ogImage?: string | null;
   noindex?: boolean;
   pageKey?: PageKey;
   canonicalPath?: string;
@@ -20,12 +20,12 @@ const {
   lang,
   title = 'Vinciane Vinckenbosch — Altiste',
   description = 'Vinciane Vinckenbosch, altiste belge. Soliste, chambriste, co-solo de la Niederbayerische Philharmonie.',
-  ogImage = '/images/grilc-03101.jpg',
   noindex = false,
   pageKey,
   canonicalPath,
 } = Astro.props;
 
+const ogImage = Astro.props.ogImage === undefined ? '/images/grilc-03101.jpg' : Astro.props.ogImage;
 const canonicalURL = new URL(canonicalPath ?? Astro.url.pathname, Astro.site);
 const alternatePath = (l: Lang) => pageKey ? pagePath(l, pageKey) : localePath(l);
 const siteURL = Astro.site?.toString().replace(/\/$/, '') ?? 'https://www.vincianevinckenbosch.com';
@@ -43,7 +43,6 @@ const siteURL = Astro.site?.toString().replace(/\/$/, '') ?? 'https://www.vincia
     <link rel="preconnect" href="https://cdn.sanity.io" />
     <link rel="dns-prefetch" href="https://cdn.sanity.io" />
 
-    <!-- hreflang for i18n -->
     {LANGS.map(l => (
       <link
         rel="alternate"
@@ -53,27 +52,24 @@ const siteURL = Astro.site?.toString().replace(/\/$/, '') ?? 'https://www.vincia
     ))}
     <link rel="alternate" hreflang="x-default" href={new URL(alternatePath('fr'), Astro.site)} />
 
-    <!-- Open Graph -->
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:image" content={new URL(ogImage, Astro.site)} />
-    <meta property="og:image:alt" content={title} />
+    {ogImage && <meta property="og:image" content={new URL(ogImage, Astro.site)} />}
+    {ogImage && <meta property="og:image:alt" content={title} />}
     <meta property="og:url" content={canonicalURL} />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Vinciane Vinckenbosch" />
     <meta property="og:locale" content={lang === 'fr' ? 'fr_FR' : lang === 'en' ? 'en_GB' : 'de_DE'} />
 
-    <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
-    <meta name="twitter:image" content={new URL(ogImage, Astro.site)} />
+    {ogImage && <meta name="twitter:image" content={new URL(ogImage, Astro.site)} />}
 
     <script is:inline>
       document.documentElement.classList.add('reveal-enabled');
     </script>
 
-    <!-- ── Structured data — Person ──────────────────── -->
     <script type="application/ld+json" set:html={JSON.stringify({
       "@context": "https://schema.org",
       "@type": "Person",
@@ -123,7 +119,6 @@ const siteURL = Astro.site?.toString().replace(/\/$/, '') ?? 'https://www.vincia
       "email": "vinciane.vinckenbosch@gmail.com"
     })} />
 
-    <!-- ── Structured data — WebSite ──────────────────── -->
     <script type="application/ld+json" set:html={JSON.stringify({
       "@context": "https://schema.org",
       "@type": "WebSite",
@@ -145,7 +140,6 @@ const siteURL = Astro.site?.toString().replace(/\/$/, '') ?? 'https://www.vincia
       }
     })} />
 
-    <!-- Preload critical fonts -->
     <link rel="preload" href="/fonts/Coconat-Regular.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/fonts/OrticaLinear-Light.woff2" as="font" type="font/woff2" crossorigin />
 
@@ -159,7 +153,6 @@ const siteURL = Astro.site?.toString().replace(/\/$/, '') ?? 'https://www.vincia
     <slot />
     <NavBar client:idle lang={lang} currentPath={Astro.url.pathname} />
 
-    <!-- ── Curseur custom — note de musique sur liens/boutons (desktop only) ── -->
     <div id="custom-cursor" aria-hidden="true">
       <svg viewBox="0 0 24 24">
         <path fill="currentColor" d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
@@ -167,7 +160,6 @@ const siteURL = Astro.site?.toString().replace(/\/$/, '') ?? 'https://www.vincia
     </div>
 
     <script is:inline>
-      /* ── Scroll reveal ──────────────────────────────────── */
       function initReveal() {
         const targets = document.querySelectorAll('[data-reveal]');
         const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -185,7 +177,6 @@ const siteURL = Astro.site?.toString().replace(/\/$/, '') ?? 'https://www.vincia
         targets.forEach(el => io.observe(el));
       }
 
-      /* ── LQIP blur-up : images lazy ─────────────────────── */
       function initBlurUp() {
         document.querySelectorAll('img[loading="lazy"]').forEach(img => {
           if (img.complete && img.naturalWidth > 0) {
@@ -197,13 +188,11 @@ const siteURL = Astro.site?.toString().replace(/\/$/, '') ?? 'https://www.vincia
         });
       }
 
-      /* ── Curseur personnalisé ────────────────────────────── */
       function initCursor() {
         const cursor = document.getElementById('custom-cursor');
         if (!cursor) return;
         if (cursor.dataset.initialized === 'true') return;
         cursor.dataset.initialized = 'true';
-        // Masqué sur touch
         if (!window.matchMedia('(hover: hover)').matches) {
           cursor.style.display = 'none';
           return;
@@ -220,7 +209,6 @@ const siteURL = Astro.site?.toString().replace(/\/$/, '') ?? 'https://www.vincia
         document.addEventListener('mouseleave', () => cursor.classList.add('cursor--hidden'));
         document.addEventListener('mouseenter', () => cursor.classList.remove('cursor--hidden'));
 
-        // Délégation : couvre aussi les composants hydratés après le chargement.
         const hoverSelector = 'a, button, [role="button"], label[for], [data-cursor-pointer]';
         document.addEventListener('mouseover', (event) => {
           if (event.target instanceof Element && event.target.closest(hoverSelector)) {
@@ -249,16 +237,30 @@ const siteURL = Astro.site?.toString().replace(/\/$/, '') ?? 'https://www.vincia
         window.scrollTo({ top: Math.max(0, top), behavior: 'auto' });
       }
 
-      /* ── Init & re-init après View Transitions ───────────── */
       function initAll() {
         initReveal();
         initBlurUp();
         initCursor();
       }
 
+      function cleanDomComments() {
+        const walker = document.createTreeWalker(document.documentElement, NodeFilter.SHOW_COMMENT);
+        const comments = [];
+        let node = walker.nextNode();
+        while (node) {
+          comments.push(node);
+          node = walker.nextNode();
+        }
+        comments.forEach(comment => comment.parentNode?.removeChild(comment));
+      }
+
       initAll();
+      document.addEventListener('astro:hydrate', () => {
+        window.setTimeout(cleanDomComments, 0);
+      });
       window.addEventListener('load', () => {
         requestAnimationFrame(() => scrollToHashWithOffset());
+        window.setTimeout(cleanDomComments, 4000);
       }, { once: true });
     </script>
   </body>

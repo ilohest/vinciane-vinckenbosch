@@ -65,8 +65,7 @@ const desktopHeroMediaClass = hasMobileHeroMedia
 
 <section class="hero" aria-label="Vinciane Vinckenbosch">
 
-  <!-- Image + overlay -->
-  <div class="hero__frame" aria-hidden="true">
+    <div class="hero__frame" aria-hidden="true">
     <div class={desktopHeroMediaClass}>
       {showHeroVideo ? (
         <video
@@ -134,25 +133,16 @@ const desktopHeroMediaClass = hasMobileHeroMedia
     <div class="hero__overlay"></div>
   </div>
 
-  <!--
-    hero__content :
-    • Desktop  → display: contents (transparent, les enfants gardent
-                  leur position: absolute individuelle)
-    • Mobile   → flex column unifié, positionné en bas de l'écran
-                  (Figma iPhone : x:32 y:511 dans 402×874)
-  -->
-  <div class="hero__content">
+    <div class="hero__content">
 
-    <!-- Nom + sous-titre -->
-    <div class="hero__name-block">
+        <div class="hero__name-block">
       <p class="hero__subtitle">{subtitle}</p>
       <h1 class="hero__name hero__name--intro">
         Vinciane<br />Vinckenbosch
       </h1>
     </div>
 
-    <!-- Dates + CTA (desktop : bas droit | mobile : dans le bloc) -->
-    <div class="hero__agenda-block">
+        <div class="hero__agenda-block">
       {displayedDates.length > 0 && (
         <ul class="hero__dates" aria-label="Prochaines dates">
           {displayedDates.map(d => <li class="hero__date">{d}</li>)}
@@ -165,8 +155,7 @@ const desktopHeroMediaClass = hasMobileHeroMedia
 
   </div>
 
-  <!-- Scroll indicator (desktop uniquement) — bouton : smooth scroll vers le bas -->
-  <button class="hero__scroll" type="button" aria-label="Faire défiler vers le bas">
+    <button class="hero__scroll" type="button" aria-label="Faire défiler vers le bas">
     <svg width="24" height="52" viewBox="0 0 24 52" fill="none">
       <line x1="12" y1="0" x2="12" y2="44" stroke="white" stroke-width="1" opacity="0.55"/>
       <polyline points="5,37 12,44 19,37" stroke="white" stroke-width="1" fill="none" opacity="0.55"/>
@@ -176,9 +165,6 @@ const desktopHeroMediaClass = hasMobileHeroMedia
 </section>
 
 <style>
-/* ────────────────────────────────────────────────────────
-   SECTION
-──────────────────────────────────────────────────────── */
 .hero {
   --hero-inset:          clamp(12px, 1.62vw, 28px);
   --hero-content-bottom: calc(var(--hero-inset) + clamp(1rem, 2vh, 2rem));
@@ -190,9 +176,6 @@ const desktopHeroMediaClass = hasMobileHeroMedia
   display: block;
 }
 
-/* ────────────────────────────────────────────────────────
-   CADRE IMAGE
-──────────────────────────────────────────────────────── */
 .hero__frame {
   position: absolute;
   inset: var(--hero-inset);
@@ -228,9 +211,6 @@ const desktopHeroMediaClass = hasMobileHeroMedia
   display: block;
 }
 
-/* ────────────────────────────────────────────────────────
-   OVERLAY
-──────────────────────────────────────────────────────── */
 .hero__overlay {
   position: absolute;
   inset: 0;
@@ -251,16 +231,9 @@ const desktopHeroMediaClass = hasMobileHeroMedia
     );
 }
 
-/* ────────────────────────────────────────────────────────
-   WRAPPER CONTENU — transparent sur desktop
-──────────────────────────────────────────────────────── */
 .hero__content {
-  display: contents; /* enfants positionnés individuellement */
-}
+  display: contents; }
 
-/* ────────────────────────────────────────────────────────
-   NOM (desktop : bas gauche)
-──────────────────────────────────────────────────────── */
 .hero__name-block {
   position: absolute;
   left:   calc(var(--hero-inset) + clamp(1.75rem, 2vw, 2.5rem));
@@ -306,9 +279,6 @@ const desktopHeroMediaClass = hasMobileHeroMedia
   animation: hero-title-rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.12s both;
 }
 
-/* ────────────────────────────────────────────────────────
-   DATES + CTA (desktop : bas droit)
-──────────────────────────────────────────────────────── */
 .hero__agenda-block {
   position: absolute;
   right:  calc(var(--hero-inset) + clamp(1.75rem, 2vw, 2.5rem));
@@ -349,26 +319,20 @@ const desktopHeroMediaClass = hasMobileHeroMedia
   color: #232323;
 }
 
-/* ────────────────────────────────────────────────────────
-   SCROLL INDICATOR
-──────────────────────────────────────────────────────── */
 .hero__scroll {
   position: absolute;
   bottom: calc(clamp(20px, 4.1vh, 48px) + 0.5rem);
-  /* Décalée à droite du nom, dans la bande libre avant le bloc agenda */
-  left: calc(50% + clamp(2rem, 6vw, 6rem));
+    left: calc(50% + clamp(2rem, 6vw, 6rem));
   transform: translateX(-50%);
   z-index: 1;
-  /* Bouton : reset + interactif */
-  appearance: none;
+    appearance: none;
   background: none;
   border: 0;
   padding: 6px;
   cursor: pointer;
   color: inherit;
   line-height: 0;
-  /* L'animation est définie dans le bloc hero entrance ci-dessous */
-}
+  }
 
 .hero__scroll:hover svg line,
 .hero__scroll:hover svg polyline {
@@ -386,10 +350,6 @@ const desktopHeroMediaClass = hasMobileHeroMedia
   50%       { transform: translateX(-50%) translateY(7px); }
 }
 
-/* ────────────────────────────────────────────────────────
-   HERO ENTRANCE — fade-in au chargement
-   Joue une seule fois grâce à animation-fill-mode: both
-──────────────────────────────────────────────────────── */
 @keyframes heroFadeUp {
   from { opacity: 0; transform: translateY(18px); }
   to   { opacity: 1; transform: translateY(0);    }
@@ -400,8 +360,7 @@ const desktopHeroMediaClass = hasMobileHeroMedia
 }
 
 .hero__subtitle {
-  /* Le subtitle est dans name-block, on anime juste le bloc parent */
-}
+  }
 
 .hero__agenda-block {
   animation: heroFadeUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.65s both;
@@ -413,19 +372,13 @@ const desktopHeroMediaClass = hasMobileHeroMedia
     scrollBounce 2.2s ease-in-out                     2s    infinite;
 }
 
-/* ════════════════════════════════════════════════════════
-   MOBILE — Figma iPhone 17 : 402×874
-   Image inset ~20px | Content block x:32 y:511
-════════════════════════════════════════════════════════ */
 @media (max-width: 768px) {
 
   .hero {
-    /* Pas de bord sur mobile : image plein écran */
-    --hero-inset: 0px;
+        --hero-inset: 0px;
   }
 
-  /* Supprimer le border-radius éventuel du frame */
-  .hero__frame {
+    .hero__frame {
     border-radius: 0;
   }
 
@@ -437,8 +390,7 @@ const desktopHeroMediaClass = hasMobileHeroMedia
     display: block !important;
   }
 
-  /* Overlay renforcé en bas pour la lisibilité du texte */
-  .hero__overlay {
+    .hero__overlay {
     background: linear-gradient(
       to bottom,
       rgba(35,35,35, 0.0)  0%,
@@ -448,19 +400,11 @@ const desktopHeroMediaClass = hasMobileHeroMedia
     );
   }
 
-  /* Recadrage : privilégie le visage (col. gauche de la photo) */
-  .hero__img {
+    .hero__img {
     object-position: 30% top;
   }
 
-  /* ── hero__content devient un vrai flex column positionné en bas ── */
-  /*
-    Figma :
-      x:32 dans 402px → 7.96% = ~5vw depuis le bord
-      y:511 dans 874px → bottom ≈ (874-511)/874 = 41.5% ≈ 12vh depuis le bas
-      gap: 20px = 1.25rem
-  */
-  .hero__content {
+      .hero__content {
     display: flex;
     flex-direction: column;
     gap: 1rem;
@@ -471,8 +415,7 @@ const desktopHeroMediaClass = hasMobileHeroMedia
     z-index: 1;
   }
 
-  /* Enfants : sortent de leur position: absolute desktop */
-  .hero__name-block,
+    .hero__name-block,
   .hero__agenda-block {
     position: static;
     bottom: auto;
@@ -480,24 +423,20 @@ const desktopHeroMediaClass = hasMobileHeroMedia
     left: auto;
   }
 
-  /* Name block : gap réduit entre subtitle et nom */
-  .hero__name-block {
+    .hero__name-block {
     gap: 0.3rem;
   }
 
-  /* Figma : 20px Ortica uppercase */
-  .hero__subtitle {
+    .hero__subtitle {
     font-size: 1.25rem;
   }
 
-  /* Figma : 53px Coconat, lineHeight 52px */
-  .hero__name {
+    .hero__name {
     font-size: clamp(2.75rem, 13.2vw, 3.3125rem);
     line-height: 0.98;
   }
 
-  /* Dates : alignées à GAUCHE sur mobile */
-  .hero__agenda-block {
+    .hero__agenda-block {
     align-items: stretch;
     gap: 1.25rem;
   }
@@ -513,16 +452,13 @@ const desktopHeroMediaClass = hasMobileHeroMedia
     white-space: normal;
   }
 
-  /* CTA : visible sur mobile, aligné à gauche */
-  .hero__cta {
+    .hero__cta {
     display: inline-flex;
     align-self: flex-start;
-    font-size: 1.25rem;     /* Figma : 20px */
-    padding: 0.4rem 1.1rem;
+    font-size: 1.25rem;         padding: 0.4rem 1.1rem;
   }
 
-  /* Scroll indicator : caché sur mobile */
-  .hero__scroll { display: none; }
+    .hero__scroll { display: none; }
 }
 </style>
 

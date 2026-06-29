@@ -170,6 +170,12 @@ const quickLinks = [
     href: "/structure/presse",
   },
   {
+    title: "Aperçu de partage",
+    mark: "🔗",
+    text: "Texte et image des cartes de lien dans les chats et réseaux.",
+    href: "/structure/apercuPartage",
+  },
+  {
     title: "Crédits photo",
     mark: "📸",
     text: "Textes de crédits affichés sur le site.",

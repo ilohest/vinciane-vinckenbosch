@@ -50,10 +50,8 @@ const eventSchemas = allEventsData.map(e => ({
 }));
 ---
 
-<!-- JSON-LD Event — aide Google Rich Results -->
 {eventSchemas.map(schema => (
   <script type="application/ld+json" set:html={JSON.stringify(schema)} />
 ))}
 
-<!-- Filtrage past/upcoming géré côté client dans le composant Vue -->
 <AgendaSectionVue client:visible events={allEventsData} lang={lang} />

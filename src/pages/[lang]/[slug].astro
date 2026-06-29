@@ -355,9 +355,6 @@ const gallerySchema = pageKey === 'media' ? {
   padding-bottom: var(--page-padding);
 }
 
-/* Page archives : on neutralise le padding-top propre de l'agenda ;
-   l'espace au-dessus du titre est géré par .archives-page (comme la galerie),
-   sinon les deux s'additionnent et le titre descend trop bas. */
 .archives-page :global(.agenda__container) {
   padding-top: 0;
 }

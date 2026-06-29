@@ -36,14 +36,8 @@
   font-display: swap;
 }
 
-/* ── Variables globales ───────────────────────────────────── */
 :root {
-  /*
-    Espacement inter-paragraphes uniforme sur tout le site.
-    Utilisé dans bio, contact, agenda, footer…
-    Valeur compacte et élégante : ~7px.
-  */
-  --para-gap: 0.45rem;
+    --para-gap: 0.45rem;
 }
 
 *, *::before, *::after {
@@ -89,8 +83,6 @@ main {
   padding: 0;
 }
 
-/* Hauteur de la navbar fixe en haut — utilisée pour le padding-top
-   des pages où la navbar est toujours visible (hors homepage) */
 :root {
   --navbar-height: 57px;
 }
@@ -163,11 +155,6 @@ main {
 .text-accent { color: #DA7F52; }
 .text-muted  { color: #BCB7A9; }
 
-/* ══════════════════════════════════════════════════════
-   LQIP BLUR-UP — images lazy
-   Démarrent floutées + légèrement zoomées,
-   se nettoient quand elles arrivent
-══════════════════════════════════════════════════════ */
 img[loading="lazy"] {
   opacity: 0;
   transform: scale(1.03);
@@ -182,15 +169,8 @@ img[loading="lazy"].img-loaded {
   transform: scale(1);
 }
 
-/* ══════════════════════════════════════════════════════
-   CURSEUR — note de musique sur les liens/boutons
-   Curseur natif normal partout ailleurs. Desktop uniquement.
-══════════════════════════════════════════════════════ */
 @media (hover: hover) {
-  /* Sur les éléments interactifs (et leurs enfants) : curseur natif masqué,
-     remplacé par la note de musique. !important pour battre les règles
-     `cursor: pointer` des composants. (Le reste du site garde le curseur normal.) */
-  a, a *,
+    a, a *,
   button, button *,
   [role="button"], [role="button"] *,
   label[for], label[for] *,
@@ -209,12 +189,8 @@ img[loading="lazy"].img-loaded {
   margin-top:  -13px;
   pointer-events: none;
   z-index: 99999;
-  transform: translate(-100px, -100px); /* hors écran par défaut */
-  color: #ffffff;            /* la note utilise currentColor */
-  /* Effet négatif : la note s'inverse selon le fond → lisible partout */
-  mix-blend-mode: difference;
-  opacity: 0;                /* invisible par défaut */
-  transition: opacity 0.18s ease;
+  transform: translate(-100px, -100px);   color: #ffffff;                mix-blend-mode: difference;
+  opacity: 0;                  transition: opacity 0.18s ease;
 }
 
 #custom-cursor svg {
@@ -223,17 +199,14 @@ img[loading="lazy"].img-loaded {
   height: 100%;
 }
 
-/* Visible uniquement au survol d'un lien / bouton */
 #custom-cursor.cursor--hover {
   opacity: 1;
 }
 
-/* Souris hors fenêtre → masquée (prioritaire sur --hover) */
 #custom-cursor.cursor--hidden {
   opacity: 0;
 }
 
-/* Masqué sur touch */
 @media (hover: none) {
   #custom-cursor { display: none; }
 }

@@ -1,13 +1,4 @@
 ---
-/**
- * QuoteBlock — même layout que le bio__quote-row du Figma :
- *   row · justify-content: space-between · align-items: flex-end
- *   Texte : ~79.7% de la largeur  |  Attribution : droite, bottom-alignée
- *
- * Figma (Frame 1000001808 & Frame 1000001845) :
- *   - quote text  : Ortica Light 85px, lineHeight 90px, color #DA7F52
- *   - attribution : Ortica Light 23px, color #F7F5F3
- */
 
 interface Props {
   quote: string;
@@ -26,29 +17,20 @@ const { quote, attribution, size = 'large' } = Astro.props;
 </blockquote>
 
 <style>
-/* ── Conteneur ───────────────────────────────────────────── */
 .quote {
   font-style: normal;
-  /* Identique à .bio__quote-row */
-  display: flex;
+    display: flex;
   justify-content: space-between;
   align-items: flex-end;
   gap: 2rem;
 }
 
-/* ── Texte de la citation ────────────────────────────────── */
-/*
-  Figma : width 1332 / 1672 = 79.7 %
-  Même police et taille que .bio__quote-text
-*/
 .quote__text {
   font-family: "Ortica Linear", Georgia, serif;
   font-weight: 300;
   color: #DA7F52;
-  /* Figma : 85px / 1728px = 4.92vw */
-  line-height: 1.06;
-  /* Indentation de première ligne, identique à l'ouverture de bio */
-  text-indent: 3em;
+    line-height: 1.06;
+    text-indent: 3em;
   flex: 0 0 calc(79.7% - 1rem);
   max-width: calc(79.7% - 1rem);
 }
@@ -61,27 +43,19 @@ const { quote, attribution, size = 'large' } = Astro.props;
   font-size: clamp(1.25rem, 3vw, 3rem);
 }
 
-/* ── Attribution ─────────────────────────────────────────── */
-/*
-  Figma : Ortica Light 23px, color #F7F5F3, right-aligned
-  Bottom-aligné grâce à align-items: flex-end du parent
-*/
 .quote__attr {
   font-family: "Ortica Linear", Georgia, serif;
   font-weight: 300;
-  /* Figma : 23px / 1728px = 1.33vw */
-  font-size: clamp(0.8125rem, 1.33vw, 1.4375rem);
+    font-size: clamp(0.8125rem, 1.33vw, 1.4375rem);
   color: #F7F5F3;
   font-style: normal;
   opacity: 0.75;
   text-align: right;
   flex-shrink: 1;
   max-width: 55%;
-  /* Petit décalage vers le bas pour aligner la baseline */
-  padding-bottom: 0.25rem;
+    padding-bottom: 0.25rem;
 }
 
-/* ── Mobile : on empile ──────────────────────────────────── */
 @media (max-width: 768px) {
   .quote {
     flex-direction: column;
@@ -96,6 +70,19 @@ const { quote, attribution, size = 'large' } = Astro.props;
     text-align: right;
     align-self: flex-end;
     white-space: normal;
+  }
+}
+
+@media (max-width: 480px) {
+  .quote__text {
+    font-size: 1.65rem;
+    line-height: 1.08;
+    text-align: end;
+    text-indent: 0;
+  }
+
+  .quote__attr {
+    text-align: end;
   }
 }
 </style>

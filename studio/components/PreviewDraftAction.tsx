@@ -11,6 +11,7 @@ const editableTypes = new Set([
   "mediaItem",
   "pressItem",
   "siteSettings",
+  "socialPreview",
   "legalNotice",
   "privacyPolicy",
 ]);

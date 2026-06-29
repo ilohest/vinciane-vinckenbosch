@@ -15,12 +15,7 @@
       </button>
     </div>
 
-    <!--
-      Masonry en colonnes flex : les éléments sont répartis ligne par ligne
-      (1·2·3 sur la 1re rangée, 4·5·6 sur la suivante…) pour respecter l'ordre
-      de lecture défini par glisser-déposer dans Sanity.
-    -->
-    <div class="masonry">
+        <div class="masonry">
       <div v-for="(col, c) in columnedItems" :key="c" class="masonry__col">
         <div
           v-for="entry in col"
@@ -164,8 +159,7 @@
           class="lightbox__img"
           decoding="async"
         />
-        <!-- Légende + actions (téléchargement, lien source) -->
-        <div class="lightbox__bar">
+                <div class="lightbox__bar">
           <span v-if="displayedItems[lightboxIndex]?.caption" class="lightbox__caption">
             {{ displayedItems[lightboxIndex]?.caption }}
           </span>
@@ -366,12 +360,6 @@ const columns = computed(() => {
   return 3;
 });
 
-/**
- * Répartit les éléments dans N colonnes en round-robin (élément i → colonne i % N).
- * Résultat : remplissage ligne par ligne (1·2·3 puis 4·5·6…) tout en conservant
- * la vraie masonry (chaque colonne empile ses images à hauteur variable).
- * `index` = position d'origine → la lightbox navigue dans l'ordre Sanity.
- */
 const columnedItems = computed(() => {
   const cols: Array<Array<{ item: GalleryItem; index: number }>> = Array.from(
     { length: columns.value },
@@ -474,10 +462,8 @@ onUnmounted(() => {
 }
 
 .masonry__item {
-  /* gap géré par la colonne flex */
-}
+  }
 
-/* Bouton réinitialisé */
 .masonry__link {
   display: block;
   width: 100%;
@@ -604,7 +590,6 @@ onUnmounted(() => {
   opacity: 1;
 }
 
-/* Overlay : légende (bas gauche) + icône agrandir (bas droite) */
 .masonry__overlay {
   position: absolute;
   inset: 0;
@@ -651,13 +636,11 @@ onUnmounted(() => {
   display: block;
 }
 
-/* Mobile / tactile : overlay toujours visible (pas de hover) */
 @media (hover: none), (max-width: 768px) {
   .masonry__overlay { opacity: 1; }
   .masonry__video-controls { opacity: 1; }
 }
 
-/* Lightbox */
 .lightbox {
   position: fixed;
   inset: 0;
@@ -680,8 +663,7 @@ onUnmounted(() => {
 
 .lightbox__img {
   max-width: 90vw;
-  /* laisse la place à la barre légende/source dessous */
-  max-height: 80vh;
+    max-height: 80vh;
   object-fit: contain;
 }
 
@@ -698,7 +680,6 @@ onUnmounted(() => {
   border: 0;
 }
 
-/* Barre sous l'image : légende à gauche, actions à droite */
 .lightbox__bar {
   display: flex;
   align-items: center;
@@ -774,7 +755,6 @@ onUnmounted(() => {
   cursor: wait;
 }
 
-/* Reset bouton → même apparence que le lien */
 .lightbox__download {
   background: none;
   cursor: pointer;

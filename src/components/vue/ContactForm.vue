@@ -1,7 +1,6 @@
 <template>
   <form class="cform" @submit.prevent="onSubmit" novalidate>
-    <!-- Honeypot anti-spam : caché visuellement -->
-    <div class="cform__hp" aria-hidden="true">
+        <div class="cform__hp" aria-hidden="true">
       <label
         >Company<input
           v-model="form.company"
@@ -172,7 +171,6 @@ async function onSubmit() {
   width: 100%;
 }
 
-/* Honeypot : invisible pour humains, visible pour bots */
 .cform__hp {
   position: absolute;
   left: -9999px;
@@ -242,8 +240,7 @@ async function onSubmit() {
 }
 
 .cform__submit {
-  /* btn-pill gère l'apparence — on surcharge uniquement l'état disabled */
-  transition:
+    transition:
     background-color 0.25s ease,
     color 0.25s ease,
     opacity 0.2s ease;

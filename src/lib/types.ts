@@ -107,6 +107,11 @@ export interface Homepage {
   socialLinks?: { youtube?: string; facebook?: string; instagram?: string };
 }
 
+export interface SocialPreview {
+  description?: LocalizedText;
+  image?: SanityImageAsset;
+}
+
 export interface MediaItem {
   _id: string;
   type: 'photo' | 'video';

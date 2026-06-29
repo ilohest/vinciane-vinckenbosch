@@ -1,5 +1,5 @@
 import { sanityClient } from './sanity';
-import type { Homepage, HeroEventTeaser, SiteSettings } from './types';
+import type { Homepage, HeroEventTeaser, SiteSettings, SocialPreview } from './types';
 import { sanityImageUrl, sanityImageSrcset, sanityDownloadUrl } from './sanity-image';
 
 type QueryClient = Pick<typeof sanityClient, 'fetch'>;
@@ -58,6 +58,10 @@ const HOMEPAGE_PROJECTION = `
   contactVideoUrl,
   "contactVideoThumbnail": contactVideoThumbnail { ${IMAGE_PROJECTION} },
   socialLinks
+`;
+const SOCIAL_PREVIEW_PROJECTION = `
+  description,
+  "image": image { ${IMAGE_PROJECTION} }
 `;
 
 /** Crédits photo par défaut (utilisés tant que Sanity n'est pas rempli) */
@@ -133,6 +137,34 @@ export async function getHomepagePreview(
     }
 
     return data;
+  } catch (error) {
+    if (options.throwOnError) throw error;
+    return null;
+  }
+}
+
+export async function getSocialPreview(
+  client: QueryClient = sanityClient,
+  options: QueryOptions = {},
+): Promise<SocialPreview | null> {
+  try {
+    return await client.fetch<SocialPreview | null>(
+      `*[_type == "socialPreview"][0]{${SOCIAL_PREVIEW_PROJECTION}}`
+    );
+  } catch (error) {
+    if (options.throwOnError) throw error;
+    return null;
+  }
+}
+
+export async function getSocialPreviewPreview(
+  client: QueryClient,
+  options: QueryOptions = {},
+): Promise<SocialPreview | null> {
+  try {
+    return await client.fetch<SocialPreview | null>(
+      `coalesce(*[_id == "drafts.socialPreview"][0], *[_id == "socialPreview"][0]){${SOCIAL_PREVIEW_PROJECTION}}`
+    );
   } catch (error) {
     if (options.throwOnError) throw error;
     return null;

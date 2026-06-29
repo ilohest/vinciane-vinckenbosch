@@ -1,7 +1,6 @@
 <template>
   <div class="biodl" :class="{ 'biodl--open': open }">
-    <!-- Bouton principal -->
-    <button
+        <button
       type="button"
       class="biodl__toggle"
       :aria-expanded="open"
@@ -10,8 +9,7 @@
       {{ label }}
     </button>
 
-    <!-- Choix de langue -->
-    <Transition name="biodl-list">
+        <Transition name="biodl-list">
       <ul v-if="open" class="biodl__langs" role="list">
         <li v-for="opt in available" :key="opt.code">
           <a
@@ -84,7 +82,6 @@ onUnmounted(() => {
   align-items: flex-start;
 }
 
-/* Bouton — même style que l'ancien CTA (Ortica uppercase + soulignement) */
 .biodl__toggle {
   display: inline-flex;
   align-items: center;
@@ -124,7 +121,6 @@ onUnmounted(() => {
   transform: none;
 }
 
-/* Liste des langues */
 .biodl__langs {
   list-style: none;
   display: flex;
@@ -148,7 +144,6 @@ onUnmounted(() => {
   color: #DA7F52;
 }
 
-/* Transition d'ouverture */
 .biodl-list-enter-active,
 .biodl-list-leave-active {
   transition: opacity 0.25s ease, transform 0.25s ease;

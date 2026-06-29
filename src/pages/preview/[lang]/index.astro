@@ -11,7 +11,7 @@ import BioDownload from '../../../components/vue/BioDownload.vue';
 import Footer from '../../../components/astro/Footer.astro';
 import type { Lang } from '../../../lib/types';
 import { createSanityPreviewClient } from '../../../lib/sanity';
-import { getAgendaEventsPreview, getHeroEventsPreview, getHomepagePreview } from '../../../lib/queries';
+import { getAgendaEventsPreview, getHeroEventsPreview, getHomepagePreview, getSocialPreviewPreview } from '../../../lib/queries';
 import { frenchTypo } from '../../../lib/typography';
 import { sanityImageCropSrcset, sanityImageCropUrl, sanityImageObjectPosition } from '../../../lib/sanity-image';
 
@@ -28,6 +28,7 @@ const previewClient = createSanityPreviewClient();
 const previewQueryOptions = { throwOnError: true };
 const heroEvents = await getHeroEventsPreview(lang, 3, previewClient, previewQueryOptions);
 const homepage = await getHomepagePreview(previewClient, previewQueryOptions);
+const socialPreview = await getSocialPreviewPreview(previewClient, previewQueryOptions);
 const agendaEvents = await getAgendaEventsPreview(lang, previewClient, previewQueryOptions);
 const visibleDraftCount = await previewClient.fetch<number>(
   `count(*[_id in path("drafts.**") || _id in path("versions.**")])`,
@@ -65,16 +66,23 @@ const quote2AttributionValue = homepage?.quote2Attribution;
 const quote2Attribution = typeof quote2AttributionValue === 'string'
   ? quote2AttributionValue
   : quote2AttributionValue?.[lang] || quote2AttributionValue?.fr || '(Wilfried Strehle, ancien alto solo du Berliner Philharmoniker)';
+
+const pageTitles = {
+  fr: 'Vinciane Vinckenbosch — Altiste belge',
+  en: 'Vinciane Vinckenbosch — Belgian Violist',
+  de: 'Vinciane Vinckenbosch — belgische Bratschistin',
+};
+const ogImage = socialPreview?.image
+  ? sanityImageCropUrl(socialPreview.image, 1200, 1200 / 630)
+  : undefined;
+const socialDescription = socialPreview?.description?.[lang]?.trim() ?? '';
 ---
 
 <BaseLayout
   lang={lang}
-  title={`Aperçu brouillon — ${{
-    fr: 'Vinciane Vinckenbosch — Altiste belge',
-    en: 'Vinciane Vinckenbosch — Belgian Violist',
-    de: 'Vinciane Vinckenbosch — belgische Bratschistin',
-  }[lang]}`}
-  description="Aperçu brouillon non publié."
+  title={`Aperçu brouillon — ${pageTitles[lang]}`}
+  description={socialDescription}
+  ogImage={ogImage ?? null}
   noindex
 >
   <div class="preview-banner" role="status">

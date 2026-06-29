@@ -1,14 +1,12 @@
 <template>
-  <!-- ── Navbar (desktop + mobile) ─────────────────────────── -->
-  <nav
+    <nav
     class="navbar"
     :class="{ 'navbar--hidden': isHidden }"
     aria-label="Navigation principale"
   >
     <div class="navbar__inner">
 
-      <!-- GAUCHE : nom = lien retour accueil, flip lettre par lettre -->
-      <a :href="`/${lang}`" class="navbar__brand" aria-label="Vinciane Vinckenbosch" @click="onBrandClick">
+            <a :href="`/${lang}`" class="navbar__brand" aria-label="Vinciane Vinckenbosch" @click="onBrandClick">
         <span class="flip-word" aria-hidden="true">
           <span
             v-for="(char, ci) in 'Vinciane Vinckenbosch'"
@@ -23,8 +21,7 @@
         <span class="sr-only">Vinciane Vinckenbosch</span>
       </a>
 
-      <!-- DROITE desktop : liens + langue + social -->
-      <div class="navbar__right">
+            <div class="navbar__right">
         <ul class="navbar__links" role="list">
           <li v-for="item in navItems" :key="item.key">
             <a
@@ -33,8 +30,7 @@
               :class="{ 'navbar__link--active': isActive(item) }"
               @click="onNavItemClick($event, item)"
             >
-              <!-- Flip lettre par lettre avec stagger -->
-              <span class="flip-word" aria-hidden="true">
+                            <span class="flip-word" aria-hidden="true">
                 <span
                   v-for="(char, ci) in item.label"
                   :key="ci"
@@ -84,8 +80,7 @@
         </a>
       </div>
 
-      <!-- DROITE mobile : hamburger 2 barres → croix -->
-      <button
+            <button
         class="hamburger"
         :class="{ 'hamburger--open': menuOpen }"
         @click="toggleMenu"
@@ -99,8 +94,7 @@
     </div>
   </nav>
 
-  <!-- ── Overlay mobile plein écran depuis le bas ────────────── -->
-  <Transition name="overlay">
+    <Transition name="overlay">
     <div
       v-if="menuOpen"
       class="mobile-menu"
@@ -198,11 +192,6 @@ function localeLangPath(l: 'fr' | 'en' | 'de'): string {
   return localizedPathFromPath(activePath.value, l);
 }
 
-/**
- * Détermine si un lien de nav est actif :
- * - Lien ancre (#agenda, #contact) → vrai si la section est visible
- * - Lien de page (/media, /presse…) → vrai si pathname correspond
- */
 function isActive(item: { href: string }): boolean {
   if (item.href.includes('#')) {
     const hash = item.href.split('#')[1];
@@ -213,10 +202,6 @@ function isActive(item: { href: string }): boolean {
   return activePath.value === itemPath || activePath.value.startsWith(itemPath + '/');
 }
 
-/**
- * Clic sur le logo : si on est déjà sur l'accueil, on annule la navigation
- * et on smooth scroll vers le haut. Sinon, navigation normale vers l'accueil.
- */
 function onBrandClick(e: MouseEvent) {
   if (isHomePage(activePath.value)) {
     e.preventDefault();
@@ -323,17 +308,13 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-/* ════════════════════════════════════════════════════════
-   NAVBAR — position EN HAUT
-════════════════════════════════════════════════════════ */
 .navbar {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   z-index: 50;
-  /* Cache vers le haut */
-  transform: translateY(0);
+    transform: translateY(0);
   transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -351,7 +332,6 @@ onUnmounted(() => {
   border-bottom: 1px solid rgba(35, 35, 35, 0.1);
 }
 
-/* ── Nom (gauche) ─────────────────────────────────────── */
 .navbar__brand {
   font-family: "Coconat", Georgia, serif;
   font-weight: 400;
@@ -364,7 +344,6 @@ onUnmounted(() => {
 }
 .navbar__brand:hover { opacity: 0.6; }
 
-/* ── Droite : liens + langue + social ─────────────────── */
 .navbar__right {
   display: flex;
   align-items: center;
@@ -408,17 +387,13 @@ onUnmounted(() => {
 .navbar__lang:hover, .navbar__lang--active { opacity: 1; }
 
 .navbar__social {
-  color: #DA7F52;   /* orange — cohérent avec mobile */
-  display: flex;
+  color: #DA7F52;     display: flex;
   align-items: center;
   opacity: 0.7;
   transition: opacity 0.2s ease;
 }
 .navbar__social:hover { opacity: 1; }
 
-/* ════════════════════════════════════════════════════════
-   HAMBURGER — mobile uniquement (2 barres → croix)
-════════════════════════════════════════════════════════ */
 .hamburger {
   display: none;
   flex-direction: column;
@@ -438,30 +413,22 @@ onUnmounted(() => {
   display: block;
   width: 28px;
   height: 1.5px;
-  background-color: #DA7F52; /* remplacé en noir via @media */
-  border-radius: 2px;
+  background-color: #DA7F52;   border-radius: 2px;
   transform-origin: center;
-  /* Transition légèrement plus longue pour bien voir l'effet */
-  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* Barre 1 → branche diagonale / */
 .hamburger--open .hamburger__bar:first-child {
   transform: translateY(5.25px) rotate(45deg);
 }
-/* Barre 2 → branche diagonale \ */
 .hamburger--open .hamburger__bar:last-child {
   transform: translateY(-5.25px) rotate(-45deg);
 }
 
-/* ════════════════════════════════════════════════════════
-   OVERLAY MOBILE — fond beige, texte orange, depuis le bas
-════════════════════════════════════════════════════════ */
 .mobile-menu {
   position: fixed;
   inset: 0;
-  z-index: 49;           /* derrière la navbar (z:50) */
-  background-color: #E6E3DB;
+  z-index: 49;             background-color: #E6E3DB;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -526,7 +493,6 @@ onUnmounted(() => {
 }
 .mobile-menu__social:hover { opacity: 1; }
 
-/* ── Transition overlay : slide depuis le haut (menu en haut) ── */
 .overlay-enter-active {
   transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
 }
@@ -538,21 +504,12 @@ onUnmounted(() => {
   transform: translateY(-100%);
 }
 
-/* ════════════════════════════════════════════════════════
-   MOBILE
-════════════════════════════════════════════════════════ */
-/* ════════════════════════════════════════════════════════
-   FLIP LETTRE PAR LETTRE — stagger via --i
-   Chaque caractère flip indépendamment avec un délai progressif
-════════════════════════════════════════════════════════ */
 
-/* Conteneur du mot : inline-flex pour que les chars se suivent */
 .flip-word {
   display: inline-flex;
   align-items: baseline;
 }
 
-/* Chaque caractère : overflow hidden, hauteur fixe */
 .flip-char {
   display: inline-block;
   overflow: hidden;
@@ -566,10 +523,8 @@ onUnmounted(() => {
   display: block;
   transition:
     transform 0.38s cubic-bezier(0.22, 1, 0.36, 1)
-    calc(var(--i, 0) * 28ms);  /* délai progressif par lettre */
-}
+    calc(var(--i, 0) * 28ms);  }
 
-/* Couche B : cachée en dessous */
 .flip-char__b {
   position: absolute;
   top: 0;
@@ -577,7 +532,6 @@ onUnmounted(() => {
   transform: translateY(105%);
 }
 
-/* Hover / actif : A monte, B entre — liens ET brand */
 .navbar__link:hover .flip-char__a,
 .navbar__link--active .flip-char__a,
 .navbar__brand:hover .flip-char__a,
@@ -598,7 +552,6 @@ onUnmounted(() => {
   transform: translateY(0);
 }
 
-/* Accessibilité : cache le texte dupliqué aux lecteurs d'écran */
 .sr-only {
   position: absolute;
   width: 1px;
@@ -612,17 +565,14 @@ onUnmounted(() => {
 }
 
 @media (max-width: 900px) {
-  /* Cacher les liens desktop, afficher le hamburger */
-  .navbar__right { display: none; }
+    .navbar__right { display: none; }
   .hamburger     { display: flex; }
 
-  /* Nom plus grand sur mobile */
-  .navbar__brand {
+    .navbar__brand {
     font-size: 1.5rem;
   }
 
-  /* Barres hamburger en noir */
-  .hamburger__bar {
+    .hamburger__bar {
     background-color: #232323;
   }
 }

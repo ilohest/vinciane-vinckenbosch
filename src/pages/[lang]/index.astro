@@ -9,7 +9,7 @@ import BioDownload from '../../components/vue/BioDownload.vue';
 import Footer from '../../components/astro/Footer.astro';
 import type { Lang } from '../../lib/types';
 import { LANGS } from '../../lib/i18n';
-import { getHeroEvents, getHomepage } from '../../lib/queries';
+import { getHeroEvents, getHomepage, getSocialPreview } from '../../lib/queries';
 import { frenchTypo } from '../../lib/typography';
 import { sanityImageCropSrcset, sanityImageCropUrl, sanityImageObjectPosition } from '../../lib/sanity-image';
 
@@ -20,14 +20,15 @@ export function getStaticPaths() {
 const { lang } = Astro.params as { lang: Lang };
 const heroEvents = await getHeroEvents(lang, 3);
 const homepage = await getHomepage();
+const socialPreview = await getSocialPreview();
 const finalImage = homepage?.finalImage || '/images/grilc-02660.jpg';
 const finalImageRatio = 1672 / 900;
 const finalImageSrc = sanityImageCropUrl(finalImage, 3200, finalImageRatio);
 const finalImageSrcset = sanityImageCropSrcset(finalImage, finalImageRatio);
 const finalImagePosition = sanityImageObjectPosition(finalImage);
-// Image de partage social (Open Graph) = photo hero, recadrée en 1200×630
-const ogImage = homepage?.heroImage?.url
-  ? sanityImageCropUrl(homepage.heroImage.url, 1200, 1200 / 630)
+// Image de partage social (Open Graph / Twitter), pilotée uniquement par le Studio.
+const ogImage = socialPreview?.image
+  ? sanityImageCropUrl(socialPreview.image, 1200, 1200 / 630)
   : undefined;
 // PDF de biographie par langue : Sanity en priorité, sinon fichiers locaux
 const bioPdfs = {
@@ -52,29 +53,21 @@ const quote2Attribution = typeof quote2AttributionValue === 'string'
   ? quote2AttributionValue
   : quote2AttributionValue?.[lang] || quote2AttributionValue?.fr || '(Wilfried Strehle, ancien alto solo du Berliner Philharmoniker)';
 
----
+const pageTitles = {
+  fr: 'Vinciane Vinckenbosch — Altiste belge',
+  en: 'Vinciane Vinckenbosch — Belgian Violist',
+  de: 'Vinciane Vinckenbosch — belgische Bratschistin',
+};
+const socialDescription = socialPreview?.description?.[lang]?.trim() ?? '';
 
-{(() => {
-  const titles = {
-    fr: 'Vinciane Vinckenbosch — Altiste belge',
-    en: 'Vinciane Vinckenbosch — Belgian Violist',
-    de: 'Vinciane Vinckenbosch — belgische Bratschistin',
-  };
-  const descs = {
-    fr: 'Vinciane Vinckenbosch, altiste belge. Co-solo de la Niederbayerische Philharmonie, soliste, chambriste, membre fondatrice du Trio Linaris. Saluée par la critique internationale pour la grande classe de son jeu.',
-    en: 'Vinciane Vinckenbosch, Belgian violist. Co-principal at the Niederbayerische Philharmonie, soloist, chamber musician, founding member of Trio Linaris. Acclaimed by international critics for the great class of her playing.',
-    de: 'Vinciane Vinckenbosch, belgische Bratschistin. Co-Solo der Niederbayerischen Philharmonie, Solistin, Kammermusikerin, Gründungsmitglied des Trio Linaris. Von der internationalen Kritik für ihre große Klasse gelobt.',
-  };
-  return null;
-})()}
+---
 
 <BaseLayout
   lang={lang}
-  title={{ fr: 'Vinciane Vinckenbosch — Altiste belge', en: 'Vinciane Vinckenbosch — Belgian Violist', de: 'Vinciane Vinckenbosch — belgische Bratschistin' }[lang]}
-  description={{ fr: 'Vinciane Vinckenbosch, altiste belge. Co-solo de la Niederbayerische Philharmonie, soliste, chambriste, membre fondatrice du Trio Linaris. Saluée par la critique internationale pour la grande classe de son jeu.', en: 'Vinciane Vinckenbosch, Belgian violist. Co-principal at the Niederbayerische Philharmonie, soloist, chamber musician, founding member of Trio Linaris. Acclaimed by international critics.', de: 'Vinciane Vinckenbosch, belgische Bratschistin. Co-Solo der Niederbayerischen Philharmonie, Solistin, Kammermusikerin, Gründungsmitglied des Trio Linaris.' }[lang]}
-  ogImage={ogImage}
+  title={pageTitles[lang]}
+  description={socialDescription}
+  ogImage={ogImage ?? null}
 >
-  <!-- Hero OUTSIDE main → enfant direct de body, zéro contrainte de conteneur -->
   <HeroSection
     lang={lang}
     heroEvents={heroEvents}
@@ -92,7 +85,6 @@ const quote2Attribution = typeof quote2AttributionValue === 'string'
         attribution={quote2Attribution}
         size="large"
       />
-      <!-- CTA — Télécharger la biographie (choix de langue) -->
       <div class="quote-cta-row">
         <BioDownload client:visible lang={lang} pdfs={bioPdfs} />
       </div>
@@ -129,12 +121,9 @@ const quote2Attribution = typeof quote2AttributionValue === 'string'
 }
 
 .page-section--padded {
-  /* Même padding horizontal que bio__wrap pour aligner les quotes */
   padding: clamp(4rem, 8vw, 8rem) clamp(1.5rem, 3.7vw, 4rem);
 }
 
-/* CTA télécharger biographie — sous la citation */
-/* Desktop : aligné à DROITE · Mobile : aligné à GAUCHE */
 .quote-cta-row {
   display: flex;
   justify-content: flex-end;
