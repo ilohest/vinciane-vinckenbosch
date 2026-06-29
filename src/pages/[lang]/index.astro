@@ -30,11 +30,11 @@ const finalImagePosition = sanityImageObjectPosition(finalImage);
 const ogImage = socialPreview?.image
   ? sanityImageCropUrl(socialPreview.image, 1200, 1200 / 630)
   : undefined;
-// PDF de biographie par langue : Sanity en priorité, sinon fichiers locaux
+// PDF de biographie par langue : uniquement ceux téléversés dans Sanity.
 const bioPdfs = {
-  fr: homepage?.biographyPdfs?.fr ?? '/pdfs/biographie-fr.pdf',
-  en: homepage?.biographyPdfs?.en ?? '/pdfs/biographie-en.pdf',
-  de: homepage?.biographyPdfs?.de ?? '/pdfs/biographie-de.pdf',
+  fr: homepage?.biographyPdfs?.fr,
+  en: homepage?.biographyPdfs?.en,
+  de: homepage?.biographyPdfs?.de,
 };
 
 const quote2Fallback = {
@@ -85,9 +85,11 @@ const socialDescription = socialPreview?.description?.[lang]?.trim() ?? '';
         attribution={quote2Attribution}
         size="large"
       />
-      <div class="quote-cta-row">
-        <BioDownload client:visible lang={lang} pdfs={bioPdfs} />
-      </div>
+      {bioPdfs[lang] && (
+        <div class="quote-cta-row">
+          <BioDownload client:visible lang={lang} pdfs={bioPdfs} />
+        </div>
+      )}
     </section>
 
     <AgendaSection lang={lang} />

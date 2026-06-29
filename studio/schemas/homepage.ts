@@ -240,7 +240,7 @@ export const homepage = defineType({
               type: "object",
               options: { columns: 3 },
               description:
-                "Si un PDF est ajouté, le nom devient un lien de téléchargement (le lien web ci-dessus est ignoré). Le site sert le PDF de la langue affichée, avec repli sur le français.",
+                "Si un PDF est ajouté dans au moins une langue, le lien web ci-dessus est ignoré. Le nom devient cliquable uniquement dans les langues qui ont leur propre PDF.",
               fields: [
                 {
                   name: "fr",
@@ -365,7 +365,7 @@ export const homepage = defineType({
       title: "PDF de la biographie (par langue)",
       group: "bio",
       description:
-        "Téléversez le PDF dans chaque langue. L'utilisateur choisit la langue au téléchargement.",
+        "Téléversez le PDF dans chaque langue. Le lien de téléchargement s'affiche uniquement dans les langues qui ont leur propre PDF.",
       type: "object",
       options: { columns: 3 },
       fields: [

@@ -46,9 +46,9 @@ const finalImageSrcset = sanityImageCropSrcset(finalImage, finalImageRatio);
 const finalImagePosition = sanityImageObjectPosition(finalImage);
 
 const bioPdfs = {
-  fr: homepage?.biographyPdfs?.fr ?? '/pdfs/biographie-fr.pdf',
-  en: homepage?.biographyPdfs?.en ?? '/pdfs/biographie-en.pdf',
-  de: homepage?.biographyPdfs?.de ?? '/pdfs/biographie-de.pdf',
+  fr: homepage?.biographyPdfs?.fr,
+  en: homepage?.biographyPdfs?.en,
+  de: homepage?.biographyPdfs?.de,
 };
 
 const quote2Fallback = {
@@ -108,9 +108,11 @@ const socialDescription = socialPreview?.description?.[lang]?.trim() ?? '';
         attribution={quote2Attribution}
         size="large"
       />
-      <div class="quote-cta-row">
-        <BioDownload client:visible lang={lang} pdfs={bioPdfs} />
-      </div>
+      {bioPdfs[lang] && (
+        <div class="quote-cta-row">
+          <BioDownload client:visible lang={lang} pdfs={bioPdfs} />
+        </div>
+      )}
     </section>
 
     <AgendaSection lang={lang} events={agendaEvents} />

@@ -74,13 +74,14 @@ const bacriParagraph = {
   },
 }[lang];
 
-// Liens éditables : un nom → un lien web OU un PDF (par langue, repli FR)
+// Liens éditables : un nom → un lien web OU un PDF disponible dans la langue affichée.
 const trioLinks = (homepage?.trioLinks ?? []).filter((l) => l?.label?.trim());
 const trioLinkMap = new Map<string, string>();
 for (const l of trioLinks) {
   const label = l.label!.trim();
-  const pdfHref = l.pdf?.[lang] || l.pdf?.fr || undefined;
-  const href = pdfHref || l.url?.trim();
+  const hasPdf = Boolean(l.pdf?.fr || l.pdf?.en || l.pdf?.de);
+  const pdfHref = l.pdf?.[lang];
+  const href = hasPdf ? pdfHref : l.url?.trim();
   if (href) trioLinkMap.set(label, href);
 }
 
@@ -493,9 +494,6 @@ pushTrioText(fullTrioText.slice(trioCursor));
 
 .bio__trio-accent {
   color: var(--color-accent);
-  text-decoration: underline;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 0.18em;
 }
 
 .bio__trio-link:not(.bio__trio-link--accent):hover {
@@ -619,6 +617,13 @@ pushTrioText(fullTrioText.slice(trioCursor));
   .bio__quote-text {
     font-size: 1.6rem;
     line-height: 1.08;
+    text-align: end;
+    text-indent: 0;
+  }
+
+  .bio__trio-text {
+    font-size: 1.65rem;
+    line-height: 1.1;
     text-align: end;
     text-indent: 0;
   }
