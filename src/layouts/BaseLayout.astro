@@ -243,24 +243,9 @@ const siteURL = Astro.site?.toString().replace(/\/$/, '') ?? 'https://www.vincia
         initCursor();
       }
 
-      function cleanDomComments() {
-        const walker = document.createTreeWalker(document.documentElement, NodeFilter.SHOW_COMMENT);
-        const comments = [];
-        let node = walker.nextNode();
-        while (node) {
-          comments.push(node);
-          node = walker.nextNode();
-        }
-        comments.forEach(comment => comment.parentNode?.removeChild(comment));
-      }
-
       initAll();
-      document.addEventListener('astro:hydrate', () => {
-        window.setTimeout(cleanDomComments, 0);
-      });
       window.addEventListener('load', () => {
         requestAnimationFrame(() => scrollToHashWithOffset());
-        window.setTimeout(cleanDomComments, 4000);
       }, { once: true });
     </script>
   </body>
