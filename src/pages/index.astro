@@ -1,4 +1,64 @@
 ---
-// Redirect root to /fr
-return Astro.redirect('/fr', 301);
+const destination = '/fr';
 ---
+
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="refresh" content={`0;url=${destination}`} />
+    <meta name="robots" content="noindex,follow" />
+    <link rel="canonical" href={destination} />
+    <title>Vinciane Vinckenbosch</title>
+    <script is:inline define:vars={{ destination }}>
+      window.location.replace(destination);
+    </script>
+    <style>
+      @font-face {
+        font-family: 'Coconat';
+        src: url('/fonts/Coconat-Regular.woff2') format('woff2');
+        font-display: swap;
+      }
+
+      html,
+      body {
+        margin: 0;
+        min-height: 100%;
+        background: #f7f3ed;
+        color: #1c1b19;
+      }
+
+      body {
+        display: grid;
+        min-height: 100vh;
+        place-items: center;
+        font-family: 'Coconat', Georgia, serif;
+      }
+
+      main {
+        opacity: 0.72;
+        text-align: center;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(1.5rem, 6vw, 3rem);
+        font-weight: 400;
+        letter-spacing: 0;
+      }
+
+      a {
+        color: inherit;
+        text-decoration-thickness: 0.06em;
+        text-underline-offset: 0.2em;
+      }
+    </style>
+  </head>
+  <body>
+    <main aria-label="Redirection vers la version française">
+      <h1>Vinciane Vinckenbosch</h1>
+      <p><a href={destination}>Entrer sur le site</a></p>
+    </main>
+  </body>
+</html>
