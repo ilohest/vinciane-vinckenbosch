@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import Analytics from '@vercel/analytics/astro';
 import NavBar from '../components/vue/NavBar.vue';
 import { LANGS, localePath } from '../lib/i18n';
 import type { Lang } from '../lib/types';
@@ -152,6 +153,7 @@ const siteURL = Astro.site?.toString().replace(/\/$/, '') ?? 'https://www.vincia
   <body>
     <slot />
     <NavBar client:idle lang={lang} currentPath={Astro.url.pathname} />
+    <Analytics />
 
     <div id="custom-cursor" aria-hidden="true">
       <svg viewBox="0 0 24 24">

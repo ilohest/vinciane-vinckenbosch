@@ -20,6 +20,7 @@
     "@sanity/locale-fr-fr": "^1.2.32",
     "@tailwindcss/vite": "^4.3.0",
     "@types/gsap": "^1.20.2",
+    "@vercel/analytics": "^1.6.1",
     "@vercel/speed-insights": "^2.0.0",
     "astro": "^6.4.2",
     "gsap": "^3.15.0",
