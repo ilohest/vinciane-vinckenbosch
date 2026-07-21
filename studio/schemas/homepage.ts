@@ -1,9 +1,19 @@
 import { defineField, defineType } from "sanity";
+import { HeroEventsInput } from "../components/HeroEventsInput";
 import { InfoNote } from "../components/InfoNote";
 import { isLooseUrl } from "./urlValidation";
 
 const MAX_HERO_VIDEO_SIZE_MB = 25;
 const MAX_HERO_VIDEO_SIZE_BYTES = MAX_HERO_VIDEO_SIZE_MB * 1024 * 1024;
+
+function todayIsoDate(): string {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Europe/Brussels",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date());
+}
 
 /** Champ texte localisé FR / EN / DE (type partagé `localeText`) */
 const loc = (
@@ -147,15 +157,62 @@ export const homepage = defineType({
       title: "Concerts affichés dans le hero",
       group: "hero",
       type: "array",
-      of: [{ type: "reference", to: [{ type: "event" }] }],
+      of: [
+        {
+          type: "reference",
+          to: [{ type: "event" }],
+          options: {
+            filter: () => ({
+              filter: "defined(date) && date >= $today",
+              params: { today: todayIsoDate() },
+            }),
+          },
+        },
+      ],
+      components: { input: HeroEventsInput },
       description:
-        "Sélectionnez jusqu'à 3 concerts. Si rien n'est sélectionné, les 3 prochains concerts sont affichés automatiquement.",
+        "Sélectionnez jusqu'à 3 concerts futurs. Les concerts passés ne s'affichent pas sur le site; le hero complète automatiquement avec les prochaines dates à venir.",
       validation: (R) =>
         R.max(3)
           .error(
             "Maximum 3 concerts. Supprimez-en un avant d'en ajouter un autre.",
           )
-          .unique(),
+          .unique()
+          .custom(
+            async (
+              value: Array<{ _ref?: string }> | undefined,
+              context: any,
+            ) => {
+              const refs = (value ?? [])
+                .map((event) => event?._ref)
+                .filter(Boolean);
+              if (refs.length === 0) return true;
+
+              const client = context.getClient({ apiVersion: "2024-01-01" }) as {
+                fetch: (
+                  query: string,
+                  params?: Record<string, unknown>,
+                ) => Promise<Array<{ date?: string; city?: string }>>;
+              };
+              const pastEvents = await client.fetch(
+                `*[_id in $refs && defined(date) && date < $today]{
+                  date,
+                  "city": coalesce(cityLocalized.fr, city)
+                }`,
+                { refs, today: todayIsoDate() },
+              );
+
+              if (pastEvents.length === 0) return true;
+
+              const labels = pastEvents
+                .map((event) =>
+                  [event.date, event.city].filter(Boolean).join(" — "),
+                )
+                .join(", ");
+
+              return `Retirez les concerts passés de cette sélection: ${labels}.`;
+            },
+          ),
     }),
 
     loc(

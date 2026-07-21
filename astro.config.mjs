@@ -19,6 +19,11 @@ export default defineConfig({
   integrations: [
     vue(),
     sitemap({
+      customPages: [
+        'https://www.vincianevinckenbosch.com/fr/',
+        'https://www.vincianevinckenbosch.com/en/',
+        'https://www.vincianevinckenbosch.com/de/',
+      ],
       filter: (page) => {
         const url = new URL(page);
         const segments = url.pathname.split('/').filter(Boolean);

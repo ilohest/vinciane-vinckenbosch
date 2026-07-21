@@ -1,4 +1,6 @@
 ---
+export const prerender = false;
+
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import HeroSection from '../../components/astro/HeroSection.astro';
 import QuoteBlock from '../../components/astro/QuoteBlock.astro';
@@ -13,11 +15,15 @@ import { getHeroEvents, getHomepage, getSocialPreview } from '../../lib/queries'
 import { frenchTypo } from '../../lib/typography';
 import { sanityImageCropSrcset, sanityImageCropUrl, sanityImageObjectPosition } from '../../lib/sanity-image';
 
-export function getStaticPaths() {
-  return LANGS.map(lang => ({ params: { lang } }));
+const langParam = Astro.params.lang;
+
+if (!LANGS.includes(langParam as Lang)) {
+  return new Response('Not found', { status: 404 });
 }
 
-const { lang } = Astro.params as { lang: Lang };
+Astro.response.headers.set('Cache-Control', 'no-store, max-age=0');
+
+const lang = langParam as Lang;
 const heroEvents = await getHeroEvents(lang, 3);
 const homepage = await getHomepage();
 const socialPreview = await getSocialPreview();

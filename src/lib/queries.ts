@@ -63,6 +63,13 @@ const SOCIAL_PREVIEW_PROJECTION = `
   description,
   "image": image { ${IMAGE_PROJECTION} }
 `;
+const EVENT_TEASER_PROJECTION = `
+  _id,
+  date,
+  city,
+  cityLocalized,
+  country
+`;
 
 /** Crédits photo par défaut (utilisés tant que Sanity n'est pas rempli) */
 export const DEFAULT_PHOTO_CREDITS: string[] = ['Andrej Grilc'];
@@ -172,7 +179,42 @@ export async function getSocialPreviewPreview(
 }
 
 function todayIsoDate(): string {
-  return new Date().toISOString().slice(0, 10);
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Europe/Brussels',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(new Date());
+}
+
+function isFutureHeroEvent(event: HeroEventTeaser, today: string): boolean {
+  return Boolean(event.date && event.city && event.country && event.date >= today);
+}
+
+function normalizeHeroEvents(
+  events: Array<HeroEventTeaser | null | undefined>,
+  lang: 'fr' | 'en' | 'de',
+  today: string,
+): HeroEventTeaser[] {
+  return events
+    .filter((event): event is HeroEventTeaser => Boolean(event))
+    .map((event) => localizeEventCity(event, lang))
+    .filter((event) => isFutureHeroEvent(event, today));
+}
+
+function uniqueHeroEvents(events: HeroEventTeaser[]): HeroEventTeaser[] {
+  const seen = new Set<string>();
+
+  return events.filter((event) => {
+    const key = event._id.replace(/^drafts\./, '');
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+function sortHeroEventsByDate(events: HeroEventTeaser[]): HeroEventTeaser[] {
+  return [...events].sort((a, b) => a.date.localeCompare(b.date));
 }
 
 export async function getHeroEvents(
@@ -182,40 +224,32 @@ export async function getHeroEvents(
   options: QueryOptions = {},
 ): Promise<HeroEventTeaser[]> {
   try {
+    const today = todayIsoDate();
     const homepage = await client.fetch<Pick<Homepage, 'heroEvents'> | null>(
       `*[_type == "homepage"][0]{
         heroEvents[]->{
-          _id,
-          date,
-          city,
-          cityLocalized,
-          country
+          ${EVENT_TEASER_PROJECTION}
         }
       }`
     );
 
-    const selectedEvents = (homepage?.heroEvents ?? [])
-      .filter((event): event is HeroEventTeaser => Boolean(event))
-      .map((event) => localizeEventCity(event, lang))
-      .filter((event) => event?.date && event?.city && event?.country);
-    if (selectedEvents.length > 0) {
-      return selectedEvents.slice(0, limit);
-    }
+    const selectedEvents = sortHeroEventsByDate(
+      normalizeHeroEvents(homepage?.heroEvents ?? [], lang, today),
+    );
+    if (selectedEvents.length >= limit) return selectedEvents.slice(0, limit);
 
-    // Sinon (liste vide) : les prochains concerts automatiquement
     const events = await client.fetch<HeroEventTeaser[]>(
       `*[_type == "event" && defined(date) && (defined(cityLocalized.fr) || defined(city)) && defined(country) && date >= $today]
         | order(date asc) [0...$limit]{
-          _id,
-          date,
-          city,
-          cityLocalized,
-          country
+          ${EVENT_TEASER_PROJECTION}
         }`,
-      { today: todayIsoDate(), limit }
+      { today, limit: limit + selectedEvents.length }
     );
 
-    return events.map((event) => localizeEventCity(event, lang));
+    return sortHeroEventsByDate(uniqueHeroEvents([
+      ...selectedEvents,
+      ...normalizeHeroEvents(events, lang, today),
+    ])).slice(0, limit);
   } catch (error) {
     if (options.throwOnError) throw error;
     return [];
@@ -229,14 +263,12 @@ export async function getHeroEventsPreview(
   options: QueryOptions = {},
 ): Promise<HeroEventTeaser[]> {
   try {
+    const today = todayIsoDate();
     const homepage = await getHomepagePreview(client, options);
-    const selectedEvents = (homepage?.heroEvents ?? [])
-      .filter((event): event is HeroEventTeaser => Boolean(event))
-      .map((event) => localizeEventCity(event, lang))
-      .filter((event) => event?.date && event?.city && event?.country);
-    if (selectedEvents.length > 0) {
-      return selectedEvents.slice(0, limit);
-    }
+    const selectedEvents = sortHeroEventsByDate(
+      normalizeHeroEvents(homepage?.heroEvents ?? [], lang, today),
+    );
+    if (selectedEvents.length >= limit) return selectedEvents.slice(0, limit);
 
     const events = await client.fetch<HeroEventTeaser[]>(
       `*[
@@ -247,16 +279,15 @@ export async function getHeroEventsPreview(
         && date >= $today
         && (_id in path("drafts.**") || !defined(*[_id == "drafts." + ^._id][0]._id))
       ] | order(date asc) [0...$limit]{
-        _id,
-        date,
-        city,
-        cityLocalized,
-        country
+        ${EVENT_TEASER_PROJECTION}
       }`,
-      { today: todayIsoDate(), limit }
+      { today, limit: limit + selectedEvents.length }
     );
 
-    return events.map((event) => localizeEventCity(event, lang));
+    return sortHeroEventsByDate(uniqueHeroEvents([
+      ...selectedEvents,
+      ...normalizeHeroEvents(events, lang, today),
+    ])).slice(0, limit);
   } catch (error) {
     if (options.throwOnError) throw error;
     return [];
