@@ -135,7 +135,7 @@ const siteURL = Astro.site?.toString().replace(/\/$/, '') ?? 'https://www.vincia
         "@type": "SearchAction",
         "target": {
           "@type": "EntryPoint",
-          "urlTemplate": `${siteURL}/fr/#agenda?q={search_term_string}`
+          "urlTemplate": `${siteURL}/fr#agenda?q={search_term_string}`
         },
         "query-input": "required name=search_term_string"
       }

@@ -5,7 +5,7 @@ import AgendaSectionVue from '../../components/vue/AgendaSection.vue';
 import MasonryGallery from '../../components/vue/MasonryGallery.vue';
 import type { Lang } from '../../lib/types';
 import { LANGS, useTranslations } from '../../lib/i18n';
-import { LEGACY_PAGE_SLUGS, PAGE_SLUGS, pageKeyFromSlug, pagePath, type PageKey } from '../../lib/routes';
+import { PAGE_SLUGS, pagePath, type PageKey } from '../../lib/routes';
 import {
   getAgendaEvents,
   getLegalNotice,
@@ -17,17 +17,12 @@ import {
 import { localizedSections } from '../../lib/portable-text';
 
 export function getStaticPaths() {
-  return LANGS.flatMap((lang) => {
-    const slugs = new Set([
-      ...Object.values(PAGE_SLUGS[lang]),
-      ...Object.values(LEGACY_PAGE_SLUGS),
-    ]);
-
-    return [...slugs].flatMap((slug) => {
-      const pageKey = pageKeyFromSlug(lang, slug);
-      return pageKey ? [{ params: { lang, slug }, props: { pageKey } }] : [];
-    });
-  });
+  return LANGS.flatMap((lang) =>
+    Object.entries(PAGE_SLUGS[lang]).map(([pageKey, slug]) => ({
+      params: { lang, slug },
+      props: { pageKey: pageKey as PageKey },
+    })),
+  );
 }
 
 const { lang } = Astro.params as { lang: Lang; slug: string };
@@ -271,7 +266,7 @@ const gallerySchema = pageKey === 'media' ? {
         showAllByDefault={true}
         hideArchivesLink={true}
         hideLinks={true}
-        backHref={`/${lang}/#agenda`}
+        backHref={`/${lang}#agenda`}
       />
     </main>
   )}

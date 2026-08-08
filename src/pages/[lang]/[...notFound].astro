@@ -1,12 +1,25 @@
 ---
 import NotFoundPage from '../../components/astro/NotFoundPage.astro';
 import { DEFAULT_LANG, LANGS } from '../../lib/i18n';
+import { LEGACY_PAGE_SLUGS, PAGE_SLUGS, pagePath, type PageKey } from '../../lib/routes';
 import type { Lang } from '../../lib/types';
 
 export const prerender = false;
 
 const requestedLang = Astro.params.lang as Lang | undefined;
-const lang = requestedLang && LANGS.includes(requestedLang) ? requestedLang : DEFAULT_LANG;
+const hasValidLang = Boolean(requestedLang && LANGS.includes(requestedLang));
+const lang: Lang = hasValidLang ? requestedLang as Lang : DEFAULT_LANG;
+const requestedSlug = Astro.params.notFound;
+
+if (hasValidLang && requestedSlug && !requestedSlug.includes('/')) {
+  const legacyPage = Object.entries(LEGACY_PAGE_SLUGS).find(
+    ([pageKey, slug]) => slug === requestedSlug && PAGE_SLUGS[lang][pageKey as PageKey] !== slug,
+  );
+
+  if (legacyPage) {
+    return Astro.redirect(pagePath(lang, legacyPage[0] as PageKey), 301);
+  }
+}
 
 Astro.response.status = 404;
 ---

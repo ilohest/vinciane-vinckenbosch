@@ -13,6 +13,7 @@ const CANONICAL_PAGE_SLUGS = {
 
 export default defineConfig({
   site: 'https://www.vincianevinckenbosch.com',
+  trailingSlash: 'never',
   // Site statique par défaut ; les routes serveur (ex: /api/contact)
   // déclarent `export const prerender = false` pour tourner en serverless.
   adapter: vercel(),
@@ -20,20 +21,21 @@ export default defineConfig({
     vue(),
     sitemap({
       customPages: [
-        'https://www.vincianevinckenbosch.com/fr/',
-        'https://www.vincianevinckenbosch.com/en/',
-        'https://www.vincianevinckenbosch.com/de/',
+        'https://www.vincianevinckenbosch.com/fr',
+        'https://www.vincianevinckenbosch.com/en',
+        'https://www.vincianevinckenbosch.com/de',
       ],
       filter: (page) => {
         const url = new URL(page);
         const segments = url.pathname.split('/').filter(Boolean);
-        if (segments.length <= 1) return true;
+        if (segments.length === 1) return ['fr', 'en', 'de'].includes(segments[0]);
+        if (segments.length !== 2) return false;
         const [lang, slug] = segments;
         return CANONICAL_PAGE_SLUGS[lang]?.includes(slug) ?? false;
       },
       serialize(item) {
         // Homepages : priorité maximale
-        if (/\/(fr|en|de)\/$/.test(item.url)) {
+        if (/\/(fr|en|de)$/.test(item.url)) {
           return { ...item, priority: 1.0, changefreq: 'weekly' };
         }
         // Pages contenu
