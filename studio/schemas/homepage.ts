@@ -157,6 +157,7 @@ export const homepage = defineType({
       title: "Concerts affichés dans le hero",
       group: "hero",
       type: "array",
+      options: { sortable: false },
       of: [
         {
           type: "reference",
@@ -171,7 +172,7 @@ export const homepage = defineType({
       ],
       components: { input: HeroEventsInput },
       description:
-        "Sélectionnez jusqu'à 3 concerts futurs. Les concerts passés ne s'affichent pas sur le site; le hero complète automatiquement avec les prochaines dates à venir.",
+        "Sélectionnez jusqu'à 3 concerts futurs. Si rien n'est sélectionné, les 3 prochaines dates sont affichées automatiquement. Les concerts passés ne s'affichent pas sur le site; le hero complète automatiquement avec les prochaines dates à venir.",
       validation: (R) =>
         R.max(3)
           .error(
