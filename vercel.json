@@ -5,5 +5,11 @@
       "destination": "/fr",
       "permanent": true
     }
+  ],
+  "rewrites": [
+    {
+      "source": "/:path",
+      "destination": "/fr/:path"
+    }
   ]
 }
