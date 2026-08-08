@@ -18,7 +18,7 @@ import { sanityImageCropSrcset, sanityImageCropUrl, sanityImageObjectPosition } 
 const langParam = Astro.params.lang;
 
 if (!LANGS.includes(langParam as Lang)) {
-  return Astro.rewrite('/404');
+  return Astro.rewrite('/not-found');
 }
 
 Astro.response.headers.set('Cache-Control', 'no-store, max-age=0');
