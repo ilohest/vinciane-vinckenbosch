@@ -64,12 +64,12 @@
           v-for="(event, idx) in visibleEvents"
           :key="`${event.date}-${event.city}`"
           class="event-wrap"
-          :class="{ 'event-wrap--linked': !!event.ticketUrl && !hideLinks }"
+          :class="{ 'event-wrap--linked': isActionable(event) }"
           :style="{ '--stagger': `${Math.max(0, idx - MAX + 1) * 60}ms` }"
         >
           <component
-            :is="event.ticketUrl && !hideLinks ? 'a' : 'div'"
-            :href="event.ticketUrl && !hideLinks ? event.ticketUrl : undefined"
+            :is="isActionable(event) ? 'a' : 'div'"
+            :href="actionHref(event)"
             :target="event.ticketUrl && !hideLinks ? '_blank' : undefined"
             :rel="
               event.ticketUrl && !hideLinks ? 'noopener noreferrer' : undefined
@@ -77,7 +77,7 @@
             class="event"
           >
             <div class="event__date-col">
-                            <time class="event__date">{{ event.date }}</time>
+              <time class="event__date">{{ event.date }}</time>
               <span v-if="event.time" class="event__time">{{
                 event.time
               }}</span>
@@ -94,46 +94,66 @@
             </ul>
           </component>
 
-                    <component
-            :is="event.ticketUrl && !hideLinks ? 'a' : 'div'"
-            :href="event.ticketUrl && !hideLinks ? event.ticketUrl : undefined"
+          <component
+            :is="isActionable(event) ? 'a' : 'div'"
+            :href="actionHref(event)"
             :target="event.ticketUrl && !hideLinks ? '_blank' : undefined"
             :rel="
               event.ticketUrl && !hideLinks ? 'noopener noreferrer' : undefined
             "
             class="event-line"
-            :class="{ 'event-line--linked': !!event.ticketUrl && !hideLinks }"
+            :class="{
+              'event-line--linked': isActionable(event),
+              'event-line--private': event.accessType === 'private' && !hideLinks,
+            }"
             :aria-label="
-              event.ticketUrl && !hideLinks
-                ? `Info — ${event.city}, ${event.venue}`
+              isActionable(event)
+                ? `${actionLabel(event)} — ${event.city}, ${event.venue}`
                 : undefined
             "
-            :aria-hidden="event.ticketUrl && !hideLinks ? undefined : true"
+            :aria-hidden="isActionable(event) ? undefined : true"
           >
             <div class="event-line__sweep"></div>
-            <span v-if="event.ticketUrl && !hideLinks" class="event-line__label"
-              >INFO</span
-            >
+            <span v-if="isActionable(event)" class="event-line__label">{{
+              actionLabel(event)
+            }}</span>
             <svg
-              v-if="event.ticketUrl && !hideLinks"
+              v-if="isActionable(event)"
               class="event-line__arrow"
               viewBox="0 0 24 24"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
             >
-              <path
-                d="M7 17L17 7"
-                stroke="currentColor"
-                stroke-width="1.5"
-                stroke-linecap="round"
-              />
-              <path
-                d="M9 7H17V15"
-                stroke="currentColor"
-                stroke-width="1.5"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
+              <template v-if="event.accessType === 'private'">
+                <path
+                  d="M5 12H19"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                />
+                <path
+                  d="M14 7L19 12L14 17"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </template>
+              <template v-else>
+                <path
+                  d="M7 17L17 7"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                />
+                <path
+                  d="M9 7H17V15"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </template>
             </svg>
           </component>
         </div>
@@ -181,6 +201,7 @@ interface Event {
   venue: string;
   role: string;
   program?: string[];
+  accessType?: "ticketing" | "private" | "none";
   ticketUrl?: string;
 }
 
@@ -209,6 +230,8 @@ const i18n = {
     noResults: "Aucun résultat pour",
     noEvents: "Aucun concert à venir.",
     noArchive: "Aucune archive disponible.",
+    contact: "Me contacter",
+    info: "Info",
   },
   en: {
     titleAgenda: "agenda",
@@ -220,6 +243,8 @@ const i18n = {
     noResults: "No results for",
     noEvents: "No upcoming concerts.",
     noArchive: "No archived concerts yet.",
+    contact: "Contact me",
+    info: "Info",
   },
   de: {
     titleAgenda: "Termine",
@@ -231,6 +256,8 @@ const i18n = {
     noResults: "Keine Ergebnisse für",
     noEvents: "Keine bevorstehenden Konzerte.",
     noArchive: "Noch keine archivierten Konzerte.",
+    contact: "Kontakt",
+    info: "Info",
   },
 } as const;
 
@@ -247,6 +274,24 @@ const emptyLabel = computed(() => {
   if (trimmedQuery) return `${t.value.noResults} « ${trimmedQuery} »`;
   return props.showPastOnly ? t.value.noArchive : t.value.noEvents;
 });
+
+function isActionable(event: Event): boolean {
+  return (
+    !props.hideLinks &&
+    (Boolean(event.ticketUrl) || event.accessType === "private")
+  );
+}
+
+function actionHref(event: Event): string | undefined {
+  if (!isActionable(event)) return undefined;
+  return event.accessType === "private"
+    ? `/${props.lang}#contact-title`
+    : event.ticketUrl;
+}
+
+function actionLabel(event: Event): string {
+  return event.accessType === "private" ? t.value.contact : t.value.info;
+}
 
 function parseEventDate(event: Event): Date {
   const parsed = new Date(`${event.dateIso}T00:00:00`);
@@ -571,6 +616,10 @@ a.event {
   width: calc(100% - 104px);
 }
 
+.event-wrap--linked:hover .event-line--private .event-line__sweep {
+  width: calc(100% - 160px);
+}
+
 .event-line__label {
   position: absolute;
   z-index: 2;
@@ -583,6 +632,8 @@ a.event {
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: #f7f5f3;
+  background-color: #232323;
+  padding: 0 0.5rem 0 0.875rem;
   white-space: nowrap;
   opacity: 0;
   transition:
@@ -703,7 +754,7 @@ a.event {
     transform: translateY(-50%);
   }
 
-    .event__city,
+  .event__city,
   .event__venue,
   .event__role,
   .event__program {

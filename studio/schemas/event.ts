@@ -146,11 +146,29 @@ export const event = defineType({
       initialValue: false,
     }),
     defineField({
+      name: "accessType",
+      title: "Accès au concert",
+      type: "string",
+      description:
+        "Choisissez ce que le site doit proposer aux visiteurs pour ce concert.",
+      initialValue: "ticketing",
+      options: {
+        layout: "radio",
+        list: [
+          { title: "Billetterie en ligne", value: "ticketing" },
+          { title: "Concert privé (renvoi vers Contact)", value: "private" },
+          { title: "Aucune information", value: "none" },
+        ],
+      },
+    }),
+    defineField({
       name: "ticketUrl",
       title: "Lien billetterie",
       type: "string",
       description:
         "Exemples acceptés : https://exemple.com ou www.exemple.com.",
+      hidden: ({ parent }) =>
+        parent?.accessType === "private" || parent?.accessType === "none",
       validation: (R) => R.custom(isLooseUrl),
     }),
   ],

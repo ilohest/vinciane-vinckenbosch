@@ -303,6 +303,7 @@ export interface AgendaEvent {
   venue: string;
   role: string;
   program?: string[];  // ["Œuvre — Compositeur", …]
+  accessType?: 'ticketing' | 'private' | 'none';
   ticketUrl?: string;
 }
 
@@ -350,6 +351,7 @@ interface RawSanityEvent {
   venue?: { fr?: string; en?: string; de?: string };
   role?: { fr?: string; en?: string; de?: string };
   program?: Array<{ composer?: string; piece?: { fr?: string; en?: string; de?: string } | string }>;
+  accessType?: 'ticketing' | 'private' | 'none';
   ticketUrl?: string;
 }
 
@@ -381,6 +383,7 @@ export async function getAgendaEvents(
       `*[_type == "event" && defined(date)] | order(date asc){
         date, time, city, cityLocalized, country, venue, role,
         program[]{ composer, piece },
+        accessType,
         ticketUrl
       }`
     );
@@ -404,7 +407,10 @@ export async function getAgendaEvents(
           return [piece, p.composer].filter(Boolean).join(' — ');
         })
         .filter(Boolean),
-      ticketUrl: normalizeExternalUrl(e.ticketUrl),
+      accessType: e.accessType,
+      ticketUrl: e.accessType === 'private' || e.accessType === 'none'
+        ? undefined
+        : normalizeExternalUrl(e.ticketUrl),
     }));
   } catch (error) {
     if (options.throwOnError) throw error;
@@ -426,6 +432,7 @@ export async function getAgendaEventsPreview(
       ] | order(date asc){
         date, time, city, cityLocalized, country, venue, role,
         program[]{ composer, piece },
+        accessType,
         ticketUrl
       }`
     );
@@ -449,7 +456,10 @@ export async function getAgendaEventsPreview(
           return [piece, p.composer].filter(Boolean).join(' — ');
         })
         .filter(Boolean),
-      ticketUrl: normalizeExternalUrl(e.ticketUrl),
+      accessType: e.accessType,
+      ticketUrl: e.accessType === 'private' || e.accessType === 'none'
+        ? undefined
+        : normalizeExternalUrl(e.ticketUrl),
     }));
   } catch (error) {
     if (options.throwOnError) throw error;
