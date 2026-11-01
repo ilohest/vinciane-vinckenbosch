@@ -10,7 +10,7 @@ const { quote, attribution, size = 'large' } = Astro.props;
 ---
 
 <blockquote class:list={['quote', `quote--${size}`]} >
-  <p class="quote__text" set:html={quote} />
+  <p class="quote__text">{quote}</p>
   {attribution && (
     <cite class="quote__attr">{attribution}</cite>
   )}

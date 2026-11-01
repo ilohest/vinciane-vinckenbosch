@@ -12,7 +12,6 @@ import Footer from '../../../components/astro/Footer.astro';
 import type { Lang } from '../../../lib/types';
 import { createSanityPreviewClient } from '../../../lib/sanity';
 import { getAgendaEventsPreview, getHeroEventsPreview, getHomepagePreview, getSocialPreviewPreview } from '../../../lib/queries';
-import { frenchTypo } from '../../../lib/typography';
 import { sanityImageCropSrcset, sanityImageCropUrl, sanityImageObjectPosition } from '../../../lib/sanity-image';
 
 const { lang } = Astro.params as { lang: Lang };
@@ -51,21 +50,11 @@ const bioPdfs = {
   de: homepage?.biographyPdfs?.de,
 };
 
-const quote2Fallback = {
-  fr: '« Une instrumentiste remarquable » et une « musicienne vivante et intéressante ».',
-  en: '« A remarkable instrumentalist » and a « lively and interesting musician ».',
-  de: '« Eine bemerkenswerte Instrumentalistin » und eine « lebendige und interessante Musikerin ».',
-};
-
-const quote2 = {
-  fr: frenchTypo(homepage?.quote2Text?.fr || quote2Fallback.fr),
-  en: frenchTypo(homepage?.quote2Text?.en || quote2Fallback.en),
-  de: frenchTypo(homepage?.quote2Text?.de || quote2Fallback.de),
-};
+const quote2 = homepage?.quote2Text?.[lang] ?? '';
 const quote2AttributionValue = homepage?.quote2Attribution;
 const quote2Attribution = typeof quote2AttributionValue === 'string'
   ? quote2AttributionValue
-  : quote2AttributionValue?.[lang] || quote2AttributionValue?.fr || '(Wilfried Strehle, ancien alto solo du Berliner Philharmoniker)';
+  : quote2AttributionValue?.[lang] ?? '';
 
 const pageTitles = {
   fr: 'Vinciane Vinckenbosch — Altiste belge',
@@ -103,11 +92,7 @@ const socialDescription = socialPreview?.description?.[lang]?.trim() ?? '';
     <BiographySection lang={lang} homepage={homepage} />
 
     <section class="page-section page-section--padded" data-reveal>
-      <QuoteBlock
-        quote={quote2[lang]}
-        attribution={quote2Attribution}
-        size="large"
-      />
+      {quote2 && <QuoteBlock quote={quote2} attribution={quote2Attribution} size="large" />}
       {bioPdfs[lang] && (
         <div class="quote-cta-row">
           <BioDownload client:visible lang={lang} pdfs={bioPdfs} />
