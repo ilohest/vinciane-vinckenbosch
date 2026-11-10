@@ -1,4 +1,4 @@
-import { localeString, localeText, localeBlock } from './locale';
+import { localeString, localeText, localeBlock, localeBioBlock } from './locale';
 import { homepage } from './homepage';
 import { event } from './event';
 import { mediaItem } from './mediaItem';
@@ -13,6 +13,7 @@ export const schemaTypes = [
   localeString,
   localeText,
   localeBlock,
+  localeBioBlock,
   // Documents
   homepage,
   event,

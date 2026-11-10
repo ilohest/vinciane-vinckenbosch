@@ -1,4 +1,9 @@
-import { defineType } from "sanity";
+import { defineArrayMember, defineField, defineType } from "sanity";
+import {
+  LegacyBioPortableTextInput,
+  OrangeMarkIcon,
+  OrangeMark,
+} from "../components/LegacyBioPortableTextInput";
 
 /**
  * Types de contenu localisés FR / EN / DE, partagés par tous les schémas.
@@ -132,5 +137,40 @@ export const localeBlock = defineType({
         },
       ],
     },
+  ],
+});
+
+/** Paragraphes biographiques avec une marque orange sélectionnable dans l'éditeur. */
+export const localeBioBlock = defineType({
+  name: "localeBioBlock",
+  title: "Paragraphe biographique localisé",
+  type: "object",
+  fields: [
+    ...(["fr", "en", "de"] as const).map((locale) =>
+      defineField({
+        name: locale,
+        title: locale === "fr" ? "🇫🇷 Français" : locale === "en" ? "🇬🇧 Anglais" : "🇩🇪 Allemand",
+        type: "array",
+        of: [
+          defineArrayMember({
+            type: "block",
+            styles: [{ title: "Normal", value: "normal" }],
+            lists: [],
+            marks: {
+              decorators: [
+                {
+                  title: "Orange",
+                  value: "accent",
+                  icon: OrangeMarkIcon,
+                  component: OrangeMark,
+                },
+              ],
+              annotations: [],
+            },
+          }),
+        ],
+        components: { input: LegacyBioPortableTextInput },
+      }),
+    ),
   ],
 });

@@ -12,6 +12,17 @@ export interface LocalizedText {
   de: string;
 }
 
+export interface BioTextBlock {
+  _type: string;
+  children?: Array<{ _type: string; text?: string; marks?: string[] }>;
+}
+
+export interface LocalizedBioText {
+  fr?: BioTextBlock[];
+  en?: BioTextBlock[];
+  de?: BioTextBlock[];
+}
+
 export interface SanityImageAsset {
   _type: 'image';
   asset: { _ref: string; url: string };
@@ -87,18 +98,27 @@ export interface Homepage {
   }[];
   // Mots de la phrase Trio à souligner en rouge (accent)
   trioAccentWords?: string[];
-
   // Paragraphes biographie
   bioParaOrchestre?: LocalizedText;
+  bioParaOrchestreRich?: LocalizedBioText;
   bioParaPrix?: LocalizedText;
+  bioParaPrixRich?: LocalizedBioText;
   bioParaFestivals?: LocalizedText;
+  bioParaFestivalsRich?: LocalizedBioText;
   bioParaSoliste?: LocalizedText;
+  bioParaSolisteRich?: LocalizedBioText;
   bioParaTonkuenstler?: LocalizedText;
+  bioParaTonkuenstlerRich?: LocalizedBioText;
   bioParaBacri?: LocalizedText;
+  bioParaBacriRich?: LocalizedBioText;
   bioParaFormationViolon?: LocalizedText;
+  bioParaFormationViolonRich?: LocalizedBioText;
   bioParaFormationAlto?: LocalizedText;
+  bioParaFormationAltoRich?: LocalizedBioText;
   bioParaMaitres?: LocalizedText;
+  bioParaMaitresRich?: LocalizedBioText;
   bioParaPedagogie?: LocalizedText;
+  bioParaPedagogieRich?: LocalizedBioText;
 
   // Contact
   contactGalleryImages?: SanityImageAsset[];

@@ -1,0 +1,52 @@
+---
+interface TextBlock {
+  _type: string;
+  children?: Array<{ _type: string; text?: string; marks?: string[] }>;
+}
+
+interface Props {
+  text: string;
+  richText?: TextBlock[];
+}
+
+const { text, richText } = Astro.props;
+---
+
+{richText !== undefined
+  ? richText.filter((block) => block._type === 'block').map((block) => (
+    <p class="bio__p">
+      {block.children?.map((child) => {
+        const marks = child.marks ?? [];
+        return marks.length
+          ? <span class:list={[
+              marks.includes('accent') && 'bio__accent',
+              marks.includes('strong') && 'bio__strong',
+              marks.includes('em') && 'bio__em',
+            ]}>{child.text}</span>
+          : child.text;
+      })}
+    </p>
+  ))
+  : text && <p class="bio__p">{text}</p>}
+
+<style>
+  .bio__p {
+    font-family: "Ortica Linear", Georgia, serif;
+    font-weight: 300;
+    font-size: clamp(0.9375rem, 1.5vw, 1.625rem);
+    color: #F7F5F3;
+    line-height: 1.55;
+  }
+
+  .bio__accent {
+    color: var(--color-accent);
+  }
+
+  .bio__strong {
+    font-weight: 700;
+  }
+
+  .bio__em {
+    font-style: italic;
+  }
+</style>

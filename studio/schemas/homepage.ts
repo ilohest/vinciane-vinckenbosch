@@ -1,4 +1,4 @@
-import { defineField, defineType } from "sanity";
+import { defineArrayMember, defineField, defineType } from "sanity";
 import { HeroEventsInput } from "../components/HeroEventsInput";
 import { InfoNote } from "../components/InfoNote";
 import { isLooseUrl } from "./urlValidation";
@@ -28,6 +28,19 @@ const loc = (
     group,
     description,
     type: "localeText",
+  });
+
+const legacyBioParagraph = (name: string, title: string) =>
+  defineField({ name, title, group: "bio", type: "localeText", hidden: true });
+
+const formattedBioParagraph = (name: string, title: string) =>
+  defineField({
+    name: `${name}Rich`,
+    title,
+    group: "bio",
+    type: "localeBioBlock",
+    description:
+      "Sélectionnez un passage dans le texte et choisissez « Orange » dans la barre d’outils pour le mettre en évidence.",
   });
 
 const helpNote = (
@@ -260,8 +273,10 @@ export const homepage = defineType({
         "Portrait vertical, affiché à gauche des paragraphes 1 et 2.",
     }),
 
-    loc("bioParaOrchestre", "Paragraphe 1", "bio"),
-    loc("bioParaPrix", "Paragraphe 2", "bio"),
+    legacyBioParagraph("bioParaOrchestre", "Paragraphe 1 — ancien texte"),
+    formattedBioParagraph("bioParaOrchestre", "Paragraphe 1"),
+    legacyBioParagraph("bioParaPrix", "Paragraphe 2 — ancien texte"),
+    formattedBioParagraph("bioParaPrix", "Paragraphe 2"),
 
     loc("bioTrioText", "Grand texte blanc", "bio"),
 
@@ -353,7 +368,7 @@ export const homepage = defineType({
       title: "Mots en rouge (grand texte blanc)",
       group: "bio",
       type: "array",
-      of: [{ type: "string" }],
+      of: [defineArrayMember({ type: "string" })],
       description:
         "Mots ou expressions de la phrase à mettre en avant en rouge (ex. « Trio Linaris »). Écrivez-les exactement comme dans le texte. Laissez vide pour aucun.",
     }),
@@ -387,12 +402,17 @@ export const homepage = defineType({
       description: "Portrait vertical, affiché à gauche des paragraphes 3 à 6.",
     }),
 
-    loc("bioParaFestivals", "Paragraphe 3", "bio"),
-    loc("bioParaSoliste", "Paragraphe 4", "bio"),
-    loc("bioParaTonkuenstler", "Paragraphe 5", "bio"),
-    loc("bioParaBacri", "Paragraphe 6", "bio"),
+    legacyBioParagraph("bioParaFestivals", "Paragraphe 3 — ancien texte"),
+    formattedBioParagraph("bioParaFestivals", "Paragraphe 3"),
+    legacyBioParagraph("bioParaSoliste", "Paragraphe 4 — ancien texte"),
+    formattedBioParagraph("bioParaSoliste", "Paragraphe 4"),
+    legacyBioParagraph("bioParaTonkuenstler", "Paragraphe 5 — ancien texte"),
+    formattedBioParagraph("bioParaTonkuenstler", "Paragraphe 5"),
+    legacyBioParagraph("bioParaBacri", "Paragraphe 6 — ancien texte"),
+    formattedBioParagraph("bioParaBacri", "Paragraphe 6"),
 
-    loc("bioParaFormationViolon", "Paragraphe 7", "bio"),
+    legacyBioParagraph("bioParaFormationViolon", "Paragraphe 7 — ancien texte"),
+    formattedBioParagraph("bioParaFormationViolon", "Paragraphe 7"),
 
     defineField({
       name: "bioFormationImage",
@@ -405,9 +425,12 @@ export const homepage = defineType({
         "Photo paysage affichée au-dessus des paragraphes 8-10 (colonne droite).",
     }),
 
-    loc("bioParaFormationAlto", "Paragraphe 8", "bio"),
-    loc("bioParaMaitres", "Paragraphe 9", "bio"),
-    loc("bioParaPedagogie", "Paragraphe 10", "bio"),
+    legacyBioParagraph("bioParaFormationAlto", "Paragraphe 8 — ancien texte"),
+    formattedBioParagraph("bioParaFormationAlto", "Paragraphe 8"),
+    legacyBioParagraph("bioParaMaitres", "Paragraphe 9 — ancien texte"),
+    formattedBioParagraph("bioParaMaitres", "Paragraphe 9"),
+    legacyBioParagraph("bioParaPedagogie", "Paragraphe 10 — ancien texte"),
+    formattedBioParagraph("bioParaPedagogie", "Paragraphe 10"),
 
     loc(
       "quote2Text",

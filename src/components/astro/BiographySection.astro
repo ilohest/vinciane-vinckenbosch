@@ -1,6 +1,7 @@
 ---
-import type { Homepage, Lang } from '../../lib/types';
+import type { Homepage, Lang, LocalizedBioText } from '../../lib/types';
 import { useTranslations } from '../../lib/i18n';
+import BioParagraph from './BioParagraph.astro';
 import { sanityImageCropSrcset, sanityImageCropUrl, sanityImageObjectPosition } from '../../lib/sanity-image';
 
 interface Props {
@@ -15,6 +16,8 @@ const bio = (field: keyof Homepage): string => {
   const v = homepage?.[field] as { fr?: string; en?: string; de?: string } | undefined;
   return v?.[lang] ?? '';
 };
+const bioRich = (field: keyof Homepage) =>
+  (homepage?.[field] as LocalizedBioText | undefined)?.[lang];
 
 // Les textes éditoriaux viennent de Sanity dans la langue de la page.
 const heroQuote = homepage?.heroQuote?.[lang] ?? '';
@@ -169,8 +172,8 @@ pushTrioText(fullTrioText.slice(trioCursor));
         </picture>
       </div>
       <div class="bio__text-col">
-        {bio('bioParaOrchestre') && <p class="bio__p">{bio('bioParaOrchestre')}</p>}
-        {bio('bioParaPrix') && <p class="bio__p">{bio('bioParaPrix')}</p>}
+        <BioParagraph text={bio('bioParaOrchestre')} richText={bioRich('bioParaOrchestreRich')} />
+        <BioParagraph text={bio('bioParaPrix')} richText={bioRich('bioParaPrixRich')} />
       </div>
     </div>
 
@@ -249,16 +252,16 @@ pushTrioText(fullTrioText.slice(trioCursor));
         </picture>
       </div>
       <div class="bio__text-col">
-        {bio('bioParaFestivals') && <p class="bio__p">{bio('bioParaFestivals')}</p>}
-        {bio('bioParaSoliste') && <p class="bio__p">{bio('bioParaSoliste')}</p>}
-        {bio('bioParaTonkuenstler') && <p class="bio__p">{bio('bioParaTonkuenstler')}</p>}
-        {bio('bioParaBacri') && <p class="bio__p">{bio('bioParaBacri')}</p>}
+        <BioParagraph text={bio('bioParaFestivals')} richText={bioRich('bioParaFestivalsRich')} />
+        <BioParagraph text={bio('bioParaSoliste')} richText={bioRich('bioParaSolisteRich')} />
+        <BioParagraph text={bio('bioParaTonkuenstler')} richText={bioRich('bioParaTonkuenstlerRich')} />
+        <BioParagraph text={bio('bioParaBacri')} richText={bioRich('bioParaBacriRich')} />
       </div>
     </div>
 
         <div class="bio__row bio__row--text-left" data-reveal>
       <div class="bio__text-col">
-        {bio('bioParaFormationViolon') && <p class="bio__p">{bio('bioParaFormationViolon')}</p>}
+        <BioParagraph text={bio('bioParaFormationViolon')} richText={bioRich('bioParaFormationViolonRich')} />
       </div>
       <div class="bio__right-col">
         <div class="bio__img-wrap bio__img-wrap--landscape">
@@ -278,9 +281,9 @@ pushTrioText(fullTrioText.slice(trioCursor));
           </picture>
         </div>
         <div class="bio__text-col">
-          {bio('bioParaFormationAlto') && <p class="bio__p">{bio('bioParaFormationAlto')}</p>}
-          {bio('bioParaMaitres') && <p class="bio__p">{bio('bioParaMaitres')}</p>}
-          {bio('bioParaPedagogie') && <p class="bio__p">{bio('bioParaPedagogie')}</p>}
+          <BioParagraph text={bio('bioParaFormationAlto')} richText={bioRich('bioParaFormationAltoRich')} />
+          <BioParagraph text={bio('bioParaMaitres')} richText={bioRich('bioParaMaitresRich')} />
+          <BioParagraph text={bio('bioParaPedagogie')} richText={bioRich('bioParaPedagogieRich')} />
         </div>
       </div>
     </div>
@@ -433,14 +436,6 @@ pushTrioText(fullTrioText.slice(trioCursor));
   display: flex;
   flex-direction: column;
   gap: var(--para-gap); }
-
-.bio__p {
-  font-family: "Ortica Linear", Georgia, serif;
-  font-weight: 300;
-    font-size: clamp(0.9375rem, 1.5vw, 1.625rem);
-  color: #F7F5F3;
-  line-height: 1.55;
-}
 
 .bio__trio-text {
   font-family: "Ortica Linear", Georgia, serif;
